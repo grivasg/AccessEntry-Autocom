@@ -33,12 +33,12 @@ const datatable = new DataTable('#tablaSolicitudes', {
             data: 'nombres_apellidos'
         },
         {
-            title: 'Puesto',
-            data: 'plaza'
+            title: 'Catalogo',
+            data: 'sol_cred_catalogo'
         },
         {
-            title: 'Dependencia',
-            data: 'dependencia'
+            title: 'Puesto',
+            data: 'puesto_dependencia'
         },
         {
             title: 'Correo',
@@ -49,15 +49,23 @@ const datatable = new DataTable('#tablaSolicitudes', {
             data: 'sol_cred_telefono'
         },
         {
-            title: 'Fecha de Solicitud',
-            data: 'sol_cred_fecha_solicitud'
+            title: 'Modulos para habilitar',
+            data: 'sol_cred_modulo'
+        },
+        {
+            title: 'Justificacion',
+            data: 'sol_cred_justificacion'
+        },
+        {
+            title: '¿Cuénta con Usuario y contraseña para AUTOCOM?',
+            data: 'sol_cred_usuario'
         },
         {
             title: 'Estado de Solicitud',
             data: 'estado_solicitud'
         },
         {
-            title: 'Acciones',
+            title: 'Modifique o Confirme Informacion',
             data: 'solicitud_id',
             searchable: false,
             orderable: false,
@@ -69,8 +77,11 @@ const datatable = new DataTable('#tablaSolicitudes', {
                 data-sol_cred_correo="${row.sol_cred_correo}"  
                 data-sol_cred_telefono="${row.sol_cred_telefono}" 
                 data-sol_cred_fecha_solicitud="${row.sol_cred_fecha_solicitud}" 
-                data-sol_cred_estado_solicitud="${row.sol_cred_estado_solicitud}"<i class='bi bi-pencil-square'></i>Modificar</button>
-                <button class='btn btn-danger eliminar' data-alumno_id="${data}">Eliminar</button>
+                data-sol_cred_modulo="${row.sol_cred_modulo}" 
+                data-sol_cred_justificacion="${row.sol_cred_justificacion}" 
+                data-sol_cred_usuario="${row.sol_cred_usuario}" 
+                data-sol_cred_estado_solicitud="${row.sol_cred_estado_solicitud}"><i class='bi bi-pencil-square'></i></button>
+                <button class='btn btn-success confirmar' data-solicitud_id="${data}"><i class="bi bi-check2-square"></i></button>
                 `
                 return html;
             }
@@ -125,6 +136,36 @@ const guardar = async (e) => {
     }
 }
 
+const traerDatos = (e) => {
+    const elemento = e.currentTarget.dataset;
+
+    formulario.solicitud_id.value = elemento.solicitud_id;
+    formulario.sol_cred_catalogo.value = elemento.sol_cred_catalogo;
+    formulario.sol_cred_correo.value = elemento.sol_cred_correo;
+    formulario.sol_cred_telefono.value = elemento.sol_cred_telefono;
+    formulario.sol_cred_fecha_solicitud.value = elemento.sol_cred_fecha_solicitud;
+    formulario.sol_cred_modulo.value = elemento.sol_cred_modulo;
+    formulario.sol_cred_justificacion.value = elemento.sol_cred_justificacion;
+    formulario.sol_cred_usuario.value = elemento.sol_cred_usuario;
+    tabla.parentElement.parentElement.style.display = 'none';
+    btnGuardar.parentElement.style.display = 'none';
+    btnGuardar.disabled = true;
+    btnModificar.parentElement.style.display = '';
+    btnModificar.disabled = false;
+    btnCancelar.parentElement.style.display = '';
+    btnCancelar.disabled = false;
+}
+
+const cancelar = () => {
+    tabla.parentElement.parentElement.style.display = ''
+    formulario.reset();
+    btnGuardar.parentElement.style.display = ''
+    btnGuardar.disabled = false
+    btnModificar.parentElement.style.display = 'none'
+    btnModificar.disabled = true
+    btnCancelar.parentElement.style.display = 'none'
+    btnCancelar.disabled = true
+}
 
 const buscar = async () => {
     try {
@@ -149,41 +190,13 @@ const buscar = async () => {
 }
 buscar();
 
-const traerDatos = (e) => {
-    const elemento = e.currentTarget.dataset
-
-    formulario.solicitud_id.value = elemento.solicitud_id;
-    formulario.sol_cred_catalogo.value = elemento.sol_cred_catalogo;
-    formulario.sol_cred_correo.value = elemento.sol_cred_correo;
-    formulario.sol_cred_telefono.value = elemento.sol_cred_telefono;
-    formulario.sol_cred_fecha_solicitud.value = elemento.sol_cred_fecha_solicitud;
-    tabla.parentElement.parentElement.style.display = 'none'
-
-    btnGuardar.parentElement.style.display = 'none'
-    btnGuardar.disabled = true
-    btnModificar.parentElement.style.display = ''
-    btnModificar.disabled = false
-    btnCancelar.parentElement.style.display = ''
-    btnCancelar.disabled = false
-}
-
-const cancelar = () => {
-    tabla.parentElement.parentElement.style.display = ''
-    formulario.reset();
-    btnGuardar.parentElement.style.display = ''
-    btnGuardar.disabled = false
-    btnModificar.parentElement.style.display = 'none'
-    btnModificar.disabled = true
-    btnCancelar.parentElement.style.display = 'none'
-    btnCancelar.disabled = true
-}
 
 const modificar = async (e) => {
     e.preventDefault();
 
     if (!validarFormulario(formulario)) {
         Swal.fire({
-            title: "Campos vacios",
+            title: "Campos vacíos",
             text: "Debe llenar todos los campos",
             icon: "info"
         });
@@ -220,7 +233,7 @@ const modificar = async (e) => {
     } catch (error) {
         console.log(error);
     }
-};
+}
 
 const eliminar = async (e) => {
     const solicitud_id = e.currentTarget.dataset.solicitud_id
@@ -274,5 +287,5 @@ const eliminar = async (e) => {
 formulario.addEventListener('submit', guardar)
 btnCancelar.addEventListener('click', cancelar)
 btnModificar.addEventListener('click', modificar)
-datatable.on('click', '.modificar', traerDatos)
+datatable.on('click', '.modificar', traerDatos);
 datatable.on('click', '.eliminar', eliminar)
