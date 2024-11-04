@@ -62,7 +62,14 @@ const datatable = new DataTable('#tablaSolicitudes', {
         },
         {
             title: 'Estado de Solicitud',
-            data: 'estado_solicitud'
+            data: 'estado_solicitud',
+            render: (data, type, row, meta) => {
+                return `
+                    <span>${data}</span>
+                    <button class="btn btn-success cambiar-estado" data-solicitud_id="${row.solicitud_id}">Verificar<i class="bi bi-person-check"></i>
+                    </button>
+                `;
+            }
         },
         {
             title: 'Acciones',
