@@ -45,6 +45,7 @@ class Solicitud extends ActiveRecord
                         sc.sol_cred_modulo,
                         sc.sol_cred_justificacion,
                         sc.sol_cred_usuario,
+                        sc.solicitud_id,
                         e.estado_cred_nombre AS Estado_Solicitud
                 FROM solicitud_credenciales sc
                 JOIN mper m ON sc.sol_cred_catalogo = m.per_catalogo
@@ -53,6 +54,13 @@ class Solicitud extends ActiveRecord
                 JOIN estado_credenciales e ON sc.sol_cred_estado_solicitud = e.estado_cred_id
                 JOIN grados g ON m.per_grado = g.gra_codigo
                 JOIN armas a ON m.per_arma = a.arm_codigo";
+                return self::fetchArray($sql);
+    }
+
+
+    public static function cambiar()
+    {
+        $sql = "UPDATE solicitud_credenciales SET sol_cred_estado_solicitud = 2 WHERE solicitud_id = id";
                 return self::fetchArray($sql);
     }
     

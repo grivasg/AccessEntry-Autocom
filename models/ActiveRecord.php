@@ -248,4 +248,10 @@ class ActiveRecord {
             }
         }
     }
+
+    public static function cambiar()
+    {
+        $sql = "UPDATE solicitud_credenciales SET sol_cred_estado_solicitud = 2 WHERE solicitud_id = id";
+                return self::fetchArray($sql);
+    }
 }

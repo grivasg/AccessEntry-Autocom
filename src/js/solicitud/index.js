@@ -65,7 +65,7 @@ const datatable = new DataTable('#tablaSolicitudes', {
             data: 'estado_solicitud'
         },
         {
-            title: 'Modifique o Confirme Informacion',
+            title: 'Acciones',
             data: 'solicitud_id',
             searchable: false,
             orderable: false,
@@ -81,7 +81,8 @@ const datatable = new DataTable('#tablaSolicitudes', {
                 data-sol_cred_justificacion="${row.sol_cred_justificacion}" 
                 data-sol_cred_usuario="${row.sol_cred_usuario}" 
                 data-sol_cred_estado_solicitud="${row.sol_cred_estado_solicitud}"><i class='bi bi-pencil-square'></i></button>
-                <button class='btn btn-success confirmar' data-solicitud_id="${data}"><i class="bi bi-check2-square"></i></button>
+                
+                <button class='btn btn-danger confirmar' data-solicitud_id="${data}"><i class="bi bi-trash3-fill"></i></i></button>
                 `
                 return html;
             }
@@ -203,6 +204,7 @@ const modificar = async (e) => {
         return;
     }
 
+
     try {
         const body = new FormData(formulario);
         const url = "/AccessEntry-Autocom/API/solicitud/modificar";
@@ -214,6 +216,7 @@ const modificar = async (e) => {
         const respuesta = await fetch(url, config);
         const data = await respuesta.json();
         const { codigo, mensaje, detalle } = data;
+        console.log('Respuesta de la API:', data);
         let icon = 'info';
         if (codigo == 1) {
             icon = 'success';
@@ -235,21 +238,19 @@ const modificar = async (e) => {
     }
 }
 
-const eliminar = async (e) => {
+const confirmar = async (e) => {
     const solicitud_id = e.currentTarget.dataset.solicitud_id
-
     let confirmacion = await Swal.fire({
         icon: 'question',
         title: 'Confirmacion',
-        text: '¿Esta seguro que desea eliminar este registro?',
+        text: '¿Está seguro que desea eliminar esta Solicitud?',
         showCancelButton: true,
-        confirmButtonText: 'Si, eliminar',
+        confirmButtonText: 'Si, Seguro',
         cancelButtonText: 'No, cancelar',
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#999902',
         // input: 'text'
     })
-    console.log(confirmacion);
     if (confirmacion.isConfirmed) {
         try {
             const body = new FormData()
@@ -259,7 +260,6 @@ const eliminar = async (e) => {
                 method: 'POST',
                 body
             }
-
             const respuesta = await fetch(url, config);
             const data = await respuesta.json();
             const { codigo, mensaje, detalle } = data;
@@ -281,11 +281,10 @@ const eliminar = async (e) => {
             console.log(error);
         }
     }
-
-}
+};
 
 formulario.addEventListener('submit', guardar)
 btnCancelar.addEventListener('click', cancelar)
 btnModificar.addEventListener('click', modificar)
 datatable.on('click', '.modificar', traerDatos);
-datatable.on('click', '.eliminar', eliminar)
+datatable.on('click', '.confirmar', confirmar)

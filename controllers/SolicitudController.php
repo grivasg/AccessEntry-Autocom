@@ -6,8 +6,10 @@ use Exception;
 use Model\Solicitud;
 use MVC\Router;
 
-class SolicitudController {
-    public static function index(Router $router){
+class SolicitudController
+{
+    public static function index(Router $router)
+    {
         $router->render('solicitud/index', []);
     }
 
@@ -57,23 +59,22 @@ class SolicitudController {
 
     public static function modificarAPI()
     {
-        $_POST['sol_cred_catalogo'] = htmlspecialchars($_POST['sol_cred_catalogo']);
         $id = filter_var($_POST['solicitud_id'], FILTER_SANITIZE_NUMBER_INT);
-        try {
 
+        try {
             $solicitud = Solicitud::find($id);
             $solicitud->sincronizar($_POST);
             $solicitud->actualizar();
             http_response_code(200);
             echo json_encode([
                 'codigo' => 1,
-                'mensaje' => 'Solicitud Modificada Exitosamente',
+                'mensaje' => 'Datos modificados exitosamente',
             ]);
         } catch (Exception $e) {
             http_response_code(500);
             echo json_encode([
                 'codigo' => 0,
-                'mensaje' => 'Error al Modificar Datos',
+                'mensaje' => 'Error al modificar los Datos',
                 'detalle' => $e->getMessage(),
             ]);
         }
@@ -91,13 +92,36 @@ class SolicitudController {
             http_response_code(200);
             echo json_encode([
                 'codigo' => 1,
-                'mensaje' => 'Solicitud Eliminado Exitosamente',
+                'mensaje' => 'Solicitud Eliminada Exitosamente',
             ]);
         } catch (Exception $e) {
             http_response_code(500);
             echo json_encode([
                 'codigo' => 0,
                 'mensaje' => 'Error al Eliminar Solicitud',
+                'detalle' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    public static function cambiarEstadoAPI()
+    {
+        $id = filter_var($_POST['solicitud_id'], FILTER_SANITIZE_NUMBER_INT);
+
+        try {
+            $solicitud = Solicitud::find($id);
+            $solicitud->cambiar();
+
+            http_response_code(200);
+            echo json_encode([
+                'codigo' => 1,
+                'mensaje' => 'Solicitud Generada Exitosamente',
+            ]);
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode([
+                'codigo' => 0,
+                'mensaje' => 'Error al Generar la Solicitud',
                 'detalle' => $e->getMessage(),
             ]);
         }
