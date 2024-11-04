@@ -56,12 +56,5 @@ class Solicitud extends ActiveRecord
                 JOIN armas a ON m.per_arma = a.arm_codigo";
                 return self::fetchArray($sql);
     }
-
-
-    public static function cambiar()
-    {
-        $sql = "UPDATE solicitud_credenciales SET sol_cred_estado_solicitud = 2 WHERE solicitud_id = id";
-                return self::fetchArray($sql);
-    }
     
 }

@@ -245,53 +245,49 @@ const modificar = async (e) => {
     }
 }
 
-const confirmar = async (e) => {
-    const solicitud_id = e.currentTarget.dataset.solicitud_id
-    let confirmacion = await Swal.fire({
-        icon: 'question',
-        title: 'Confirmacion',
-        text: '¿Está seguro que desea eliminar esta Solicitud?',
+const verificar = async (e) => {
+    const solicitud_id = e.currentTarget.dataset.solicitud_id;
+
+    // Confirmar la acción con el usuario
+    const confirmacion = await Swal.fire({
+        title: 'Confirmación',
+        text: '¿Está seguro de que desea verificar esta solicitud?',
+        icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'Si, Seguro',
-        cancelButtonText: 'No, cancelar',
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#999902',
-        // input: 'text'
-    })
+        confirmButtonText: 'Sí, verificar',
+        cancelButtonText: 'No, cancelar'
+    });
+
     if (confirmacion.isConfirmed) {
         try {
-            const body = new FormData()
-            body.append('solicitud_id', solicitud_id)
-            const url = "/AccessEntry-Autocom/API/solicitud/eliminar"
-            const config = {
-                method: 'POST',
-                body
-            }
+            const url = `/AccessEntry-Autocom/API/solicitud/verificar/${solicitud_id}`;
+            const config = { method: 'POST' };
             const respuesta = await fetch(url, config);
             const data = await respuesta.json();
-            const { codigo, mensaje, detalle } = data;
-            let icon = 'info'
-            if (codigo == 1) {
-                icon = 'success'
-                formulario.reset();
-                buscar();
-            } else {
-                icon = 'error'
-                console.log(detalle);
-            }
+            
+            const { codigo, mensaje } = data;
 
+            // Feedback al usuario con Toast
+            let icon = codigo === 1 ? 'success' : 'error';
             Toast.fire({
                 icon: icon,
                 title: mensaje
-            })
+            });
+
+            if (codigo === 1) {
+                // Si la solicitud fue verificada, actualizamos la tabla
+                buscar(); // Llamamos a la función buscar() para actualizar la DataTable
+            }
         } catch (error) {
-            console.log(error);
+            console.error('Error al verificar la solicitud:', error);
         }
     }
 };
 
-formulario.addEventListener('submit', guardar)
-btnCancelar.addEventListener('click', cancelar)
-btnModificar.addEventListener('click', modificar)
+
+
+formulario.addEventListener('submit', guardar);
+btnCancelar.addEventListener('click', cancelar);
+btnModificar.addEventListener('click', modificar);
 datatable.on('click', '.modificar', traerDatos);
-datatable.on('click', '.confirmar', confirmar)
+datatable.on('click', '.cambiar-estado', verificar);
