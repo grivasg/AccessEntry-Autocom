@@ -66,7 +66,7 @@ const datatable = new DataTable('#tablaSolicitudes', {
             render: (data, type, row, meta) => {
                 return `
                     <span>${data}</span>
-                    <button class="btn btn-success cambiar-estado" data-solicitud_id="${row.solicitud_id}">Verificar<i class="bi bi-person-check"></i>
+                    <button class="btn btn-success cambiar-estado" data-solicitud_id="${row.solicitud_id}">Verificar
                     </button>
                 `;
             }
@@ -89,7 +89,7 @@ const datatable = new DataTable('#tablaSolicitudes', {
                 data-sol_cred_usuario="${row.sol_cred_usuario}" 
                 data-sol_cred_estado_solicitud="${row.sol_cred_estado_solicitud}"><i class='bi bi-pencil-square'></i></button>
                 
-                <button class='btn btn-danger confirmar' data-solicitud_id="${data}"><i class="bi bi-trash3-fill"></i></i></button>
+                <button class='btn btn-danger eliminar' data-solicitud_id="${data}"><i class="bi bi-trash3-fill"></i></i></button>
                 `
                 return html;
             }
@@ -245,49 +245,53 @@ const modificar = async (e) => {
     }
 }
 
-const verificar = async (e) => {
-    const solicitud_id = e.currentTarget.dataset.solicitud_id;
-
-    // Confirmar la acción con el usuario
-    const confirmacion = await Swal.fire({
-        title: 'Confirmación',
-        text: '¿Está seguro de que desea verificar esta solicitud?',
-        icon: 'warning',
+const eliminar = async (e) => {
+    const solicitud_id = e.currentTarget.dataset.solicitud_id
+    let confirmacion = await Swal.fire({
+        icon: 'question',
+        title: 'Confirmacion',
+        text: '¿Está seguro que desea eliminar esta Solicitud?',
         showCancelButton: true,
-        confirmButtonText: 'Sí, verificar',
-        cancelButtonText: 'No, cancelar'
-    });
-
+        confirmButtonText: 'Si, Seguro',
+        cancelButtonText: 'No, cancelar',
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#999902',
+        // input: 'text'
+    })
     if (confirmacion.isConfirmed) {
         try {
-            const url = `/AccessEntry-Autocom/API/solicitud/verificar/${solicitud_id}`;
-            const config = { method: 'POST' };
+            const body = new FormData()
+            body.append('solicitud_id', solicitud_id)
+            const url = "/AccessEntry-Autocom/API/solicitud/eliminar"
+            const config = {
+                method: 'POST',
+                body
+            }
             const respuesta = await fetch(url, config);
             const data = await respuesta.json();
-            
-            const { codigo, mensaje } = data;
+            const { codigo, mensaje, detalle } = data;
+            let icon = 'info'
+            if (codigo == 1) {
+                icon = 'success'
+                formulario.reset();
+                buscar();
+            } else {
+                icon = 'error'
+                console.log(detalle);
+            }
 
-            // Feedback al usuario con Toast
-            let icon = codigo === 1 ? 'success' : 'error';
             Toast.fire({
                 icon: icon,
                 title: mensaje
-            });
-
-            if (codigo === 1) {
-                // Si la solicitud fue verificada, actualizamos la tabla
-                buscar(); // Llamamos a la función buscar() para actualizar la DataTable
-            }
+            })
         } catch (error) {
-            console.error('Error al verificar la solicitud:', error);
+            console.log(error);
         }
     }
 };
 
-
-
-formulario.addEventListener('submit', guardar);
-btnCancelar.addEventListener('click', cancelar);
-btnModificar.addEventListener('click', modificar);
+formulario.addEventListener('submit', guardar)
+btnCancelar.addEventListener('click', cancelar)
+btnModificar.addEventListener('click', modificar)
 datatable.on('click', '.modificar', traerDatos);
-datatable.on('click', '.cambiar-estado', verificar);
+datatable.on('click', '.eliminar', eliminar)

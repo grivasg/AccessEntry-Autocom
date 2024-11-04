@@ -105,55 +105,39 @@ class SolicitudController
     }
 
     public static function verificarAPI($id) {
-        try {
-            // Buscar la solicitud por ID
-            $solicitud = Solicitud::find($id);
-            
-            // Verificar si la solicitud existe
-            if (!$solicitud) {
-                http_response_code(404);
-                echo json_encode([
-                    'codigo' => 0,
-                    'mensaje' => 'Solicitud no encontrada.',
-                ]);
-                return;
-            }
-    
-            // Verificar si la solicitud tiene el estado correcto para ser verificada
-            if ($solicitud->sol_cred_estado_solicitud == 1) { // 1 = "Pendiente de Verificación"
-                // Cambiar el estado de la solicitud a "Solicitud Enviada" (estado 2)
-                $sql = "UPDATE solicitud_credenciales 
-                        SET sol_cred_estado_solicitud = 2 
-                        WHERE solicitud_id = :id";
-                $stmt = self::$db->prepare($sql);
-                $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-                $stmt->execute();
-    
-                // Respuesta exitosa
-                http_response_code(200);
-                echo json_encode([
-                    'codigo' => 1,
-                    'mensaje' => 'Solicitud verificada y estado cambiado a "Solicitud Enviada".',
-                ]);
-            } else {
-                // Si la solicitud ya no está en el estado "Pendiente de Verificación", devuelve un error
-                http_response_code(400);
-                echo json_encode([
-                    'codigo' => 0,
-                    'mensaje' => 'La solicitud no está en el estado correcto para ser verificada.',
-                ]);
-            }
-        } catch (Exception $e) {
-            // Error al intentar cambiar el estado
-            http_response_code(500);
+    try {
+        // Buscar la solicitud por ID
+        $solicitud = Solicitud::find($id);
+
+        // Verificar si la solicitud tiene el estado correcto para ser verificada
+        if ($solicitud->sol_cred_estado_solicitud == 1) {
+            // Cambiar el estado de la solicitud a "Solicitud Enviada" (estado 2)
+            $solicitud->sol_cred_estado_solicitud = 2; // "Solicitud Enviada"
+            $solicitud->actualizar(); // Método para actualizar la solicitud en la base de datos
+
+            // Respuesta exitosa
+            http_response_code(200);
+            echo json_encode([
+                'codigo' => 1,
+                'mensaje' => 'Solicitud verificada y estado cambiado a "Solicitud Enviada".',
+            ]);
+        } else {
+            // Si la solicitud ya no está en el estado "Pendiente de Verificación", devuelve un error
+            http_response_code(400);
             echo json_encode([
                 'codigo' => 0,
-                'mensaje' => 'Error al verificar la solicitud',
-                'detalle' => $e->getMessage(),
+                'mensaje' => 'La solicitud no está en el estado correcto para ser verificada.',
             ]);
         }
+    } catch (Exception $e) {
+        // Error al intentar cambiar el estado
+        http_response_code(500);
+        echo json_encode([
+            'codigo' => 0,
+            'mensaje' => 'Error al verificar la solicitud',
+            'detalle' => $e->getMessage(),
+        ]);
     }
-    
-    
+}
 
 };
