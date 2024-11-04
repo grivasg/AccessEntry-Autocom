@@ -6,7 +6,7 @@
     <script src="build/js/app.js"></script>
     <link rel="shortcut icon" href="<?= asset('images/cit.png') ?>" type="image/x-icon">
     <link rel="stylesheet" href="<?= asset('build/styles.css') ?>">
-    <title>DemoApp</title>
+    <title>ACCESS ENTRY AUTOCOM</title>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark  bg-dark">
@@ -36,9 +36,7 @@
                             <li>
                                 <a class="dropdown-item nav-link text-white " href="/aplicaciones/nueva"><i class="ms-lg-0 ms-2 bi bi-plus-circle me-2"></i>Subitem</a>
                             </li>
-                        
-                    
-                        
+                                               
                         </ul>
                     </div> 
 
@@ -56,11 +54,11 @@
     <div class="progress fixed-bottom" style="height: 6px;">
         <div class="progress-bar progress-bar-animated bg-danger" id="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
     </div>
-    <div class="container-fluid pt-5 mb-4" style="min-height: 85vh">
-        
-        <?php echo $contenido; ?>
-    </div>
     <div class="container-fluid " >
+        <div class="container-fluid pt-5 mb-4" style="min-height: 85vh">
+            
+            <?php echo $contenido; ?>
+        </div>
         <div class="row justify-content-center text-center">
             <div class="col-12">
                 <p style="font-size:xx-small; font-weight: bold;">
