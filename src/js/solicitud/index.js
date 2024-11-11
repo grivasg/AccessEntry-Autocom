@@ -66,7 +66,7 @@ const datatable = new DataTable('#tablaSolicitudes', {
             render: (data, type, row, meta) => {
                 return `
                     <span>${data}</span>
-                    <button class="btn btn-success cambiar-estado" data-solicitud_id="${row.solicitud_id}">Verificar
+                    <button class="btn btn-success verificar" data-solicitud_id="${row.solicitud_id}">Verificar
                     </button>
                 `;
             }
@@ -290,8 +290,60 @@ const eliminar = async (e) => {
     }
 };
 
+const verificar = async (e) => {
+    let confirmacion = await Swal.fire({
+        icon: 'question',
+        title: 'Confirmacion',
+        text: 'Esta accion es Irreversible, ¿Desea Enviar la Solicitud?',
+        showCancelButton: true,
+        confirmButtonText: 'Si, Enviar',
+        cancelButtonText: 'No, cancelar',
+        confirmButtonColor: '#018f1b',
+        cancelButtonColor: '#cc0606',
+        // input: 'text'
+    })
+    if (confirmacion.isConfirmed) {
+        try {
+            alert("¡Datos Enviados!");
+            const body = new FormData(formulario);
+            const url = "/AccessEntry-Autocom/API/solicitud/verificar";
+            const config = {
+                method: 'POST',
+                body
+            };
+
+            const respuesta = await fetch(url, config);
+            const data = await respuesta.json();
+            const { codigo, mensaje, detalle } = data;
+            console.log('Respuesta de la API:', data);
+            let icon = 'info';
+            if (codigo == 1) {
+                icon = 'success';
+                formulario.reset();
+                buscar();
+                cancelar();
+            } else {
+                icon = 'error';
+                console.log(detalle);
+            }
+
+            Toast.fire({
+                icon: icon,
+                title: mensaje
+            });
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+};
+
+
+
+
 formulario.addEventListener('submit', guardar)
 btnCancelar.addEventListener('click', cancelar)
 btnModificar.addEventListener('click', modificar)
 datatable.on('click', '.modificar', traerDatos);
 datatable.on('click', '.eliminar', eliminar)
+datatable.on('click', '.verificar', verificar)

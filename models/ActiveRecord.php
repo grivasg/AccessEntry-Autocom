@@ -249,4 +249,34 @@ class ActiveRecord {
         }
     }
 
+    public function verificacion($campo, $valorNuevo) {
+        // Sanitizar el campo y el nuevo valor
+        $campo = strtolower($campo); // Asegurarse de que el campo esté en minúsculas (por convención)
+        $valorNuevo = self::$db->quote($valorNuevo); // Sanitizar el nuevo valor para evitar inyecciones SQL
+    
+        // Obtener el ID de la tabla o usar 'id' por defecto
+        $id = static::$idTabla ?? 'id';
+    
+        // Crear la consulta UPDATE
+        $query = "UPDATE " . static::$tabla . " SET {$campo} = {$valorNuevo} ";
+    
+        // Asegurarse de que solo actualizamos el registro correspondiente
+        $query .= " WHERE {$id} = :id";
+    
+        // Preparar la consulta
+        $stmt = self::$db->prepare($query);
+    
+        // Vincular el parámetro de ID
+        $stmt->bindParam(':id', $this->$id, PDO::PARAM_INT);
+    
+        // Ejecutar la consulta
+        $resultado = $stmt->execute();
+    
+        // Retornar el resultado
+        return [
+            'resultado' => $resultado,
+        ];
+    }
+    
+
 };

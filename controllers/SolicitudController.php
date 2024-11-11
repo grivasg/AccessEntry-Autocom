@@ -104,40 +104,26 @@ class SolicitudController
         }
     }
 
-    public static function verificarAPI($id) {
-    try {
-        // Buscar la solicitud por ID
-        $solicitud = Solicitud::find($id);
+    public static function verificarAPI()
+    {
+        $id = filter_var($_POST['solicitud_id'], FILTER_SANITIZE_NUMBER_INT);
 
-        // Verificar si la solicitud tiene el estado correcto para ser verificada
-        if ($solicitud->sol_cred_estado_solicitud == 1) {
-            // Cambiar el estado de la solicitud a "Solicitud Enviada" (estado 2)
-            $solicitud->sol_cred_estado_solicitud = 2; // "Solicitud Enviada"
-            $solicitud->actualizar(); // Método para actualizar la solicitud en la base de datos
-
-            // Respuesta exitosa
+        try {
+            $solicitud = Solicitud::find($id);
+            $solicitud->sincronizar($_POST);
+            $solicitud->verificacion();
             http_response_code(200);
             echo json_encode([
                 'codigo' => 1,
-                'mensaje' => 'Solicitud verificada y estado cambiado a "Solicitud Enviada".',
+                'mensaje' => 'Solicitud Enviada',
             ]);
-        } else {
-            // Si la solicitud ya no está en el estado "Pendiente de Verificación", devuelve un error
-            http_response_code(400);
+        } catch (Exception $e) {
+            http_response_code(500);
             echo json_encode([
                 'codigo' => 0,
-                'mensaje' => 'La solicitud no está en el estado correcto para ser verificada.',
+                'mensaje' => 'Error al Enviar la Solicitud',
+                'detalle' => $e->getMessage(),
             ]);
         }
-    } catch (Exception $e) {
-        // Error al intentar cambiar el estado
-        http_response_code(500);
-        echo json_encode([
-            'codigo' => 0,
-            'mensaje' => 'Error al verificar la solicitud',
-            'detalle' => $e->getMessage(),
-        ]);
     }
-}
-
 };
