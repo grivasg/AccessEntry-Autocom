@@ -104,22 +104,37 @@ class SolicitudController
         }
     }
 
+
     public static function verificarAPI()
     {
+        $id = filter_var($_POST['solicitud_id'], FILTER_SANITIZE_NUMBER_INT);
+        
+
         try {
-            $solicitudes = Solicitud::obtenerSolicitudes1();
+            // Buscar la solicitud por ID
+            $solicitud = Solicitud::find($id);
+
+            // Verificamos si la solicitud existe
+            if (!$solicitud) {
+                throw new Exception("Solicitud no encontrada.");
+            }
+
+            // Cambiamos el estado de la solicitud a "verificada" o el valor que corresponda
+            $solicitud->sol_cred_estado_solicitud = 2; // O el estado que corresponda para "verificada"
+
+            // Actualizamos la solicitud en la base de datos
+            $solicitud->actualizar();
+
             http_response_code(200);
             echo json_encode([
                 'codigo' => 1,
-                'mensaje' => 'Datos encontrados',
-                'detalle' => '',
-                'datos' => $solicitudes
+                'mensaje' => 'Solicitud verificada exitosamente',
             ]);
         } catch (Exception $e) {
             http_response_code(500);
             echo json_encode([
                 'codigo' => 0,
-                'mensaje' => 'Error al buscar Solicitudes',
+                'mensaje' => 'Error al verificar solicitud',
                 'detalle' => $e->getMessage(),
             ]);
         }

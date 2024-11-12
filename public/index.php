@@ -17,6 +17,7 @@ $router->post('/API/solicitud/guardar', [SolicitudController::class, 'guardarAPI
 $router->post('/API/solicitud/modificar', [SolicitudController::class, 'modificarAPI']); // Modificar solicitud existente
 $router->post('/API/solicitud/eliminar', [SolicitudController::class, 'eliminarAPI']); // Eliminar solicitud
 $router->post('API/solicitud/verificar', [SolicitudController::class, 'verificarAPI']);
+$router->post('/API/solicitud/verificar', [SolicitudController::class, 'verificarAPI']);
 
 
 // Comprueba y valida las rutas, que existan y les asigna las funciones del Controlador

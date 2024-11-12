@@ -62,22 +62,7 @@ const datatable = new DataTable('#tablaSolicitudes', {
         },
         {
             title: 'Estado de Solicitud',
-            data: 'estado_solicitud',
-            render: (data, type, row, meta) => {
-                let html = `
-                <button class='btn btn-success verificar' 
-                data-solicitud_id="${data}" 
-                data-sol_cred_catalogo="${row.sol_cred_catalogo}" 
-                data-sol_cred_correo="${row.sol_cred_correo}"  
-                data-sol_cred_telefono="${row.sol_cred_telefono}" 
-                data-sol_cred_fecha_solicitud="${row.sol_cred_fecha_solicitud}" 
-                data-sol_cred_modulo="${row.sol_cred_modulo}" 
-                data-sol_cred_justificacion="${row.sol_cred_justificacion}" 
-                data-sol_cred_usuario="${row.sol_cred_usuario}" 
-                data-sol_cred_estado_solicitud="${row.sol_cred_estado_solicitud}"><i class='bi bi-pencil-square'></i>VERIFICAR</button>
-                `
-                return html;
-            }
+            data: 'estado_solicitud'
         },
         {
             title: 'Acciones',
@@ -98,6 +83,9 @@ const datatable = new DataTable('#tablaSolicitudes', {
                 data-sol_cred_estado_solicitud="${row.sol_cred_estado_solicitud}"><i class='bi bi-pencil-square'></i></button>
                 
                 <button class='btn btn-danger eliminar' data-solicitud_id="${data}"><i class="bi bi-trash3-fill"></i></i></button>
+                <button class='btn btn-success verificar' 
+                data-solicitud_id="${data}" 
+                data-sol_cred_estado_solicitud="${row.sol_cred_estado_solicitud}"><i class='bi bi-pencil-square'></i>VERIFICAR</button>
                 `
                 return html;
             }
@@ -300,6 +288,9 @@ const eliminar = async (e) => {
 
 const verificar = async (e) => {
     e.preventDefault();
+    const elemento = e.currentTarget.dataset;
+    const solicitud_id = elemento.solicitud_id;
+    // Confirmar acción de verificación
     let confirmacion = await Swal.fire({
         icon: 'question',
         title: 'Confirmacion',
@@ -309,20 +300,41 @@ const verificar = async (e) => {
         cancelButtonText: 'No, cancelar',
         confirmButtonColor: '#d33',
         cancelButtonColor: '#999902',
-        // input: 'text'
-    })
+    });
+
     if (confirmacion.isConfirmed) {
         try {
-            alert('Hola tu');
-            
-        } catch (error) {
+            // Enviar solicitud de verificación a la API
+            const body = new FormData();
+            body.append('solicitud_id', solicitud_id);
 
+            const url = "/AccessEntry-Autocom/API/solicitud/verificar";
+            const config = {
+                method: 'POST',
+                body: body
+            };
+            const respuesta = await fetch(url, config);
+            const data = await respuesta.json();
+            const { codigo, mensaje, detalle } = data;
+
+            let icon = 'info';
+            if (codigo == 1) {
+                icon = 'success';
+                location.reload();
+            } else {
+                icon = 'error';
+                console.log(detalle);
+            }
+            Toast.fire({
+                icon: icon,
+                title: mensaje
+            });
+        } catch (error) {
+            console.log(error);
         }
     }
 };
-
-
-
+buscar();
 
 formulario.addEventListener('submit', guardar)
 btnCancelar.addEventListener('click', cancelar)

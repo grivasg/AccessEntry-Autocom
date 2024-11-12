@@ -6,9 +6,7 @@ class Solicitud extends ActiveRecord
 {
     protected static $tabla = 'solicitud_credenciales';
     protected static $idTabla = 'solicitud_id';
-    protected static $columnasDB = ['sol_cred_catalogo', 'sol_cred_correo', 'sol_cred_telefono', 
-                                    'sol_cred_fecha_solicitud', 'sol_cred_modulo', 'sol_cred_justificacion',
-                                     'sol_cred_usuario', 'sol_cred_estado_solicitud'];
+    protected static $columnasDB = ['sol_cred_catalogo', 'sol_cred_correo', 'sol_cred_telefono', 'sol_cred_fecha_solicitud', 'sol_cred_modulo', 'sol_cred_justificacion', 'sol_cred_usuario', 'sol_cred_estado_solicitud'];
 
     public $solicitud_id;
     public $sol_cred_catalogo;
@@ -39,13 +37,13 @@ class Solicitud extends ActiveRecord
                         || m.per_nom2 || ' ' || m.per_ape1 || ' ' || m.per_ape2 || ' ' || m.per_ape3) AS Nombres_Apellidos,
                         sc.sol_cred_catalogo,
                         TRIM(org.org_plaza_desc) || ' - ' || TRIM(d.dep_desc_lg) AS Puesto_Dependencia,  -- Combina plaza y dependencia
+                        sc.solicitud_id,
                         sc.sol_cred_correo,
                         sc.sol_cred_telefono,
                         sc.sol_cred_fecha_solicitud,
                         sc.sol_cred_modulo,
                         sc.sol_cred_justificacion,
                         sc.sol_cred_usuario,
-                        sc.solicitud_id,
                         e.estado_cred_nombre AS Estado_Solicitud
                 FROM solicitud_credenciales sc
                 JOIN mper m ON sc.sol_cred_catalogo = m.per_catalogo
@@ -53,7 +51,8 @@ class Solicitud extends ActiveRecord
                 JOIN mdep d ON org.org_dependencia = d.dep_llave
                 JOIN estado_credenciales e ON sc.sol_cred_estado_solicitud = e.estado_cred_id
                 JOIN grados g ON m.per_grado = g.gra_codigo
-                JOIN armas a ON m.per_arma = a.arm_codigo";
+                JOIN armas a ON m.per_arma = a.arm_codigo
+                WHERE sc.sol_cred_estado_solicitud = 1";
                 return self::fetchArray($sql);
     }
 

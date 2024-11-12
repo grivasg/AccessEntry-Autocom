@@ -61,7 +61,7 @@
         </div>
     </form>
 </div>
-<h2 class="text-center mb-4">Verificacion de Solicitudes</h2>
+<h2 class="text-center mb-4">Porfavor Verifique sus Solicitudes</h2>
 <div class="row">
     <div class="col table-responsive">
         <table class="table table-bordered table-hover w-100" id="tablaSolicitudes">
