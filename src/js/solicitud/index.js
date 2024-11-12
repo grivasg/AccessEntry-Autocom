@@ -9,6 +9,13 @@ const tabla = document.getElementById('tablaSolicitudes');
 const btnGuardar = document.getElementById('btnGuardar');
 const btnModificar = document.getElementById('btnModificar');
 const btnCancelar = document.getElementById('btnCancelar');
+// document.addEventListener('DOMContentLoaded', function() {
+//     const navbar = document.querySelector('nav');
+//     if (navbar) {
+//         navbar.style.display = 'none';  // Oculta el navbar
+//     }
+// });
+
 
 const datatable = new DataTable('#tablaSolicitudes', {
     data: null,
@@ -251,7 +258,8 @@ const eliminar = async (e) => {
         confirmButtonText: 'Si, Seguro',
         cancelButtonText: 'No, cancelar',
         confirmButtonColor: '#d33',
-        cancelButtonColor: '#999902',
+        cancelButtonColor: '#807d7a',
+        iconColor: '#d92b2b',
         // input: 'text'
     })
     if (confirmacion.isConfirmed) {
@@ -294,12 +302,13 @@ const verificar = async (e) => {
     let confirmacion = await Swal.fire({
         icon: 'question',
         title: 'Confirmacion',
-        text: '¿Desea enviar esta Solicitud?',
+        text: 'Esta acción es irreversible, por lo que le solicitamos que verifique cuidadosamente los datos antes de proceder. ¿Está seguro de que desea enviar esta solicitud?',
         showCancelButton: true,
-        confirmButtonText: 'Si, Seguro',
+        confirmButtonText: 'Si, Enviar',
         cancelButtonText: 'No, cancelar',
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#999902',
+        confirmButtonColor: '#1e8e3e',
+        cancelButtonColor: '#d92b2b',
+        iconColor: '#f08f18',
     });
 
     if (confirmacion.isConfirmed) {
@@ -342,3 +351,4 @@ btnModificar.addEventListener('click', modificar)
 datatable.on('click', '.modificar', traerDatos);
 datatable.on('click', '.eliminar', eliminar)
 datatable.on('click', '.verificar', verificar)
+

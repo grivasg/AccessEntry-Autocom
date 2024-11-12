@@ -8,7 +8,7 @@
     </div>
   </div>
   <div class="text-center">
-    <a href="AccessEntry-Autocom/solicitud">
+    <a href="/AccessEntry-Autocom/solicitud">
       <button type="button" class="btn btn-outline-success btn-lg m-3">Solicitar Credenciales</button>
     </a>
   </div>

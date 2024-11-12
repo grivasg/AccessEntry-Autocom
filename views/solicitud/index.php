@@ -68,4 +68,5 @@
         </table>
     </div>
 </div>
+
 <script src="<?= asset('./build/js/solicitud/index.js') ?>"></script>
