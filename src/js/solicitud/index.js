@@ -64,11 +64,19 @@ const datatable = new DataTable('#tablaSolicitudes', {
             title: 'Estado de Solicitud',
             data: 'estado_solicitud',
             render: (data, type, row, meta) => {
-                return `
-                    <span>${data}</span>
-                    <button class="btn btn-success verificar" data-solicitud_id="${row.solicitud_id}">Verificar
-                    </button>
-                `;
+                let html = `
+                <button class='btn btn-success verificar' 
+                data-solicitud_id="${data}" 
+                data-sol_cred_catalogo="${row.sol_cred_catalogo}" 
+                data-sol_cred_correo="${row.sol_cred_correo}"  
+                data-sol_cred_telefono="${row.sol_cred_telefono}" 
+                data-sol_cred_fecha_solicitud="${row.sol_cred_fecha_solicitud}" 
+                data-sol_cred_modulo="${row.sol_cred_modulo}" 
+                data-sol_cred_justificacion="${row.sol_cred_justificacion}" 
+                data-sol_cred_usuario="${row.sol_cred_usuario}" 
+                data-sol_cred_estado_solicitud="${row.sol_cred_estado_solicitud}"><i class='bi bi-pencil-square'></i>VERIFICAR</button>
+                `
+                return html;
             }
         },
         {
@@ -291,49 +299,24 @@ const eliminar = async (e) => {
 };
 
 const verificar = async (e) => {
+    e.preventDefault();
     let confirmacion = await Swal.fire({
         icon: 'question',
         title: 'Confirmacion',
-        text: 'Esta accion es Irreversible, ¿Desea Enviar la Solicitud?',
+        text: '¿Desea enviar esta Solicitud?',
         showCancelButton: true,
-        confirmButtonText: 'Si, Enviar',
+        confirmButtonText: 'Si, Seguro',
         cancelButtonText: 'No, cancelar',
-        confirmButtonColor: '#018f1b',
-        cancelButtonColor: '#cc0606',
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#999902',
         // input: 'text'
     })
     if (confirmacion.isConfirmed) {
         try {
-            alert("¡Datos Enviados!");
-            const body = new FormData(formulario);
-            const url = "/AccessEntry-Autocom/API/solicitud/verificar";
-            const config = {
-                method: 'POST',
-                body
-            };
-
-            const respuesta = await fetch(url, config);
-            const data = await respuesta.json();
-            const { codigo, mensaje, detalle } = data;
-            console.log('Respuesta de la API:', data);
-            let icon = 'info';
-            if (codigo == 1) {
-                icon = 'success';
-                formulario.reset();
-                buscar();
-                cancelar();
-            } else {
-                icon = 'error';
-                console.log(detalle);
-            }
-
-            Toast.fire({
-                icon: icon,
-                title: mensaje
-            });
-
+            alert('Hola tu');
+            
         } catch (error) {
-            console.log(error);
+
         }
     }
 };

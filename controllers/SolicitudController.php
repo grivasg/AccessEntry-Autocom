@@ -106,22 +106,20 @@ class SolicitudController
 
     public static function verificarAPI()
     {
-        $id = filter_var($_POST['solicitud_id'], FILTER_SANITIZE_NUMBER_INT);
-
         try {
-            $solicitud = Solicitud::find($id);
-            $solicitud->sincronizar($_POST);
-            $solicitud->verificacion();
+            $solicitudes = Solicitud::obtenerSolicitudes1();
             http_response_code(200);
             echo json_encode([
                 'codigo' => 1,
-                'mensaje' => 'Solicitud Enviada',
+                'mensaje' => 'Datos encontrados',
+                'detalle' => '',
+                'datos' => $solicitudes
             ]);
         } catch (Exception $e) {
             http_response_code(500);
             echo json_encode([
                 'codigo' => 0,
-                'mensaje' => 'Error al Enviar la Solicitud',
+                'mensaje' => 'Error al buscar Solicitudes',
                 'detalle' => $e->getMessage(),
             ]);
         }

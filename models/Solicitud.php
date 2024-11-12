@@ -56,5 +56,10 @@ class Solicitud extends ActiveRecord
                 JOIN armas a ON m.per_arma = a.arm_codigo";
                 return self::fetchArray($sql);
     }
-    
+
+    public static function obtenerSolicitudes1()
+    {
+        $sql = "SELECT * FROM solicitud_credenciales where sol_cred_estado_solicitud = 1";
+                return self::fetchArray($sql);
+    }
 }
