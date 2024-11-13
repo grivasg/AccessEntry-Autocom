@@ -12,9 +12,9 @@ class Solicitud extends ActiveRecord
     public $sol_cred_catalogo;
     public $sol_cred_correo;
     public $sol_cred_telefono;
-    public $sol_cred_fecha_solicitud;
     public $sol_cred_modulo;
     public $sol_cred_justificacion;
+    public $sol_cred_fecha_solicitud;
     public $sol_cred_usuario;
     public $sol_cred_estado_solicitud;
 
@@ -24,9 +24,9 @@ class Solicitud extends ActiveRecord
         $this->sol_cred_catalogo = $args['sol_cred_catalogo'] ?? '';
         $this->sol_cred_correo = $args['sol_cred_correo'] ?? '';
         $this->sol_cred_telefono = $args['sol_cred_telefono'] ?? '';
-        $this->sol_cred_fecha_solicitud = $args['sol_cred_fecha_solicitud'] ?? '';
         $this->sol_cred_modulo = $args['sol_cred_modulo'] ?? '';
         $this->sol_cred_justificacion = $args['sol_cred_justificacion'] ?? '';
+        $this->sol_cred_fecha_solicitud = $args['sol_cred_fecha_solicitud'] ?? '';
         $this->sol_cred_usuario = $args['sol_cred_usuario'] ?? '';
         $this->sol_cred_estado_solicitud = $args['sol_cred_estado_solicitud'] ?? 1; // Valor por defecto
     }

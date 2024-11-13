@@ -5,219 +5,44 @@ import DataTable from "datatables.net-bs5";
 import { lenguaje } from "../lenguaje";
 
 const formulario = document.getElementById('formularioSolicitud');
-const tabla = document.getElementById('tablaSolicitudes');
 const btnGuardar = document.getElementById('btnGuardar');
-const btnModificar = document.getElementById('btnModificar');
-const btnCancelar = document.getElementById('btnCancelar');
-// document.addEventListener('DOMContentLoaded', function() {
-//     const navbar = document.querySelector('nav');
-//     if (navbar) {
-//         navbar.style.display = 'none';  // Oculta el navbar
-//     }
-// });
 
+// Funciones para avanzar entre pasos
+const nextStepBtn = document.getElementById('next-step');
+const backStepBtn = document.getElementById('back-step');
 
-const datatable = new DataTable('#tablaSolicitudes', {
-    data: null,
-    language: lenguaje,
-    pageLength: '15',
-    lengthMenu: [3, 9, 11, 25, 100],
-    columns: [
-        {
-            title: 'No.',
-            data: 'solicitud_id',
-            width: '2%',
-            render: (data, type, row, meta) => {
-                return meta.row + 1;
-            }
-        },
-        {
-            title: 'Grado y Arma',
-            data: 'grado_arma'
-        },
-        {
-            title: 'Nombres del Solicitante',
-            data: 'nombres_apellidos'
-        },
-        {
-            title: 'Catalogo',
-            data: 'sol_cred_catalogo'
-        },
-        {
-            title: 'Puesto',
-            data: 'puesto_dependencia'
-        },
-        {
-            title: 'Correo',
-            data: 'sol_cred_correo'
-        },
-        {
-            title: 'Telefono',
-            data: 'sol_cred_telefono'
-        },
-        {
-            title: 'Modulos para habilitar',
-            data: 'sol_cred_modulo'
-        },
-        {
-            title: 'Justificacion',
-            data: 'sol_cred_justificacion'
-        },
-        {
-            title: '¿Cuénta con Usuario y contraseña para AUTOCOM?',
-            data: 'sol_cred_usuario'
-        },
-        {
-            title: 'Estado de Solicitud',
-            data: 'estado_solicitud'
-        },
-        {
-            title: 'Acciones',
-            data: 'solicitud_id',
-            searchable: false,
-            orderable: false,
-            render: (data, type, row, meta) => {
-                let html = `
-                <button class='btn btn-warning modificar' 
-                data-solicitud_id="${data}" 
-                data-sol_cred_catalogo="${row.sol_cred_catalogo}" 
-                data-sol_cred_correo="${row.sol_cred_correo}"  
-                data-sol_cred_telefono="${row.sol_cred_telefono}" 
-                data-sol_cred_fecha_solicitud="${row.sol_cred_fecha_solicitud}" 
-                data-sol_cred_modulo="${row.sol_cred_modulo}" 
-                data-sol_cred_justificacion="${row.sol_cred_justificacion}" 
-                data-sol_cred_usuario="${row.sol_cred_usuario}" 
-                data-sol_cred_estado_solicitud="${row.sol_cred_estado_solicitud}"><i class='bi bi-pencil-square'></i></button>
-                
-                <button class='btn btn-danger eliminar' data-solicitud_id="${data}"><i class="bi bi-trash3-fill"></i></i></button>
-                <button class='btn btn-success verificar' 
-                data-solicitud_id="${data}" 
-                data-sol_cred_estado_solicitud="${row.sol_cred_estado_solicitud}"><i class='bi bi-pencil-square'></i>VERIFICAR</button>
-                `
-                return html;
-            }
-        },
-    ]
-});
-btnModificar.parentElement.style.display = 'none'
-btnModificar.disabled = true
-btnCancelar.parentElement.style.display = 'none'
-btnCancelar.disabled = true
+// Asegurarse de que los elementos existan antes de añadir event listeners
+if (nextStepBtn) {
+    nextStepBtn.addEventListener('click', function () {
+        document.getElementById('step-1').style.display = 'none';
+        document.getElementById('step-2').style.display = 'block';
+    });
+}
 
+if (backStepBtn) {
+    backStepBtn.addEventListener('click', function () {
+        document.getElementById('step-2').style.display = 'none';
+        document.getElementById('step-1').style.display = 'block';
+    });
+}
+
+// Función para guardar la solicitud
 const guardar = async (e) => {
-    e.preventDefault()
-
-    if (!validarFormulario(formulario, ['solicitud_id'])) {
-        Swal.fire({
-            title: "Campos vacios",
-            text: "Debe llenar todos los campos",
-            icon: "info"
-        })
-        return
-    }
-
-    try {
-        const body = new FormData(formulario)
-        const url = "/AccessEntry-Autocom/API/solicitud/guardar"
-        const config = {
-            method: 'POST',
-            body
-        }
-
-        const respuesta = await fetch(url, config);
-        const data = await respuesta.json();
-        const { codigo, mensaje, detalle } = data;
-        let icon = 'info'
-        if (codigo == 1) {
-            icon = 'success'
-            formulario.reset();
-            buscar();
-        } else {
-            icon = 'error'
-            console.log(detalle);
-        }
-
-        Toast.fire({
-            icon: icon,
-            title: mensaje
-        });
-
-    } catch (error) {
-        console.log(error);
-    }
-}
-
-const traerDatos = (e) => {
-    const elemento = e.currentTarget.dataset;
-
-    formulario.solicitud_id.value = elemento.solicitud_id;
-    formulario.sol_cred_catalogo.value = elemento.sol_cred_catalogo;
-    formulario.sol_cred_correo.value = elemento.sol_cred_correo;
-    formulario.sol_cred_telefono.value = elemento.sol_cred_telefono;
-    formulario.sol_cred_fecha_solicitud.value = elemento.sol_cred_fecha_solicitud;
-    formulario.sol_cred_modulo.value = elemento.sol_cred_modulo;
-    formulario.sol_cred_justificacion.value = elemento.sol_cred_justificacion;
-    formulario.sol_cred_usuario.value = elemento.sol_cred_usuario;
-    tabla.parentElement.parentElement.style.display = 'none';
-    btnGuardar.parentElement.style.display = 'none';
-    btnGuardar.disabled = true;
-    btnModificar.parentElement.style.display = '';
-    btnModificar.disabled = false;
-    btnCancelar.parentElement.style.display = '';
-    btnCancelar.disabled = false;
-}
-
-const cancelar = () => {
-    tabla.parentElement.parentElement.style.display = ''
-    formulario.reset();
-    btnGuardar.parentElement.style.display = ''
-    btnGuardar.disabled = false
-    btnModificar.parentElement.style.display = 'none'
-    btnModificar.disabled = true
-    btnCancelar.parentElement.style.display = 'none'
-    btnCancelar.disabled = true
-}
-
-const buscar = async () => {
-    try {
-        const url = "/AccessEntry-Autocom/API/solicitud/buscar"
-        const config = {
-            method: 'GET',
-        }
-
-        const respuesta = await fetch(url, config);
-        const data = await respuesta.json();
-        const { codigo, mensaje, detalle, datos } = data;
-
-        console.log(datos);
-        datatable.clear().draw();
-
-        if (datos) {
-            datatable.rows.add(datos).draw();
-        }
-    } catch (error) {
-        console.log(error);
-    }
-}
-buscar();
-
-
-const modificar = async (e) => {
     e.preventDefault();
 
-    if (!validarFormulario(formulario)) {
+    // Validar el formulario antes de continuar
+    if (!validarFormulario(formulario, ['solicitud_id'])) {
         Swal.fire({
             title: "Campos vacíos",
             text: "Debe llenar todos los campos",
-            icon: "info"
+            icon: "info",
         });
         return;
     }
 
-
     try {
         const body = new FormData(formulario);
-        const url = "/AccessEntry-Autocom/API/solicitud/modificar";
+        const url = "/AccessEntry-Autocom/API/solicitud/guardar";
         const config = {
             method: 'POST',
             body
@@ -226,129 +51,37 @@ const modificar = async (e) => {
         const respuesta = await fetch(url, config);
         const data = await respuesta.json();
         const { codigo, mensaje, detalle } = data;
-        console.log('Respuesta de la API:', data);
         let icon = 'info';
-        if (codigo == 1) {
+
+        // Dependiendo del código de respuesta, mostrar mensaje y tomar acción
+        if (codigo === 1) {
             icon = 'success';
             formulario.reset();
+            // Asumiendo que existe la función buscar()
             buscar();
-            cancelar();
         } else {
             icon = 'error';
-            console.log(detalle);
+            console.error(detalle); // Es mejor utilizar console.error para errores
         }
 
+        // Mostrar mensaje Toast con la respuesta
         Toast.fire({
             icon: icon,
-            title: mensaje
+            title: mensaje,
+            timer: 8000
         });
 
     } catch (error) {
-        console.log(error);
+        console.error('Error al guardar la solicitud:', error);
+        Swal.fire({
+            title: "Error",
+            text: "Hubo un problema al procesar la solicitud. Inténtalo de nuevo más tarde.",
+            icon: "error",
+        });
     }
+};
+
+// Añadir el evento al formulario
+if (formulario) {
+    formulario.addEventListener('submit', guardar);
 }
-
-const eliminar = async (e) => {
-    const solicitud_id = e.currentTarget.dataset.solicitud_id
-    let confirmacion = await Swal.fire({
-        icon: 'question',
-        title: 'Confirmacion',
-        text: '¿Está seguro que desea eliminar esta Solicitud?',
-        showCancelButton: true,
-        confirmButtonText: 'Si, Seguro',
-        cancelButtonText: 'No, cancelar',
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#807d7a',
-        iconColor: '#d92b2b',
-        // input: 'text'
-    })
-    if (confirmacion.isConfirmed) {
-        try {
-            const body = new FormData()
-            body.append('solicitud_id', solicitud_id)
-            const url = "/AccessEntry-Autocom/API/solicitud/eliminar"
-            const config = {
-                method: 'POST',
-                body
-            }
-            const respuesta = await fetch(url, config);
-            const data = await respuesta.json();
-            const { codigo, mensaje, detalle } = data;
-            let icon = 'info'
-            if (codigo == 1) {
-                icon = 'success'
-                formulario.reset();
-                buscar();
-            } else {
-                icon = 'error'
-                console.log(detalle);
-            }
-
-            Toast.fire({
-                icon: icon,
-                title: mensaje
-            })
-        } catch (error) {
-            console.log(error);
-        }
-    }
-};
-
-const verificar = async (e) => {
-    e.preventDefault();
-    const elemento = e.currentTarget.dataset;
-    const solicitud_id = elemento.solicitud_id;
-    // Confirmar acción de verificación
-    let confirmacion = await Swal.fire({
-        icon: 'question',
-        title: 'Confirmacion',
-        text: 'Esta acción es irreversible, por lo que le solicitamos que verifique cuidadosamente los datos antes de proceder. ¿Está seguro de que desea enviar esta solicitud?',
-        showCancelButton: true,
-        confirmButtonText: 'Si, Enviar',
-        cancelButtonText: 'No, cancelar',
-        confirmButtonColor: '#1e8e3e',
-        cancelButtonColor: '#d92b2b',
-        iconColor: '#f08f18',
-    });
-
-    if (confirmacion.isConfirmed) {
-        try {
-            // Enviar solicitud de verificación a la API
-            const body = new FormData();
-            body.append('solicitud_id', solicitud_id);
-
-            const url = "/AccessEntry-Autocom/API/solicitud/verificar";
-            const config = {
-                method: 'POST',
-                body: body
-            };
-            const respuesta = await fetch(url, config);
-            const data = await respuesta.json();
-            const { codigo, mensaje, detalle } = data;
-
-            let icon = 'info';
-            if (codigo == 1) {
-                icon = 'success';
-                location.reload();
-            } else {
-                icon = 'error';
-                console.log(detalle);
-            }
-            Toast.fire({
-                icon: icon,
-                title: mensaje
-            });
-        } catch (error) {
-            console.log(error);
-        }
-    }
-};
-buscar();
-
-formulario.addEventListener('submit', guardar)
-btnCancelar.addEventListener('click', cancelar)
-btnModificar.addEventListener('click', modificar)
-datatable.on('click', '.modificar', traerDatos);
-datatable.on('click', '.eliminar', eliminar)
-datatable.on('click', '.verificar', verificar)
-
