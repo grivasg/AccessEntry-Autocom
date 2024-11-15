@@ -26,17 +26,17 @@
             <div class="row mb-3">
                 <div class="col">
                     <label for="sol_cred_solicitante" class="form-label">Datos Personales del Solicitante</label>
-                    <input type="text" name="sol_cred_solicitante" id="sol_cred_solicitante" class="form-control" readonly>
+                    <input type="text" id="sol_cred_solicitante" readonly class="form-control">
                 </div>
             </div>
             <div class="row mb-3">
                 <div class="col">
                     <label for="sol_cred_puesto" class="form-label">Puesto</label>
-                    <input type="number" name="sol_cred_puesto" id="sol_cred_puesto" class="form-control" readonly>
+                    <input type="text" id="sol_cred_puesto" readonly class="form-control">
                 </div>
                 <div class="col">
                     <label for="sol_cred_dependencia" class="form-label">Dependencia</label>
-                    <input type="text" name="sol_cred_dependencia" id="sol_cred_dependencia" class="form-control" readonly>
+                    <input type="text" id="sol_cred_dependencia" readonly class="form-control">
                 </div>
             </div>
             <div class="row mb-3">

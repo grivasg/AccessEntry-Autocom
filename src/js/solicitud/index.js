@@ -14,15 +14,23 @@ const backStepBtn = document.getElementById('back-step');
 
 // Asegurarse de que los elementos existan antes de añadir event listeners
 if (nextStepBtn) {
-    nextStepBtn.addEventListener('click', function() {
+    nextStepBtn.addEventListener('click', function () {
         // La navegación se manejará en la función siguiente()
     });
 }
 
 if (backStepBtn) {
-    backStepBtn.addEventListener('click', function() {
+    backStepBtn.addEventListener('click', function () {
+        // Ocultar paso 2 y mostrar paso 1
         document.getElementById('step-2').style.display = 'none';
         document.getElementById('step-1').style.display = 'block';
+
+        document.getElementById('sol_cred_catalogo').value = '';
+
+        Toast.fire({
+            icon: 'info',
+            title: 'Ingrese Nuevamente el Catalogo'
+        });
     });
 }
 
@@ -30,22 +38,47 @@ if (backStepBtn) {
 const guardar = async (e) => {
     e.preventDefault();
 
-    // Validar el formulario antes de continuar
-    if (!validarFormulario(formulario, ['solicitud_id'])) {
+    // Lista de campos requeridos que sí se guardarán en la BD
+    const camposRequeridos = [
+        'sol_cred_catalogo',
+        'sol_cred_correo',
+        'sol_cred_telefono',
+        'sol_cred_modulo',
+        'sol_cred_justificacion',
+        'sol_cred_usuario'
+    ];
+
+    // Validar solo los campos que se guardarán
+    if (!validarFormulario(formulario, ['solicitud_id'], camposRequeridos)) {
         Swal.fire({
             title: "Campos vacíos",
-            text: "Debe llenar todos los campos",
+            text: "Debe llenar todos los campos requeridos",
             icon: "info",
         });
         return;
     }
 
     try {
-        const body = new FormData(formulario);
+        const formData = new FormData(formulario);
+
+        // Crear un nuevo FormData solo con los campos que queremos enviar
+        const dataToSend = new FormData();
+
+        // Añadir solo los campos que corresponden a la tabla
+        dataToSend.append('sol_cred_catalogo', formData.get('sol_cred_catalogo'));
+        dataToSend.append('sol_cred_correo', formData.get('sol_cred_correo'));
+        dataToSend.append('sol_cred_telefono', formData.get('sol_cred_telefono'));
+        dataToSend.append('sol_cred_modulo', formData.get('sol_cred_modulo'));
+        dataToSend.append('sol_cred_justificacion', formData.get('sol_cred_justificacion'));
+        dataToSend.append('sol_cred_usuario', formData.get('sol_cred_usuario'));
+
+        // Si tienes un campo de fecha que se llena automáticamente
+        dataToSend.append('sol_cred_fecha_solicitud', new Date().toISOString().split('T')[0]);
+
         const url = "/AccessEntry-Autocom/API/solicitud/guardar";
         const config = {
             method: 'POST',
-            body
+            body: dataToSend
         };
 
         const respuesta = await fetch(url, config);
@@ -56,7 +89,6 @@ const guardar = async (e) => {
         if (codigo === 1) {
             icon = 'success';
             formulario.reset();
-            buscar();
         } else {
             icon = 'error';
             console.error(detalle);
