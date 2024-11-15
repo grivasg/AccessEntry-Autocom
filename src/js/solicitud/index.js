@@ -154,12 +154,12 @@ const siguiente = async (e) => {
             const urlDatos = "/AccessEntry-Autocom/API/solicitud/obtenerDatosPersonal";
             const respuestaDatos = await fetch(urlDatos, config);
             const datosPersonal = await respuestaDatos.json();
+            console.log("Respuesta completa:", datosPersonal);
 
             if (datosPersonal.codigo === 1) {
                 // Llenar los campos con los datos obtenidos
-                document.getElementById('sol_cred_solicitante').value = datosPersonal.datos.nombres_completos;
-                document.getElementById('sol_cred_puesto').value = datosPersonal.datos.puesto;
-                document.getElementById('sol_cred_dependencia').value = datosPersonal.datos.dependencia;
+                document.getElementById('nombres_completos').value = datosPersonal.datos.NOMBRES_COMPLETOS;
+                document.getElementById('puesto').value = datosPersonal.datos.PUESTO;
 
                 // Mostrar el segundo paso
                 document.getElementById('step-1').style.display = 'none';

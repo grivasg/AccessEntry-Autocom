@@ -76,17 +76,17 @@ class Solicitud extends ActiveRecord
     public static function obtenerDatosPersonal($catalogo)
     {
         $sql = "SELECT 
-            (g.gra_desc_ct || ' DE ' || a.arm_desc_ct || ' ' || 
-             m.per_nom1 || ' ' || m.per_nom2 || ' ' || 
-             m.per_ape1 || ' ' || m.per_ape2 || ' ' || m.per_ape3) AS nombres_completos,
-            TRIM(org.org_plaza_desc) AS puesto,
-            TRIM(d.dep_desc_lg) AS dependencia
-            FROM mper m
-            JOIN morg org ON m.per_plaza = org.org_plaza
-            JOIN mdep d ON org.org_dependencia = d.dep_llave
-            JOIN grados g ON m.per_grado = g.gra_codigo
-            JOIN armas a ON m.per_arma = a.arm_codigo
-            WHERE m.per_catalogo = ?";
+    TRIM(REPLACE(REPLACE(g.gra_desc_lg || ' DE ' || a.arm_desc_lg || ' ' || 
+        m.per_nom1 || ' ' || m.per_nom2 || ' ' || 
+        m.per_ape1 || ' ' || m.per_ape2 || ' ' || m.per_ape3, '  ', ' '), '  ', ' ')) AS nombres_completos,
+    TRIM(REPLACE(per_desc_empleo, '  ', ' ')) AS puesto
+FROM mper m
+JOIN morg org ON m.per_plaza = org.org_plaza
+JOIN mdep d ON org.org_dependencia = d.dep_llave
+JOIN grados g ON m.per_grado = g.gra_codigo
+JOIN armas a ON m.per_arma = a.arm_codigo
+WHERE m.per_catalogo = ?
+";
 
         $stmt = self::prepare($sql);
         $stmt->bindParam(1, $catalogo);

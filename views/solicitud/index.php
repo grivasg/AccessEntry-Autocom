@@ -25,18 +25,14 @@
         <div id="step-2" class="form-step" style="display: none;">
             <div class="row mb-3">
                 <div class="col">
-                    <label for="sol_cred_solicitante" class="form-label">Datos Personales del Solicitante</label>
-                    <input type="text" id="sol_cred_solicitante" readonly class="form-control">
+                    <label for="nombres_completos" class="form-label">Datos Personales del Solicitante</label>
+                    <input type="text" id="nombres_completos" readonly class="form-control">
                 </div>
             </div>
             <div class="row mb-3">
                 <div class="col">
-                    <label for="sol_cred_puesto" class="form-label">Puesto</label>
-                    <input type="text" id="sol_cred_puesto" readonly class="form-control">
-                </div>
-                <div class="col">
-                    <label for="sol_cred_dependencia" class="form-label">Dependencia</label>
-                    <input type="text" id="sol_cred_dependencia" readonly class="form-control">
+                    <label for="puesto" class="form-label">Empleo</label>
+                    <input type="text" id="puesto" readonly class="form-control">
                 </div>
             </div>
             <div class="row mb-3">
