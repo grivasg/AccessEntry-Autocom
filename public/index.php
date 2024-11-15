@@ -1,4 +1,4 @@
-<?php 
+<?php
 require_once __DIR__ . '/../includes/app.php';
 
 use MVC\Router;
@@ -19,6 +19,10 @@ $router->post('/API/solicitud/modificar', [SolicitudController::class, 'modifica
 $router->post('/API/solicitud/eliminar', [SolicitudController::class, 'eliminarAPI']); // Eliminar solicitud
 $router->post('API/solicitud/verificar', [SolicitudController::class, 'verificarAPI']);
 $router->post('/API/solicitud/verificar', [SolicitudController::class, 'verificarAPI']);
+
+
+$router->post('/API/solicitud/catalogoExiste', [SolicitudController::class, 'catalogoExisteAPI']);
+$router->post('/API/solicitud/obtenerDatosPersonal', [SolicitudController::class, 'obtenerDatosPersonalAPI']);
 
 // RUTAS DE ESTADO
 $router->get('/estado', [EstadoController::class, 'index']);

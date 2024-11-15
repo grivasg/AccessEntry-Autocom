@@ -108,7 +108,7 @@ class SolicitudController
     public static function verificarAPI()
     {
         $id = filter_var($_POST['solicitud_id'], FILTER_SANITIZE_NUMBER_INT);
-        
+
 
         try {
             // Buscar la solicitud por ID
@@ -136,6 +136,68 @@ class SolicitudController
                 'codigo' => 0,
                 'mensaje' => 'Error al verificar solicitud',
                 'detalle' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    // Agregar estos métodos en SolicitudController
+
+    public static function catalogoExisteAPI()
+    {
+        try {
+            $catalogo = filter_var($_POST['sol_cred_catalogo'], FILTER_SANITIZE_NUMBER_INT);
+
+
+            if (Solicitud::catalogoExiste($catalogo)) {
+                http_response_code(200);
+                echo json_encode([
+                    'codigo' => 1,
+                    'mensaje' => 'Catálogo encontrado'
+                ]);
+            } else {
+                http_response_code(404);
+                echo json_encode([
+                    'codigo' => 0,
+                    'mensaje' => 'Catálogo no encontrado'
+                ]);
+            }
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode([
+                'codigo' => 0,
+                'mensaje' => 'Error al verificar el catálogo',
+                'detalle' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public static function obtenerDatosPersonalAPI()
+    {
+        try {
+            $catalogo = filter_var($_POST['sol_cred_catalogo'], FILTER_SANITIZE_NUMBER_INT);
+
+            $datos = Solicitud::obtenerDatosPersonal($catalogo);
+
+            if ($datos) {
+                http_response_code(200);
+                echo json_encode([
+                    'codigo' => 1,
+                    'mensaje' => 'Datos encontrados',
+                    'datos' => $datos
+                ]);
+            } else {
+                http_response_code(404);
+                echo json_encode([
+                    'codigo' => 0,
+                    'mensaje' => 'No se encontraron datos para el catálogo proporcionado'
+                ]);
+            }
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode([
+                'codigo' => 0,
+                'mensaje' => 'Error al obtener datos del personal',
+                'detalle' => $e->getMessage()
             ]);
         }
     }
