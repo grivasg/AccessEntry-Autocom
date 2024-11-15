@@ -62,7 +62,7 @@
             <div class="row mb-3">
                 <div class="col">
                     <label for="sol_cred_fecha_solicitud" class="form-label">Fecha de Solicitud</label>
-                    <input type="date" name="sol_cred_fecha_solicitud" id="sol_cred_fecha_solicitud" class="form-control">
+                    <input type="date" name="sol_cred_fecha_solicitud" id="sol_cred_fecha_solicitud" class="form-control" disabled>
                 </div>
                 <div class="col">
                     <label class="form-label" for="sol_cred_usuario">¿Cuenta con Usuario de AUTOCOM?</label>

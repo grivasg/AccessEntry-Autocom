@@ -88,17 +88,23 @@ const guardar = async (e) => {
 
         if (codigo === 1) {
             icon = 'success';
+            // Vaciar el formulario
             formulario.reset();
+
+            // Volver al primer paso
+            document.getElementById('step-2').style.display = 'none';
+            document.getElementById('step-1').style.display = 'block';
+
+            // Mostrar un mensaje de éxito
+            Toast.fire({
+                icon: icon,
+                title: mensaje,
+                timer: 8000
+            });
         } else {
             icon = 'error';
             console.error(detalle);
         }
-
-        Toast.fire({
-            icon: icon,
-            title: mensaje,
-            timer: 8000
-        });
 
     } catch (error) {
         console.error('Error al guardar la solicitud:', error);
@@ -110,8 +116,13 @@ const guardar = async (e) => {
     }
 };
 
+
 const siguiente = async (e) => {
     e.preventDefault();
+
+    // Establecer la fecha actual en el campo de fecha
+    const fechaActual = new Date().toISOString().split('T')[0]; // 'YYYY-MM-DD'
+    document.getElementById('sol_cred_fecha_solicitud').value = fechaActual;
 
     // Obtener el valor del catálogo
     const catalogo = formulario.sol_cred_catalogo.value.trim();
@@ -182,6 +193,7 @@ const siguiente = async (e) => {
         });
     }
 };
+
 
 // Event Listeners
 formulario.addEventListener('submit', guardar);
