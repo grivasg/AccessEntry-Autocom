@@ -88,7 +88,14 @@ buscar();
 
 
 const ver = async (e) => {
-    alert('Funcion Ver')
+    Swal.fire({
+        title: "Solicitud Recibida:",
+        text: "Su solicitud fue recibida y se encuentra en verificacion de Datos para poder crear Usuario",
+        imageUrl: "/AccessEntry-Autocom/public/images/recibido.png",
+        imageWidth: 200,
+        imageHeight: 200,
+        imageAlt: "Custom image"
+    });
 };
 
 

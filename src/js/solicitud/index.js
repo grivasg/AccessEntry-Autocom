@@ -29,7 +29,7 @@ if (backStepBtn) {
 
         Toast.fire({
             icon: 'info',
-            title: 'Ingrese Nuevamente el Catalogo'
+            title: 'Ingrese Catálogo'
         });
     });
 }
@@ -37,6 +37,23 @@ if (backStepBtn) {
 // Función para guardar la solicitud
 const guardar = async (e) => {
     e.preventDefault();
+
+    // Mostrar mensaje de confirmación
+    const result = await Swal.fire({
+        title: "Confirmación",
+        text: "Revise bien la Información ya que esta acción es Irreversible. ¿Está Seguro que desea continuar?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sí, Generar Solicitud",
+        cancelButtonText: "Cancelar"
+    });
+
+    // Si el usuario no confirma, no se hace nada
+    if (!result.isConfirmed) {
+        return;
+    }
 
     // Lista de campos requeridos que sí se guardarán en la BD
     const camposRequeridos = [
@@ -97,7 +114,7 @@ const guardar = async (e) => {
 
             // Mostrar un mensaje de éxito
             Swal.fire({
-                title: "Solicitud Generada con Exito",
+                title: "Solicitud Generada con Éxito",
                 text: "Su solicitud ha sido registrada. Actualmente se encuentra en proceso. Será notificado oportunamente sobre cualquier actualización respecto al estado de su solicitud.",
                 icon: "success",
                 footer: '<a href="/AccessEntry-Autocom/estado">Ver Estado de Solicitud</a>',
@@ -116,6 +133,7 @@ const guardar = async (e) => {
         });
     }
 };
+
 
 
 const siguiente = async (e) => {
@@ -172,7 +190,7 @@ const siguiente = async (e) => {
                     title: "Catalogo Verificado",
                     text: "Compruebe los datos del solicitante y complete los campos para realizar la Solicitud.",
                     showConfirmButton: true,
-                  });
+                });
             } else {
                 Swal.fire({
                     title: "Error",
@@ -183,7 +201,7 @@ const siguiente = async (e) => {
         } else {
             Swal.fire({
                 title: "Catálogo no encontrado",
-                text: "El número de catálogo ingresado no existe en la base de datos",
+                text: "El número de catálogo ingresado no existe.",
                 icon: "error"
             });
         }
@@ -192,7 +210,7 @@ const siguiente = async (e) => {
         console.error('Error:', error);
         Swal.fire({
             title: "Error",
-            text: "Hubo un problema al verificar el catálogo",
+            text: "Ocurrio un problema al verificar el catálogo",
             icon: "error"
         });
     }

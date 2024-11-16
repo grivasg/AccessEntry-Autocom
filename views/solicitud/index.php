@@ -9,8 +9,8 @@
             <div class="row mb-3">
                 <div class="col-md-3"></div>
                 <div class="col-md-6">
-                    <label for="sol_cred_catalogo" class="form-label">Catalogo</label>
-                    <input type="number" name="sol_cred_catalogo" id="sol_cred_catalogo" class="form-control">
+                    <label for="sol_cred_catalogo" class="form-label">Ingrese Catalogo</label>
+                    <input type="number" name="sol_cred_catalogo" id="sol_cred_catalogo" class="form-control" placeholder="Catalogo del Solicitante">
                 </div>
             </div>
             <div class="row text-center">
@@ -38,21 +38,21 @@
             <div class="row mb-3">
                 <div class="col">
                     <label for="sol_cred_correo" class="form-label">Correo Electrónico</label>
-                    <input type="text" name="sol_cred_correo" id="sol_cred_correo" class="form-control">
+                    <input type="text" name="sol_cred_correo" id="sol_cred_correo" class="form-control" placeholder="ejemplo@gmail.com">
                 </div>
                 <div class="col">
                     <label for="sol_cred_telefono" class="form-label">Telefono</label>
-                    <input type="text" name="sol_cred_telefono" id="sol_cred_telefono" class="form-control">
+                    <input type="text" name="sol_cred_telefono" id="sol_cred_telefono" class="form-control" placeholder="ejemplo: 31280000">
                 </div>
             </div>
             <div class="row mb-3">
                 <div class="col-md-6">
-                    <label for="sol_cred_modulo" class="form-label">Modulos a Habilitar</label>
+                    <label for="sol_cred_modulo" class="form-label">Seleccione Modulos a Habilitar</label>
                     <input type="text" name="sol_cred_modulo" id="sol_cred_modulo" class="form-control">
                 </div>
                 <div class="col-md-6">
                     <label for="sol_cred_justificacion" class="form-label">Justificación</label>
-                    <input type="text" name="sol_cred_justificacion" id="sol_cred_justificacion" class="form-control">
+                    <input type="text" name="sol_cred_justificacion" id="sol_cred_justificacion" class="form-control" placeholder="Justifique el Uso de los Modulos">
                 </div>
             </div>
             <div class="row mb-3">
