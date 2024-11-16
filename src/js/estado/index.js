@@ -4,10 +4,6 @@ import Swal from "sweetalert2";
 import DataTable from "datatables.net-bs5";
 import { lenguaje } from "../lenguaje";
 
-
-
-let contador = 1;
-
 const datatable = new DataTable('#tablaEstado', {
     data: null,
     language: lenguaje,
@@ -48,21 +44,26 @@ const datatable = new DataTable('#tablaEstado', {
         },
         {
             title: 'Estado de Solicitud',
-            data: 'solicitud_id',
+            data: 'estado_solicitud',
             searchable: false,
             orderable: false,
             render: (data, type, row, meta) => {
-                let html = `
-                <button class='btn btn-warning ver' data-solicitud_id="${data}"><i class="bi bi-eye-fill"></i> VER</button>
-                `
+                // Crear el botón como elemento HTML
+                const button = document.createElement('button');
+                button.className = 'btn btn-warning ver';
+                button.innerHTML = '<i class="bi bi-eye-fill"></i> VER';
 
-                return html;
+                // Guardar los datos completos de la fila en un atributo data
+                button.setAttribute('data-row', JSON.stringify({
+                    solicitud_id: row.solicitud_id,
+                    estado_solicitud: row.estado_solicitud
+                }));
+
+                return button.outerHTML;
             }
         },
     ]
 });
-
-
 
 const buscar = async () => {
     try {
@@ -73,30 +74,61 @@ const buscar = async () => {
 
         const respuesta = await fetch(url, config);
         const data = await respuesta.json();
-        const { datos } = data; // Obtén los datos correctamente
 
-        datatable.clear().draw(); // Limpia la tabla antes de añadir los nuevos datos
+        console.log('Datos recibidos:', data); // Para debug
 
-        if (datos) {
-            datatable.rows.add(datos).draw(); // Añade los datos a la tabla y dibuja
+        if (data && data.datos) {
+            datatable.clear();
+            datatable.rows.add(data.datos).draw();
         }
     } catch (error) {
-        console.log(error);
+        console.error('Error en buscar:', error);
+        Toast.fire({
+            icon: 'error',
+            title: 'Error al cargar los datos'
+        });
     }
 };
-buscar();
-
 
 const ver = async (e) => {
-    Swal.fire({
-        title: "Solicitud Recibida:",
-        text: "Su solicitud fue recibida y se encuentra en verificacion de Datos para poder crear Usuario",
-        imageUrl: "/AccessEntry-Autocom/public/images/recibido.png",
-        imageWidth: 200,
-        imageHeight: 200,
-        imageAlt: "Custom image"
-    });
+    try {
+        // Encontrar el botón que fue clickeado
+        const button = e.target.closest('.ver');
+        if (!button) return;
+
+        // Obtener y parsear los datos guardados en el botón
+        const rowData = JSON.parse(button.getAttribute('data-row'));
+
+        console.log('Datos de la fila:', rowData); // Para debug
+
+        if (!rowData) {
+            throw new Error('No se encontraron datos para esta solicitud');
+        }
+
+        // Mostrar la ventana de alerta con la información
+        await Swal.fire({
+            title: `${rowData.estado_solicitud}`,
+            imageUrl: "/AccessEntry-Autocom/public/images/recibido.png",
+            imageWidth: 200,
+            imageHeight: 200,
+            imageAlt: "Custom image"
+        });
+
+    } catch (error) {
+        console.error('Error en ver:', error);
+        Toast.fire({
+            icon: 'error',
+            title: 'Error al mostrar los detalles'
+        });
+    }
 };
 
+// Agregar el event listener usando delegación de eventos
+document.querySelector('#tablaEstado').addEventListener('click', function (e) {
+    if (e.target.closest('.ver')) {
+        ver(e);
+    }
+});
 
-datatable.on('click', '.ver', ver);
+// Iniciar la búsqueda cuando se carga la página
+buscar();
