@@ -1,1 +1,9 @@
-<h1>hola desde la vista de Estado</h1>
+<h1 class="text-center">Estado de Solicitudes</h1>
+<div class="row">
+    <div class="col table-responsive">
+        <table class="table table-bordered table-hover w-100" id="tablaEstado">
+        </table>
+    </div>
+</div>
+
+<script src="<?= asset('./build/js/estado/index.js') ?>"></script>

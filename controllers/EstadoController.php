@@ -17,7 +17,7 @@ class EstadoController
     public static function buscarAPI()
     {
         try {
-            $solicitudes = Solicitud::obtenerSolicitudes1();
+            $solicitudes = Solicitud::obtenerSolicitudes();
             http_response_code(200);
             echo json_encode([
                 'codigo' => 1,

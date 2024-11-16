@@ -33,7 +33,7 @@ class Solicitud extends ActiveRecord
 
     public static function obtenerSolicitudes()
     {
-        $sql = "SELECT (g.gra_desc_ct || ' DE ' || a.arm_desc_ct) AS Grado_Arma, (m.per_nom1 || ' ' 
+        $sql = "SELECT (g.gra_desc_lg || ' DE ' || a.arm_desc_lg) AS Grado_Arma, (m.per_nom1 || ' ' 
                         || m.per_nom2 || ' ' || m.per_ape1 || ' ' || m.per_ape2 || ' ' || m.per_ape3) AS Nombres_Apellidos,
                         sc.sol_cred_catalogo,
                         TRIM(org.org_plaza_desc) || ' - ' || TRIM(d.dep_desc_lg) AS Puesto_Dependencia,  -- Combina plaza y dependencia

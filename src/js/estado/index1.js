@@ -1,14 +1,4 @@
-import { Dropdown } from "bootstrap";
-import { Toast, validarFormulario } from "../funciones";
-import Swal from "sweetalert2";
-import DataTable from "datatables.net-bs5";
-import { lenguaje } from "../lenguaje";
-
-
-
-let contador = 1;
-
-const datatable = new DataTable('#tablaEstado', {
+const datatable = new DataTable('#tablaSolicitudes', {
     data: null,
     language: lenguaje,
     pageLength: '15',
@@ -39,6 +29,14 @@ const datatable = new DataTable('#tablaEstado', {
             data: 'puesto_dependencia'
         },
         {
+            title: 'Correo',
+            data: 'sol_cred_correo'
+        },
+        {
+            title: 'Telefono',
+            data: 'sol_cred_telefono'
+        },
+        {
             title: 'Modulos para habilitar',
             data: 'sol_cred_modulo'
         },
@@ -47,49 +45,25 @@ const datatable = new DataTable('#tablaEstado', {
             data: 'sol_cred_justificacion'
         },
         {
+            title: '¿Cuénta con Usuario y contraseña para AUTOCOM?',
+            data: 'sol_cred_usuario'
+        },
+        {
             title: 'Estado de Solicitud',
+            data: 'estado_solicitud'
+        },
+        {
+            title: 'Acciones',
             data: 'solicitud_id',
             searchable: false,
             orderable: false,
             render: (data, type, row, meta) => {
                 let html = `
-                <button class='btn btn-warning ver' data-solicitud_id="${data}"><i class="bi bi-eye-fill"></i> VER</button>
+                <button class='btn btn-danger eliminar' data-solicitud_id="${data}"><i class="bi bi-trash3-fill"></i></i></button>
                 `
-
+                
                 return html;
             }
         },
     ]
 });
-
-
-
-const buscar = async () => {
-    try {
-        const url = "/AccessEntry-Autocom/API/estado/buscar";
-        const config = {
-            method: 'GET'
-        };
-
-        const respuesta = await fetch(url, config);
-        const data = await respuesta.json();
-        const { datos } = data; // Obtén los datos correctamente
-
-        datatable.clear().draw(); // Limpia la tabla antes de añadir los nuevos datos
-
-        if (datos) {
-            datatable.rows.add(datos).draw(); // Añade los datos a la tabla y dibuja
-        }
-    } catch (error) {
-        console.log(error);
-    }
-};
-buscar();
-
-
-const ver = async (e) => {
-    alert('Funcion Ver')
-};
-
-
-datatable.on('click', '.ver', ver);
