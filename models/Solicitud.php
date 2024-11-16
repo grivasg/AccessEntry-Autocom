@@ -45,6 +45,7 @@ class Solicitud extends ActiveRecord
                 sc.sol_cred_modulo,
                 sc.sol_cred_justificacion,
                 sc.sol_cred_usuario,
+                e.estado_cred_id,
                 e.estado_cred_nombre AS Estado_Solicitud  -- Asegúrate de que esto sea 'estado_cred_nombre'
             FROM solicitud_credenciales sc
             JOIN mper m ON sc.sol_cred_catalogo = m.per_catalogo

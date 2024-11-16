@@ -56,7 +56,8 @@ const datatable = new DataTable('#tablaEstado', {
                 // Guardar los datos completos de la fila en un atributo data
                 button.setAttribute('data-row', JSON.stringify({
                     solicitud_id: row.solicitud_id,
-                    estado_solicitud: row.estado_solicitud
+                    estado_solicitud: row.estado_solicitud,
+                    id_estado: row.estado_cred_id
                 }));
 
                 return button.outerHTML;
@@ -99,20 +100,69 @@ const ver = async (e) => {
         // Obtener y parsear los datos guardados en el botón
         const rowData = JSON.parse(button.getAttribute('data-row'));
 
-        console.log('Datos de la fila:', rowData); // Para debug
+        // Convertir id_estado a un número
+        const estado = parseInt(rowData.id_estado, 10);
 
-        if (!rowData) {
-            throw new Error('No se encontraron datos para esta solicitud');
+        // Evaluar el valor de estado
+        if (estado === 1) {
+            console.log('El estado de la solicitud es 1');
+            Swal.fire({
+                title: 'Solicitud Recibida',
+                text: 'Su solicitud ha sido recibida y está en proceso de verificación.',
+                imageUrl: "/AccessEntry-Autocom/public/images/caso1.png",
+                imageWidth: 200,
+                imageHeight: 200,
+                imageAlt: "Custom image"
+            });
+        } else if (estado === 2) {
+            console.log('El estado de la solicitud es 2');
+            Swal.fire({
+                title: 'Generando Usuario',
+                text: 'Estamos generando el usuario para usted. Espere un momento.',
+                imageUrl: "/AccessEntry-Autocom/public/images/caso2.png",
+                imageWidth: 400,
+                imageHeight: 200,
+                imageAlt: "Custom image"
+            });
+        } else if (estado === 3) {
+            console.log('El estado de la solicitud es 3');
+            Swal.fire({
+                title: 'Otorgando Permisos',
+                text: 'Estamos otorgando los permisos necesarios para su cuenta.',
+                imageUrl: "/AccessEntry-Autocom/public/images/caso3.png",
+                imageWidth: 400,
+                imageHeight: 200,
+                imageAlt: "Custom image"
+            });
+        } else if (estado === 4) {
+            console.log('El estado de la solicitud es 4');
+            Swal.fire({
+                title: 'Credenciales Enviadas',
+                text: 'Las credenciales han sido enviadas. Revise su correo para más detalles.',
+                imageUrl: "/AccessEntry-Autocom/public/images/caso4.png",
+                imageWidth: 400,
+                imageHeight: 200,
+                imageAlt: "Custom image"
+            });
+        } else if (estado === 5) {
+            console.log('El estado de la solicitud es 5');
+            Swal.fire({
+                title: 'Solicitud Rechazada',
+                text: 'Lamentablemente, su solicitud ha sido rechazada. Para mas Información revise el Informe',
+                footer: '<a href="#">Ver Informe</a>',
+                imageUrl: "/AccessEntry-Autocom/public/images/rechazado.png",
+                imageWidth: 200,
+                imageHeight: 200,
+                imageAlt: "Custom image"
+            });
+        } else {
+            console.log('Estado desconocido');
+            Swal.fire({
+                title: 'Estado Desconocido',
+                text: 'No se pudo determinar el estado de su solicitud.',
+                icon: 'warning',
+            });
         }
-
-        // Mostrar la ventana de alerta con la información
-        await Swal.fire({
-            title: `${rowData.estado_solicitud}`,
-            imageUrl: "/AccessEntry-Autocom/public/images/recibido.png",
-            imageWidth: 200,
-            imageHeight: 200,
-            imageAlt: "Custom image"
-        });
 
     } catch (error) {
         console.error('Error en ver:', error);
@@ -122,6 +172,7 @@ const ver = async (e) => {
         });
     }
 };
+
 
 // Agregar el event listener usando delegación de eventos
 document.querySelector('#tablaEstado').addEventListener('click', function (e) {
