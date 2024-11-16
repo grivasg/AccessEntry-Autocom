@@ -96,10 +96,11 @@ const guardar = async (e) => {
             document.getElementById('step-1').style.display = 'block';
 
             // Mostrar un mensaje de éxito
-            Toast.fire({
-                icon: icon,
-                title: mensaje,
-                timer: 8000
+            Swal.fire({
+                title: "Solicitud Generada con Exito",
+                text: "Su solicitud ha sido registrada. Actualmente se encuentra en proceso. Será notificado oportunamente sobre cualquier actualización respecto al estado de su solicitud.",
+                icon: "success",
+                footer: '<a href="/AccessEntry-Autocom/estado">Ver Estado de Solicitud</a>',
             });
         } else {
             icon = 'error';
@@ -165,10 +166,13 @@ const siguiente = async (e) => {
                 document.getElementById('step-1').style.display = 'none';
                 document.getElementById('step-2').style.display = 'block';
 
-                Toast.fire({
-                    icon: 'success',
-                    title: 'Catálogo verificado correctamente'
-                });
+                Swal.fire({
+                    position: "top-end",
+                    icon: "success",
+                    title: "Catalogo Verificado",
+                    text: "Compruebe los datos del solicitante y complete los campos para realizar la Solicitud.",
+                    showConfirmButton: true,
+                  });
             } else {
                 Swal.fire({
                     title: "Error",

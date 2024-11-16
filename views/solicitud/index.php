@@ -16,7 +16,7 @@
             <div class="row text-center">
                 <div class="col-md-3"></div>
                 <div class="col-md-6">
-                    <button type="button" id="next-step" class="btn btn-primary w-100">Siguiente</button>
+                    <button type="button" id="next-step" class="btn btn-dark w-100">Verificar</button>
                 </div>
             </div>
         </div>
@@ -26,13 +26,13 @@
             <div class="row mb-3">
                 <div class="col">
                     <label for="nombres_completos" class="form-label">Datos Personales del Solicitante</label>
-                    <input type="text" id="nombres_completos" readonly class="form-control">
+                    <input type="text" id="nombres_completos" class="form-control" disabled>
                 </div>
             </div>
             <div class="row mb-3">
                 <div class="col">
                     <label for="puesto" class="form-label">Empleo</label>
-                    <input type="text" id="puesto" readonly class="form-control">
+                    <input type="text" id="puesto" readonly class="form-control" disabled>
                 </div>
             </div>
             <div class="row mb-3">

@@ -1,1 +1,1 @@
-<h1>hola desde la vista</h1>
+<h1>hola desde la vista de Estado</h1>
