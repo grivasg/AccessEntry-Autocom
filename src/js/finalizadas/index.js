@@ -68,8 +68,8 @@ const datatable = new DataTable('#tablaFinalizadas', {
 
                 // Puedes agregar imágenes condicionales para cada estado
                 switch (estado) {
-                    case 'PENDIENTE REVISION':
-                        imagen = `<img src='/AccessEntry-Autocom/public/images/PENDIENTE.png' alt='Recibida' style='width: 80px; height: 80px;' />`;
+                    case 'CREDENCIALES ENVIADOS':
+                        imagen = `<img src='/AccessEntry-Autocom/public/images/ENVIADO1.png' alt='Recibida' style='width: 80px; height: 80px;' />`;
                         break;
                 }
 

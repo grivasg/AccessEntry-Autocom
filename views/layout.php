@@ -39,6 +39,9 @@
                                 <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/nuevas"><i class="bi bi-bell"></i> Nuevas Solicitudes</a>
                             </li>
                             <li>
+                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/pendientes"><i class="bi bi-bell"></i> Solicitudes a Enviar</a>
+                            </li>
+                            <li>
                                 <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/finalizadas"><i class="bi bi-bookmark-check-fill"></i> Solicitudes Finalizadas</a>
                             </li>
                         </ul>
