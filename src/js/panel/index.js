@@ -71,21 +71,6 @@ const datatable = new DataTable('#tablaPanelCau', {
                     case 'SOLICITUD RECIBIDA':
                         imagen = `<img src='/AccessEntry-Autocom/public/images/RECIBIDA1.png' alt='Recibida' style='width: 80px; height: 80px;' />`;
                         break;
-                    case 'GENERANDO USUARIO':
-                        imagen = `<img src='/AccessEntry-Autocom/public/images/USUARIO1.png' alt='Generando Usuario' style='width: 80px; height: 80px;' />`;
-                        break;
-                    case 'OTORGANDO PERMISOS':
-                        imagen = `<img src='/AccessEntry-Autocom/public/images/PERMISOS1.png' alt='Otorgando Permisos' style='width: 80px; height: 80px;' />`;
-                        break;
-                    case 'CREDENCIALES ENVIADOS':
-                        imagen = `<img src='/AccessEntry-Autocom/public/images/ENVIADO1.png' alt='Credenciales Enviados' style='width: 80px; height: 80px;' />`;
-                        break;
-                    case 'SOLICITUD RECHAZADA':
-                        imagen = `<img src='/AccessEntry-Autocom/public/images/rechazado.png' style='width: 80px; height: 80px;' />`;
-                        break;
-                    default:
-                        imagen = `<img src='/path/to/default.png' alt='Desconocido' style='width: 80px; height: 80px;' />`;
-                        break;
                 }
 
                 // Retorna el HTML que incluye la imagen y el texto
@@ -103,38 +88,10 @@ const datatable = new DataTable('#tablaPanelCau', {
             searchable: false,
             orderable: false,
             render: (data, type, row, meta) => {
-                switch (row.estado_solicitud.toUpperCase()) {
-                    case 'SOLICITUD RECIBIDA':
-                        return `
-                            <button class='btn btn-info accion' data-estado="SOLICITUD RECIBIDA" title="Solicitud Recibida">
-                                <i class='bi bi-envelope-check'></i>
-                            </button>`;
-                    case 'GENERANDO USUARIO':
-                        return `
-                            <button class='btn btn-primary accion' data-estado="GENERANDO USUARIO" title="Generando Usuario">
-                                <i class='bi bi-person-plus'></i>
-                            </button>`;
-                    case 'OTORGANDO PERMISOS':
-                        return `
-                            <button class='btn btn-warning accion' data-estado="OTORGANDO PERMISOS" title="Otorgando Permisos">
-                                <i class='bi bi-key'></i>
-                            </button>`;
-                    case 'CREDENCIALES ENVIADOS':
-                        return `
-                            <button class='btn btn-success accion' data-estado="CREDENCIALES ENVIADOS" title="Credenciales Enviados">
-                                <i class='bi bi-check-circle'></i>
-                            </button>`;
-                    case 'SOLICITUD RECHAZADA':
-                        return `
-                            <button class='btn btn-danger accion' data-estado="SOLICITUD RECHAZADA" title="Solicitud Rechazada">
-                                <i class='bi bi-x-circle'></i>
-                            </button>`;
-                    default:
-                        return `
-                            <button class='btn btn-secondary accion' data-estado="DESCONOCIDO" title="Ver detalles">
-                                <i class='bi bi-eye'></i>
-                            </button>`;
-                }
+                return `
+                    <button class='btn btn-success verificar'><i class="bi bi-clipboard-check"></i> </button>
+
+                    <button class='btn btn-danger rechazar'><i class="bi bi-hand-thumbs-down"></i></button>`;
             }
         }
     ]
@@ -165,15 +122,20 @@ const buscar = async () => {
     }
 };
 
-// Event listener simplificado que solo muestra una alerta
-datatable.on('click', '.accion', function (e) {
-    const estado = this.getAttribute('data-estado');
-    alert(`Esta es la función para: ${estado}`);
-});
+const verificar = async () => {
+    alert('SU SOLICITUD HA SIDO VERIFICADA')
+};
 
-// Iniciar la búsqueda cuando se carga la página
+const rechazar = async () => {
+    alert('SU SOLICITUD HA SIDO RECHAZADA')
+};
+
+
 buscar();
 
 
 
-datatable.on('click', '.accion');
+datatable.on('click', '.verificar', verificar);
+datatable.on('click', '.rechazar', rechazar);
+
+
