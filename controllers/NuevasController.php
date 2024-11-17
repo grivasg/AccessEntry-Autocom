@@ -12,7 +12,7 @@ class NuevasController
     {
         $router->render('nuevas/index', []);
     }
-    
+
     public static function buscarAPI()
     {
         try {
@@ -34,4 +34,69 @@ class NuevasController
         }
     }
 
+    public static function verificarAPI()
+    {
+        try {
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $solicitud_id = $_POST['solicitud_id'] ?? null;
+
+                if (!$solicitud_id) {
+                    throw new Exception('ID de solicitud no proporcionado');
+                }
+
+                $resultado = Solicitud::verificarSolicitud($solicitud_id); // Pasamos $solicitud_id aquí
+
+                if ($resultado) {
+                    http_response_code(200);
+                    echo json_encode([
+                        'codigo' => 1,
+                        'mensaje' => 'Solicitud verificada exitosamente',
+                        'detalle' => ''
+                    ]);
+                } else {
+                    throw new Exception('Error al actualizar el estado');
+                }
+            }
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode([
+                'codigo' => 0,
+                'mensaje' => 'Error al verificar la solicitud',
+                'detalle' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public static function rechazarAPI()
+    {
+        try {
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $solicitud_id = $_POST['solicitud_id'] ?? null;
+
+                if (!$solicitud_id) {
+                    throw new Exception('ID de solicitud no proporcionado');
+                }
+
+                $resultado = Solicitud::rechazarSolicitud($solicitud_id); // Pasamos $solicitud_id aquí
+
+                if ($resultado) {
+                    http_response_code(200);
+                    echo json_encode([
+                        'codigo' => 1,
+                        'mensaje' => 'Solicitud rechazada exitosamente',
+                        'detalle' => ''
+                    ]);
+                } else {
+                    throw new Exception('Error al actualizar el estado');
+                }
+            }
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode([
+                'codigo' => 0,
+                'mensaje' => 'Error al rechazar la solicitud',
+                'detalle' => $e->getMessage()
+            ]);
+        }
+    }
 };

@@ -106,32 +106,117 @@ const buscar = async () => {
 
         const respuesta = await fetch(url, config);
         const data = await respuesta.json();
+        const { datos } = data;
 
-        console.log('Datos recibidos:', data);
+        datatable.clear().draw();
 
-        if (data && data.datos) {
-            datatable.clear();
-            datatable.rows.add(data.datos).draw();
+        if (datos) {
+            datatable.rows.add(datos).draw();
         }
     } catch (error) {
-        console.error('Error en buscar:', error);
+        console.log(error);
+    }
+};
+buscar();
+
+
+
+const verificar = async (e) => {
+    try {
+        const row = datatable.row(e.target.closest('tr')).data();
+        const solicitud_id = row.solicitud_id;
+
+        const confirmacion = await Swal.fire({
+            title: '¿Está seguro?',
+            text: "¿Desea verificar esta solicitud?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, verificar',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (!confirmacion.isConfirmed) return;
+
+        const formData = new FormData();
+        formData.append('solicitud_id', solicitud_id);
+
+        const url = "/AccessEntry-Autocom/API/nuevas/verificar";
+        const config = {
+            method: 'POST',
+            body: formData
+        };
+
+        const respuesta = await fetch(url, config);
+        const data = await respuesta.json();
+
+        if (data.codigo === 1) {
+            Toast.fire({
+                icon: 'success',
+                title: data.mensaje
+            });
+            await buscar(); // Actualiza la tabla
+        } else {
+            throw new Error(data.detalle);
+        }
+    } catch (error) {
+        console.error('Error en verificar:', error);
         Toast.fire({
             icon: 'error',
-            title: 'Error al cargar los datos'
+            title: 'Error al verificar la solicitud'
         });
     }
 };
 
-const verificar = async () => {
-    alert('SU SOLICITUD HA SIDO VERIFICADA')
+const rechazar = async (e) => {
+    try {
+        const row = datatable.row(e.target.closest('tr')).data();
+
+        const solicitud_id = row.solicitud_id;
+
+        const confirmacion = await Swal.fire({
+            title: '¿Está seguro?',
+            text: "¿Desea rechazar esta solicitud?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, rechazar',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (!confirmacion.isConfirmed) return;
+
+        const formData = new FormData();
+        formData.append('solicitud_id', solicitud_id);
+
+        const url = "/AccessEntry-Autocom/API/nuevas/rechazar";
+        const config = {
+            method: 'POST',
+            body: formData
+        };
+
+        const respuesta = await fetch(url, config);
+        const data = await respuesta.json();
+
+        if (data.codigo === 1) {
+            Toast.fire({
+                icon: 'success',
+                title: data.mensaje
+            });
+            await buscar(); // Actualiza la tabla
+        } else {
+            throw new Error(data.detalle);
+        }
+    } catch (error) {
+        console.error('Error en rechazar:', error);
+        Toast.fire({
+            icon: 'error',
+            title: 'Error al rechazar la solicitud'
+        });
+    }
 };
-
-const rechazar = async () => {
-    alert('SU SOLICITUD HA SIDO RECHAZADA')
-};
-
-
-buscar();
 
 
 

@@ -34,6 +34,8 @@ $router->get('/API/estado/buscar', [EstadoController::class, 'buscarAPI']);
 // RUTAS DE NUEVAS SOLICITUDES
 $router->get('/nuevas', [NuevasController::class, 'index']);
 $router->get('/API/nuevas/buscar', [NuevasController::class, 'buscarAPI']);
+$router->post('/API/nuevas/verificar', [NuevasController::class, 'verificarAPI']);
+$router->post('/API/nuevas/rechazar', [NuevasController::class, 'rechazarAPI']);
 
 // RUTAS DE SOLICITUDES FINALIZADAS
 $router->get('/finalizadas', [FinalizadasController::class, 'index']);

@@ -119,7 +119,7 @@ const ver = async (e) => {
 
         // Evaluar el valor de estado
         if (estado === 1) {
-            console.log('El estado de la solicitud es 1');
+            // console.log('El estado de la solicitud es 1');
             Swal.fire({
                 title: 'Solicitud Recibida',
                 text: 'Su solicitud ha sido recibida y está en proceso de verificación.',
@@ -129,7 +129,7 @@ const ver = async (e) => {
                 imageAlt: "Custom image"
             });
         } else if (estado === 2) {
-            console.log('El estado de la solicitud es 2');
+            // console.log('El estado de la solicitud es 2');
             Swal.fire({
                 title: 'Generando Usuario',
                 text: 'Estamos generando el usuario para usted. Espere un momento.',
@@ -139,7 +139,7 @@ const ver = async (e) => {
                 imageAlt: "Custom image"
             });
         } else if (estado === 3) {
-            console.log('El estado de la solicitud es 3');
+            // console.log('El estado de la solicitud es 3');
             Swal.fire({
                 title: 'Otorgando Permisos',
                 text: 'Estamos otorgando los permisos necesarios para su cuenta.',
@@ -149,7 +149,7 @@ const ver = async (e) => {
                 imageAlt: "Custom image"
             });
         } else if (estado === 4) {
-            console.log('El estado de la solicitud es 4');
+            // console.log('El estado de la solicitud es 4');
             Swal.fire({
                 title: 'Credenciales Enviadas',
                 text: 'Las credenciales han sido enviadas. Revise su correo para más detalles.',
@@ -159,7 +159,7 @@ const ver = async (e) => {
                 imageAlt: "Custom image"
             });
         } else if (estado === 5) {
-            console.log('El estado de la solicitud es 5');
+            // console.log('El estado de la solicitud es 5');
             Swal.fire({
                 title: 'Solicitud Rechazada',
                 text: 'Lamentablemente, su solicitud ha sido rechazada. Para mas Información revise el Informe',
@@ -167,6 +167,16 @@ const ver = async (e) => {
                 imageUrl: "/AccessEntry-Autocom/public/images/rechazado.png",
                 imageWidth: 200,
                 imageHeight: 200,
+                imageAlt: "Custom image"
+            });
+        } else if (estado === 6) {
+            // console.log('El estado de la solicitud es 6');
+            Swal.fire({
+                title: 'Otorgando Permisos',
+                text: 'Estamos otorgando los permisos necesarios para su cuenta.',
+                imageUrl: "/AccessEntry-Autocom/public/images/caso3.png",
+                imageWidth: 490,
+                imageHeight: 270,
                 imageAlt: "Custom image"
             });
         } else {
