@@ -71,32 +71,32 @@ const datatable = new DataTable('#tablaPanelCau', {
                 switch (row.estado_solicitud.toUpperCase()) {
                     case 'SOLICITUD RECIBIDA':
                         return `
-                            <button class='btn btn-outline-info accion' data-estado="SOLICITUD RECIBIDA" title="Solicitud Recibida">
+                            <button class='btn btn-info accion' data-estado="SOLICITUD RECIBIDA" title="Solicitud Recibida">
                                 <i class='bi bi-envelope-check'></i>
                             </button>`;
                     case 'GENERANDO USUARIO':
                         return `
-                            <button class='btn btn-outline-primary accion' data-estado="GENERANDO USUARIO" title="Generando Usuario">
+                            <button class='btn btn-primary accion' data-estado="GENERANDO USUARIO" title="Generando Usuario">
                                 <i class='bi bi-person-plus'></i>
                             </button>`;
                     case 'OTORGANDO PERMISOS':
                         return `
-                            <button class='btn btn-outline-warning accion' data-estado="OTORGANDO PERMISOS" title="Otorgando Permisos">
+                            <button class='btn btn-warning accion' data-estado="OTORGANDO PERMISOS" title="Otorgando Permisos">
                                 <i class='bi bi-key'></i>
                             </button>`;
                     case 'CREDENCIALES ENVIADOS':
                         return `
-                            <button class='btn btn-outline-success accion' data-estado="CREDENCIALES ENVIADOS" title="Credenciales Enviados">
+                            <button class='btn btn-success accion' data-estado="CREDENCIALES ENVIADOS" title="Credenciales Enviados">
                                 <i class='bi bi-check-circle'></i>
                             </button>`;
                     case 'SOLICITUD RECHAZADA':
                         return `
-                            <button class='btn btn-outline-danger accion' data-estado="SOLICITUD RECHAZADA" title="Solicitud Rechazada">
+                            <button class='btn btn-danger accion' data-estado="SOLICITUD RECHAZADA" title="Solicitud Rechazada">
                                 <i class='bi bi-x-circle'></i>
                             </button>`;
                     default:
                         return `
-                            <button class='btn btn-outline-secondary accion' data-estado="DESCONOCIDO" title="Ver detalles">
+                            <button class='btn btn-secondary accion' data-estado="DESCONOCIDO" title="Ver detalles">
                                 <i class='bi bi-eye'></i>
                             </button>`;
                 }
