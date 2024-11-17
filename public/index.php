@@ -4,6 +4,7 @@ require_once __DIR__ . '/../includes/app.php';
 use MVC\Router;
 use Controllers\AppController;
 use Controllers\EstadoController;
+use Controllers\PanelController;
 use Controllers\SolicitudController;
 
 $router = new Router();
@@ -19,8 +20,6 @@ $router->post('/API/solicitud/modificar', [SolicitudController::class, 'modifica
 $router->post('/API/solicitud/eliminar', [SolicitudController::class, 'eliminarAPI']); // Eliminar solicitud
 $router->post('API/solicitud/verificar', [SolicitudController::class, 'verificarAPI']);
 $router->post('/API/solicitud/verificar', [SolicitudController::class, 'verificarAPI']);
-
-
 $router->post('/API/solicitud/catalogoExiste', [SolicitudController::class, 'catalogoExisteAPI']);
 $router->post('/API/solicitud/obtenerDatosPersonal', [SolicitudController::class, 'obtenerDatosPersonalAPI']);
 
@@ -28,6 +27,11 @@ $router->post('/API/solicitud/obtenerDatosPersonal', [SolicitudController::class
 $router->get('/estado', [EstadoController::class, 'index']);
 $router->get('/API/estado/buscar', [EstadoController::class, 'buscarAPI']);
 
+
+
+// RUTAS DE PANEL ADMIN
+$router->get('/panel', [PanelController::class, 'index']);
+$router->get('/API/panel/buscar', [PanelController::class, 'buscarAPI']);
 
 // Comprueba y valida las rutas, que existan y les asigna las funciones del Controlador
 $router->comprobarRutas();

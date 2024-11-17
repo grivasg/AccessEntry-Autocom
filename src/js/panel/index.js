@@ -27,12 +27,12 @@ const datatable = new DataTable('#tablaEstado', {
             data: 'nombres_apellidos'
         },
         {
-            title: 'Catalogo',
-            data: 'sol_cred_catalogo'
-        },
-        {
             title: 'Puesto',
             data: 'puesto_dependencia'
+        },
+        {
+            title: 'Catalogo',
+            data: 'sol_cred_catalogo'
         },
         {
             title: 'Modulos para habilitar',
@@ -41,6 +41,10 @@ const datatable = new DataTable('#tablaEstado', {
         {
             title: 'Justificacion',
             data: 'sol_cred_justificacion'
+        },
+        {
+            title: '¿Tiene Usuario de AUTOCOM?',
+            data: 'sol_cred_usuario'
         },
         {
             title: 'Fecha de Solicitud',
@@ -58,24 +62,10 @@ const datatable = new DataTable('#tablaEstado', {
         },
         {
             title: 'Estado de Solicitud',
-            data: 'estado_solicitud',
-            searchable: false,
-            orderable: false,
-            render: (data, type, row, meta) => {
-                // Crear el botón como elemento HTML
-                const button = document.createElement('button');
-                button.className = 'btn btn-warning ver';
-                button.innerHTML = '<i class="bi bi-eye-fill"></i> VER';
-
-                // Guardar los datos completos de la fila en un atributo data
-                button.setAttribute('data-row', JSON.stringify({
-                    solicitud_id: row.solicitud_id,
-                    estado_solicitud: row.estado_solicitud,
-                    id_estado: row.estado_cred_id
-                }));
-
-                return button.outerHTML;
-            }
+            data: 'estado_solicitud'
+        },
+        {
+            title: 'Acciones'
         },
     ]
 });

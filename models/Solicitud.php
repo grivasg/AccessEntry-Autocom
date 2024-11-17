@@ -59,12 +59,38 @@ class Solicitud extends ActiveRecord
         return self::fetchArray($sql);
     }
 
-
     public static function obtenerSolicitudes1()
     {
-        $sql = "SELECT * FROM solicitud_credenciales where sol_cred_estado_solicitud = 1";
+        $sql = "SELECT 
+                    (g.gra_desc_lg || ' DE ' || a.arm_desc_lg) AS Grado_Arma,  -- Grado y Arma concatenados
+                    (m.per_nom1 || ' ' || m.per_nom2 || ' ' || m.per_ape1 || ' ' || m.per_ape2 || ' ' || m.per_ape3) AS Nombres_Apellidos,  -- Nombre completo del solicitante
+                    sc.sol_cred_catalogo,  -- Catálogo de la solicitud
+                    TRIM(org.org_plaza_desc) || ' - ' || TRIM(d.dep_desc_lg) AS Puesto_Dependencia,  -- Puesto y dependencia concatenados
+                    sc.solicitud_id,  -- ID de la solicitud
+                    sc.sol_cred_correo,  -- Correo electrónico del solicitante
+                    sc.sol_cred_telefono,  -- Teléfono del solicitante
+                    sc.sol_cred_fecha_solicitud,  -- Fecha de la solicitud
+                    sc.sol_cred_modulo,  -- Módulo asociado a la solicitud
+                    sc.sol_cred_justificacion,  -- Justificación de la solicitud
+                    sc.sol_cred_usuario,  -- Usuario que realizó la solicitud
+                    e.estado_cred_id,  -- ID del estado de la solicitud
+                    e.estado_cred_nombre AS Estado_Solicitud  -- Nombre del estado de la solicitud
+                FROM solicitud_credenciales sc
+                JOIN mper m ON sc.sol_cred_catalogo = m.per_catalogo  -- Unimos con la tabla mper para obtener los datos del solicitante
+                JOIN morg org ON m.per_plaza = org.org_plaza  -- Unimos con la tabla morg para obtener la plaza
+                JOIN mdep d ON org.org_dependencia = d.dep_llave  -- Unimos con la tabla mdep para obtener la dependencia
+                JOIN estado_credenciales e ON sc.sol_cred_estado_solicitud = e.estado_cred_id  -- Unimos con estado_credenciales para obtener el estado de la solicitud
+                JOIN grados g ON m.per_grado = g.gra_codigo  -- Unimos con la tabla grados para obtener el grado
+                JOIN armas a ON m.per_arma = a.arm_codigo  -- Unimos con la tabla armas para obtener el arma
+                WHERE sc.sol_cred_estado_solicitud > 0  -- Filtramos para solo incluir solicitudes con estado mayor que 0
+                ORDER BY sc.solicitud_id ASC";  // Ordenamos los resultados por ID de solicitud de manera ascendente
         return self::fetchArray($sql);
     }
+
+
+
+
+
 
     // Agregar estos métodos en la clase Solicitud del Modelo
 
