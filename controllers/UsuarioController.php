@@ -6,17 +6,17 @@ use Exception;
 use Model\Solicitud;
 use MVC\Router;
 
-class FinalizadasController
+class UsuarioController
 {
     public static function index(Router $router)
     {
-        $router->render('finalizadas/index', []);
+        $router->render('usuario/index', []);
     }
     
     public static function buscarAPI()
     {
         try {
-            $solicitudes = Solicitud::SolicitudesFinalizadas();
+            $solicitudes = Solicitud::CreacionUsuario();
             http_response_code(200);
             echo json_encode([
                 'codigo' => 1,
@@ -28,7 +28,7 @@ class FinalizadasController
             http_response_code(500);
             echo json_encode([
                 'codigo' => 0,
-                'mensaje' => 'No se Encontraron Solicitudes Nuevas',
+                'mensaje' => 'Error al buscar Solicitudes',
                 'detalle' => $e->getMessage(),
             ]);
         }

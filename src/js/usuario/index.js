@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 import DataTable from "datatables.net-bs5";
 import { lenguaje } from "../lenguaje";
 
-const datatable = new DataTable('#tablaFinalizadas', {
+const datatable = new DataTable('#tablaUsuario', {
     data: null,
     language: lenguaje,
     pageLength: '15',
@@ -68,8 +68,8 @@ const datatable = new DataTable('#tablaFinalizadas', {
 
                 // Puedes agregar imágenes condicionales para cada estado
                 switch (estado) {
-                    case 'PENDIENTE REVISION':
-                        imagen = `<img src='/AccessEntry-Autocom/public/images/PENDIENTE.png' alt='Recibida' style='width: 80px; height: 80px;' />`;
+                    case 'GENERANDO USUARIO':
+                        imagen = `<img src='/AccessEntry-Autocom/public/images/USUARIO1.png' alt='Recibida' style='width: 80px; height: 80px;' />`;
                         break;
                 }
 
@@ -99,7 +99,7 @@ const datatable = new DataTable('#tablaFinalizadas', {
 
 const buscar = async () => {
     try {
-        const url = "/AccessEntry-Autocom/API/finalizadas/buscar";
+        const url = "/AccessEntry-Autocom/API/usuario/buscar";
         const config = {
             method: 'GET'
         };

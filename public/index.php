@@ -7,6 +7,7 @@ use Controllers\EstadoController;
 use Controllers\FinalizadasController;
 use Controllers\NuevasController;
 use Controllers\SolicitudController;
+use Controllers\UsuarioController;
 
 $router = new Router();
 $router->setBaseURL('/' . $_ENV['APP_NAME']);
@@ -35,6 +36,10 @@ $router->get('/API/nuevas/buscar', [NuevasController::class, 'buscarAPI']);
 // RUTAS DE SOLICITUDES FINALIZADAS
 $router->get('/finalizadas', [FinalizadasController::class, 'index']);
 $router->get('/API/finalizadas/buscar', [FinalizadasController::class, 'buscarAPI']);
+
+// RUTAS DE CREACION DE USUARIO
+$router->get('/usuario', [UsuarioController::class, 'index']);
+$router->get('/API/usuario/buscar', [UsuarioController::class, 'buscarAPI']);
 
 
 // Comprueba y valida las rutas, que existan y les asigna las funciones del Controlador

@@ -39,7 +39,7 @@
                                 <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/nuevas"><i class="bi bi-bell"></i> Nuevas Solicitudes</a>
                             </li>
                             <li>
-                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/"><i class="bi bi-bookmark-check-fill"></i> Solicitudes Finalizadas</a>
+                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/finalizadas"><i class="bi bi-bookmark-check-fill"></i> Solicitudes Finalizadas</a>
                             </li>
                         </ul>
                     </div>
@@ -50,10 +50,10 @@
                         <ul class="dropdown-menu  dropdown-menu-dark " id="dropwdownRevision" style="margin: 0;">
                             <!-- <h6 class="dropdown-header">Información</h6> -->
                             <li>
-                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/"><i class="bi bi-person-plus-fill"></i> Crear Usuario</a>
+                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/usuario"><i class="bi bi-person-plus-fill"></i> Crear Usuario</a>
                             </li>
                             <li>
-                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/"><i class="bi bi-toggles2"></i><i class="bi bi-database-lock"></i> Otorgar Permisos Base de Datos</a>
+                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/permiso"><i class="bi bi-toggles2"></i><i class="bi bi-database-lock"></i> Otorgar Permisos Base de Datos</a>
                             </li>
                         </ul>
                     </div>
