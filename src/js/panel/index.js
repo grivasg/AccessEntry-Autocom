@@ -138,3 +138,7 @@ datatable.on('click', '.accion', function(e) {
 
 // Iniciar la búsqueda cuando se carga la página
 buscar();
+
+
+
+datatable.on('click', '.accion');

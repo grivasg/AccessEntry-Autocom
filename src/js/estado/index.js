@@ -65,7 +65,7 @@ const datatable = new DataTable('#tablaEstado', {
                 // Crear el botón como elemento HTML
                 const button = document.createElement('button');
                 button.className = 'btn btn-warning ver';
-                button.innerHTML = '<i class="bi bi-eye-fill"></i> VER';
+                button.innerHTML = '<i class="bi bi-eye-fill"></i>';
 
                 // Guardar los datos completos de la fila en un atributo data
                 button.setAttribute('data-row', JSON.stringify({
