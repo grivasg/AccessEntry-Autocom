@@ -125,15 +125,15 @@ const verificar = async (e) => {
     try {
         const row = datatable.row(e.target.closest('tr')).data();
         const solicitud_id = row.solicitud_id;
-
+        
         const confirmacion = await Swal.fire({
-            title: '¿Está seguro?',
-            text: "¿Desea verificar esta solicitud?",
-            icon: 'warning',
+            title:'<strong>Por favor, revise que los datos sean correctos.</u></strong>',
+            text: "Esta Solicitud será enviada a la Compañia de Sistemas para la Generación de Usuario y Contraseña ¿Está seguro de que desea enviar esta solicitud? ",
+            icon: 'question',
             showCancelButton: true,
-            confirmButtonColor: '#3085d6',
+            confirmButtonColor: '#206617',
             cancelButtonColor: '#d33',
-            confirmButtonText: 'Sí, verificar',
+            confirmButtonText: 'Sí, Enviar',
             cancelButtonText: 'Cancelar'
         });
 
@@ -178,7 +178,7 @@ const rechazar = async (e) => {
         const confirmacion = await Swal.fire({
             title: '¿Está seguro?',
             text: "¿Desea rechazar esta solicitud?",
-            icon: 'warning',
+            icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
