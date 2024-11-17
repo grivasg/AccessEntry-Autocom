@@ -31,15 +31,29 @@
 
                     <div class="nav-item dropdown ">
                         <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                            <i class="bi bi-tools"></i> Panel de Administradores
+                            <i class="bi bi-tools"></i> Administradores Atención al Usuario
                         </a>
                         <ul class="dropdown-menu  dropdown-menu-dark " id="dropwdownRevision" style="margin: 0;">
                             <!-- <h6 class="dropdown-header">Información</h6> -->
                             <li>
-                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/panel">Solicitudes CAU <i class="bi bi-bell-fill"></i></a>
+                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/panel"><i class="bi bi-bell"></i> Nuevas Solicitudes</a>
                             </li>
                             <li>
-                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/panel">Solicitudes SISTEMAS <i class="bi bi-bell-fill"></i></a>
+                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/"><i class="bi bi-bookmark-check-fill"></i> Solicitudes Finalizadas</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="nav-item dropdown ">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                            <i class="bi bi-tools"></i> Administradores Sistemas
+                        </a>
+                        <ul class="dropdown-menu  dropdown-menu-dark " id="dropwdownRevision" style="margin: 0;">
+                            <!-- <h6 class="dropdown-header">Información</h6> -->
+                            <li>
+                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/"><i class="bi bi-person-plus-fill"></i> Crear Usuario</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/"><i class="bi bi-toggles2"></i><i class="bi bi-database-lock"></i> Otorgar Permisos Base de Datos</a>
                             </li>
                         </ul>
                     </div>

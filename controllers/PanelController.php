@@ -16,7 +16,7 @@ class PanelController
     public static function buscarAPI()
     {
         try {
-            $solicitudes = Solicitud::obtenerSolicitudes();
+            $solicitudes = Solicitud::SolicitudesNuevas();
             http_response_code(200);
             echo json_encode([
                 'codigo' => 1,
