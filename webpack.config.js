@@ -10,6 +10,7 @@ module.exports = {
     'js/nuevas/index' : './src/js/nuevas/index.js',
     'js/finalizadas/index' : './src/js/finalizadas/index.js',
     'js/usuario/index' : './src/js/usuario/index.js',
+    'js/permiso/index' : './src/js/permiso/index.js',
 
   },
   output: {
