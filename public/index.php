@@ -6,6 +6,7 @@ use Controllers\AppController;
 use Controllers\EstadoController;
 use Controllers\FinalizadasController;
 use Controllers\NuevasController;
+use Controllers\PendientesController;
 use Controllers\PermisoController;
 use Controllers\SolicitudController;
 use Controllers\UsuarioController;
@@ -45,6 +46,10 @@ $router->get('/API/usuario/buscar', [UsuarioController::class, 'buscarAPI']);
 // RUTAS DE ASIGNACION DE PERMISOS
 $router->get('/permiso', [PermisoController::class, 'index']);
 $router->get('/API/permiso/buscar', [PermisoController::class, 'buscarAPI']);
+
+// RUTAS DE ASIGNACION DE PERMISOS
+$router->get('/pendientes', [PendientesController::class, 'index']);
+$router->get('/API/pendientes/buscar', [PendientesController::class, 'buscarAPI']);
 
 
 // Comprueba y valida las rutas, que existan y les asigna las funciones del Controlador

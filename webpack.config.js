@@ -11,6 +11,7 @@ module.exports = {
     'js/finalizadas/index' : './src/js/finalizadas/index.js',
     'js/usuario/index' : './src/js/usuario/index.js',
     'js/permiso/index' : './src/js/permiso/index.js',
+    'js/pendientes/index' : './src/js/pendientes/index.js',
 
   },
   output: {
