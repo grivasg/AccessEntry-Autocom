@@ -4,6 +4,7 @@ require_once __DIR__ . '/../includes/app.php';
 use MVC\Router;
 use Controllers\AppController;
 use Controllers\EstadoController;
+use Controllers\FinalizadasController;
 use Controllers\NuevasController;
 use Controllers\SolicitudController;
 
@@ -27,11 +28,14 @@ $router->post('/API/solicitud/obtenerDatosPersonal', [SolicitudController::class
 $router->get('/estado', [EstadoController::class, 'index']);
 $router->get('/API/estado/buscar', [EstadoController::class, 'buscarAPI']);
 
-
-
-// RUTAS DE PANEL ADMIN
+// RUTAS DE NUEVAS SOLICITUDES
 $router->get('/nuevas', [NuevasController::class, 'index']);
 $router->get('/API/nuevas/buscar', [NuevasController::class, 'buscarAPI']);
+
+// RUTAS DE SOLICITUDES FINALIZADAS
+$router->get('/finalizadas', [FinalizadasController::class, 'index']);
+$router->get('/API/finalizadas/buscar', [FinalizadasController::class, 'buscarAPI']);
+
 
 // Comprueba y valida las rutas, que existan y les asigna las funciones del Controlador
 $router->comprobarRutas();

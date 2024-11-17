@@ -8,6 +8,7 @@ module.exports = {
     'js/solicitud/index' : './src/js/solicitud/index.js',
     'js/estado/index' : './src/js/estado/index.js',
     'js/nuevas/index' : './src/js/nuevas/index.js',
+    'js/finalizadas/index' : './src/js/finalizadas/index.js',
 
   },
   output: {
