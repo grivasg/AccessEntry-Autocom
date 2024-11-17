@@ -36,7 +36,7 @@
                         <ul class="dropdown-menu  dropdown-menu-dark " id="dropwdownRevision" style="margin: 0;">
                             <!-- <h6 class="dropdown-header">Información</h6> -->
                             <li>
-                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/panel"><i class="bi bi-bell"></i> Nuevas Solicitudes</a>
+                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/nuevas"><i class="bi bi-bell"></i> Nuevas Solicitudes</a>
                             </li>
                             <li>
                                 <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/"><i class="bi bi-bookmark-check-fill"></i> Solicitudes Finalizadas</a>

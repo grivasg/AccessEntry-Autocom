@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 import DataTable from "datatables.net-bs5";
 import { lenguaje } from "../lenguaje";
 
-const datatable = new DataTable('#tablaPanelCau', {
+const datatable = new DataTable('#tablaNuevas', {
     data: null,
     language: lenguaje,
     pageLength: '15',
@@ -99,7 +99,7 @@ const datatable = new DataTable('#tablaPanelCau', {
 
 const buscar = async () => {
     try {
-        const url = "/AccessEntry-Autocom/API/panel/buscar";
+        const url = "/AccessEntry-Autocom/API/nuevas/buscar";
         const config = {
             method: 'GET'
         };

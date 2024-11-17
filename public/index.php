@@ -4,7 +4,7 @@ require_once __DIR__ . '/../includes/app.php';
 use MVC\Router;
 use Controllers\AppController;
 use Controllers\EstadoController;
-use Controllers\PanelController;
+use Controllers\NuevasController;
 use Controllers\SolicitudController;
 
 $router = new Router();
@@ -30,8 +30,8 @@ $router->get('/API/estado/buscar', [EstadoController::class, 'buscarAPI']);
 
 
 // RUTAS DE PANEL ADMIN
-$router->get('/panel', [PanelController::class, 'index']);
-$router->get('/API/panel/buscar', [PanelController::class, 'buscarAPI']);
+$router->get('/nuevas', [NuevasController::class, 'index']);
+$router->get('/API/nuevas/buscar', [NuevasController::class, 'buscarAPI']);
 
 // Comprueba y valida las rutas, que existan y les asigna las funciones del Controlador
 $router->comprobarRutas();

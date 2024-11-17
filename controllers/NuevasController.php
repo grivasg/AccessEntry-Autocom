@@ -6,11 +6,11 @@ use Exception;
 use Model\Solicitud;
 use MVC\Router;
 
-class PanelController
+class NuevasController
 {
     public static function index(Router $router)
     {
-        $router->render('panel/index', []);
+        $router->render('nuevas/index', []);
     }
     
     public static function buscarAPI()
