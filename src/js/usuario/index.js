@@ -59,39 +59,13 @@ const datatable = new DataTable('#tablaUsuario', {
             }
         },
         {
-            title: 'Estado de Solicitud',
-            data: 'estado_solicitud',
-            render: (data, type, row) => {
-                // Aquí decides qué imagen se mostrará dependiendo del valor del estado_solicitud
-                let imagen = '';
-                let estado = data.toUpperCase();
-
-                // Puedes agregar imágenes condicionales para cada estado
-                switch (estado) {
-                    case 'GENERANDO USUARIO':
-                        imagen = `<img src='/AccessEntry-Autocom/public/images/USUARIO1.png' alt='Recibida' style='width: 80px; height: 80px;' />`;
-                        break;
-                }
-
-                // Retorna el HTML que incluye la imagen y el texto
-                return `
-                    <div style="display: flex; align-items: center;">
-                        ${imagen}
-                        <span style="margin-left: 5px;">${data}</span>
-                    </div>
-                `;
-            }
-        },
-        {
             title: 'Acciones',
             data: 'solicitud_id',
             searchable: false,
             orderable: false,
             render: (data, type, row, meta) => {
                 return `
-                    <button class='btn btn-success verificar'><i class="bi bi-clipboard-check"></i> </button>
-
-                    <button class='btn btn-danger rechazar'><i class="bi bi-hand-thumbs-down"></i></button>`;
+                    <button class='btn btn-dark ingresar'><i class="bi bi-file-earmark-arrow-up-fill"></i> </button>`;
             }
         }
     ]
@@ -122,20 +96,98 @@ const buscar = async () => {
     }
 };
 
-const verificar = async () => {
-    alert('SU SOLICITUD HA SIDO VERIFICADA')
+const ingresar = async (e) => {
+    // Evitar el comportamiento predeterminado del evento si es necesario
+    e.preventDefault();
+
+    // Obtener el botón "Ingresar" y el contenedor donde se encuentra el botón
+    const botonIngresar = e.target;
+    const botonContainer = botonIngresar.closest('td');  // Suponiendo que los botones están en una celda de tabla
+
+    // Mostrar el cuadro de diálogo de selección de archivo
+    const { value: file } = await Swal.fire({
+        title: "Selecciona un documento o imagen",
+        input: "file",
+        inputAttributes: {
+            "accept": "image/*, application/pdf, .doc, .docx",  // Ajusta los tipos de archivo según lo que desees permitir
+            "aria-label": "Cargar tu archivo"
+        },
+        showCancelButton: true, // Agregar un botón de cancelación
+        confirmButtonText: 'Subir',
+        cancelButtonText: 'Cancelar'
+    });
+
+    // Si el usuario selecciona un archivo
+    if (file) {
+        // Si es una imagen, mostramos una vista previa
+        if (file.type.startsWith('image')) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                Swal.fire({
+                    title: "Vista previa de la imagen",
+                    imageUrl: e.target.result,
+                    imageAlt: "Imagen cargada",
+                    showCancelButton: true,
+                    confirmButtonText: 'Confirmar',
+                    cancelButtonText: 'Cancelar'
+                });
+            };
+            reader.readAsDataURL(file);
+        } else {
+            // Si no es una imagen, mostramos un mensaje que el archivo fue cargado
+            Swal.fire({
+                title: "Archivo cargado",
+                text: `Has seleccionado el archivo: ${file.name}`,
+                icon: 'success'
+            });
+        }
+
+        // 1. Ocultar el botón "Ingresar" completamente
+        botonIngresar.style.display = 'none';  // Ocultamos el botón "Ingresar"
+
+        // 2. Eliminar contenido residual de la celda
+        botonContainer.innerHTML = ''; // Eliminar todo el contenido (esto incluye el fondo y espacio residual)
+
+        // 3. Crear y mostrar el botón "Enviar" con un icono
+        const botonEnviar = document.createElement('button');
+        botonEnviar.classList.add('btn', 'btn-success');
+
+        // Agregar un icono dentro del botón (por ejemplo, el icono de "paper-plane" de Bootstrap Icons)
+        botonEnviar.innerHTML = '<i class="bi bi-send"></i>';  // Icono de enviar de Bootstrap Icons
+
+        // Establecer un evento para el botón "Enviar"
+        botonEnviar.addEventListener('click', () => {
+            // Al hacer clic en "Enviar", mostramos el alert
+            alert('Aquí se envía');
+        });
+
+        // Añadir el botón "Enviar" al contenedor de la celda
+        botonContainer.appendChild(botonEnviar);
+
+        // 4. Forzar que DataTable actualice el layout
+        datatable.draw();  // Forzamos el redibujado de la tabla
+    } else {
+        Swal.fire({
+            title: "No se seleccionó archivo",
+            text: "Por favor selecciona un archivo para continuar.",
+            icon: "error"
+        });
+    }
 };
 
-const rechazar = async () => {
-    alert('SU SOLICITUD HA SIDO RECHAZADA')
-};
+
+
+
+
+
+
+
 
 
 buscar();
 
 
 
-datatable.on('click', '.verificar', verificar);
-datatable.on('click', '.rechazar', rechazar);
+datatable.on('click', '.ingresar', ingresar);
 
 
