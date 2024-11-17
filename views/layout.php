@@ -36,9 +36,11 @@
                         <ul class="dropdown-menu  dropdown-menu-dark " id="dropwdownRevision" style="margin: 0;">
                             <!-- <h6 class="dropdown-header">Información</h6> -->
                             <li>
-                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/panel">Solicitudes <i class="bi bi-bell-fill"></i></a>
+                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/panel">Solicitudes CAU <i class="bi bi-bell-fill"></i></a>
                             </li>
-
+                            <li>
+                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/panel">Solicitudes SISTEMAS <i class="bi bi-bell-fill"></i></a>
+                            </li>
                         </ul>
                     </div>
                     <div class="nav-item dropdown ">

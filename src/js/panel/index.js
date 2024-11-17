@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 import DataTable from "datatables.net-bs5";
 import { lenguaje } from "../lenguaje";
 
-const datatable = new DataTable('#tablaEstado', {
+const datatable = new DataTable('#tablaPanelCau', {
     data: null,
     language: lenguaje,
     pageLength: '15',
@@ -51,9 +51,7 @@ const datatable = new DataTable('#tablaEstado', {
             data: 'sol_cred_fecha_solicitud',
             render: (data, type, row) => {
                 if (!data) return "";
-                // Crear objeto Date
                 const fecha = new Date(data);
-                // Formatear la fecha
                 const dia = fecha.getDate().toString().padStart(2, '0');
                 const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
                 const año = fecha.getFullYear();
@@ -65,14 +63,51 @@ const datatable = new DataTable('#tablaEstado', {
             data: 'estado_solicitud'
         },
         {
-            title: 'Acciones'
-        },
+            title: 'Acciones',
+            data: 'solicitud_id',
+            searchable: false,
+            orderable: false,
+            render: (data, type, row, meta) => {
+                switch (row.estado_solicitud.toUpperCase()) {
+                    case 'SOLICITUD RECIBIDA':
+                        return `
+                            <button class='btn btn-outline-info accion' data-estado="SOLICITUD RECIBIDA" title="Solicitud Recibida">
+                                <i class='bi bi-envelope-check'></i>
+                            </button>`;
+                    case 'GENERANDO USUARIO':
+                        return `
+                            <button class='btn btn-outline-primary accion' data-estado="GENERANDO USUARIO" title="Generando Usuario">
+                                <i class='bi bi-person-plus'></i>
+                            </button>`;
+                    case 'OTORGANDO PERMISOS':
+                        return `
+                            <button class='btn btn-outline-warning accion' data-estado="OTORGANDO PERMISOS" title="Otorgando Permisos">
+                                <i class='bi bi-key'></i>
+                            </button>`;
+                    case 'CREDENCIALES ENVIADOS':
+                        return `
+                            <button class='btn btn-outline-success accion' data-estado="CREDENCIALES ENVIADOS" title="Credenciales Enviados">
+                                <i class='bi bi-check-circle'></i>
+                            </button>`;
+                    case 'SOLICITUD RECHAZADA':
+                        return `
+                            <button class='btn btn-outline-danger accion' data-estado="SOLICITUD RECHAZADA" title="Solicitud Rechazada">
+                                <i class='bi bi-x-circle'></i>
+                            </button>`;
+                    default:
+                        return `
+                            <button class='btn btn-outline-secondary accion' data-estado="DESCONOCIDO" title="Ver detalles">
+                                <i class='bi bi-eye'></i>
+                            </button>`;
+                }
+            }
+        }
     ]
 });
 
 const buscar = async () => {
     try {
-        const url = "/AccessEntry-Autocom/API/estado/buscar";
+        const url = "/AccessEntry-Autocom/API/panel/buscar";
         const config = {
             method: 'GET'
         };
@@ -80,7 +115,7 @@ const buscar = async () => {
         const respuesta = await fetch(url, config);
         const data = await respuesta.json();
 
-        console.log('Datos recibidos:', data); // Para debug
+        console.log('Datos recibidos:', data);
 
         if (data && data.datos) {
             datatable.clear();
@@ -95,94 +130,10 @@ const buscar = async () => {
     }
 };
 
-const ver = async (e) => {
-    try {
-        // Encontrar el botón que fue clickeado
-        const button = e.target.closest('.ver');
-        if (!button) return;
-
-        // Obtener y parsear los datos guardados en el botón
-        const rowData = JSON.parse(button.getAttribute('data-row'));
-
-        // Convertir id_estado a un número
-        const estado = parseInt(rowData.id_estado, 10);
-
-        // Evaluar el valor de estado
-        if (estado === 1) {
-            console.log('El estado de la solicitud es 1');
-            Swal.fire({
-                title: 'Solicitud Recibida',
-                text: 'Su solicitud ha sido recibida y está en proceso de verificación.',
-                imageUrl: "/AccessEntry-Autocom/public/images/caso1.png",
-                imageWidth: 490,
-                imageHeight: 270,
-                imageAlt: "Custom image"
-            });
-        } else if (estado === 2) {
-            console.log('El estado de la solicitud es 2');
-            Swal.fire({
-                title: 'Generando Usuario',
-                text: 'Estamos generando el usuario para usted. Espere un momento.',
-                imageUrl: "/AccessEntry-Autocom/public/images/caso2.png",
-                imageWidth: 490,
-                imageHeight: 270,
-                imageAlt: "Custom image"
-            });
-        } else if (estado === 3) {
-            console.log('El estado de la solicitud es 3');
-            Swal.fire({
-                title: 'Otorgando Permisos',
-                text: 'Estamos otorgando los permisos necesarios para su cuenta.',
-                imageUrl: "/AccessEntry-Autocom/public/images/caso3.png",
-                imageWidth: 490,
-                imageHeight: 270,
-                imageAlt: "Custom image"
-            });
-        } else if (estado === 4) {
-            console.log('El estado de la solicitud es 4');
-            Swal.fire({
-                title: 'Credenciales Enviadas',
-                text: 'Las credenciales han sido enviadas. Revise su correo para más detalles.',
-                imageUrl: "/AccessEntry-Autocom/public/images/caso4.png",
-                imageWidth: 490,
-                imageHeight: 270,
-                imageAlt: "Custom image"
-            });
-        } else if (estado === 5) {
-            console.log('El estado de la solicitud es 5');
-            Swal.fire({
-                title: 'Solicitud Rechazada',
-                text: 'Lamentablemente, su solicitud ha sido rechazada. Para mas Información revise el Informe',
-                footer: '<a href="#">Ver Informe</a>',
-                imageUrl: "/AccessEntry-Autocom/public/images/rechazado.png",
-                imageWidth: 200,
-                imageHeight: 200,
-                imageAlt: "Custom image"
-            });
-        } else {
-            console.log('Estado desconocido');
-            Swal.fire({
-                title: 'Estado Desconocido',
-                text: 'No se pudo determinar el estado de su solicitud.',
-                icon: 'warning',
-            });
-        }
-
-    } catch (error) {
-        console.error('Error en ver:', error);
-        Toast.fire({
-            icon: 'error',
-            title: 'Error al mostrar los detalles'
-        });
-    }
-};
-
-
-// Agregar el event listener usando delegación de eventos
-document.querySelector('#tablaEstado').addEventListener('click', function (e) {
-    if (e.target.closest('.ver')) {
-        ver(e);
-    }
+// Event listener simplificado que solo muestra una alerta
+datatable.on('click', '.accion', function(e) {
+    const estado = this.getAttribute('data-estado');
+    alert(`Esta es la función para: ${estado}`);
 });
 
 // Iniciar la búsqueda cuando se carga la página
