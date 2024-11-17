@@ -97,83 +97,60 @@ const buscar = async () => {
 };
 
 const ingresar = async (e) => {
-    // Evitar el comportamiento predeterminado del evento si es necesario
-    e.preventDefault();
+    e.preventDefault(); // Evitar el comportamiento por defecto
 
-    // Obtener el botón "Ingresar" y el contenedor donde se encuentra el botón
-    const botonIngresar = e.target;
-    const botonContainer = botonIngresar.closest('td');  // Suponiendo que los botones están en una celda de tabla
-
-    // Mostrar el cuadro de diálogo de selección de archivo
-    const { value: file } = await Swal.fire({
-        title: "Selecciona un documento o imagen",
-        input: "file",
-        inputAttributes: {
-            "accept": "image/*, application/pdf, .doc, .docx",  // Ajusta los tipos de archivo según lo que desees permitir
-            "aria-label": "Cargar tu archivo"
-        },
-        showCancelButton: true, // Agregar un botón de cancelación
-        confirmButtonText: 'Subir',
-        cancelButtonText: 'Cancelar'
+    // Mostrar el formulario con dos campos usando HTML personalizado
+    const { value: formData } = await Swal.fire({
+        title: 'Ingrese los credenciales del Usuario Creado',
+        html: `
+            <form id="FormCredenciales">
+                <div class="mb-3">
+                    <label for="usuario" class="form-label">Ingrese Usuario</label>
+                    <input type="text" id="usuario" class="form-control" placeholder="Escribe algo...">
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Ingrese Contraseña</label>
+                    <input type="text" id="password" class="form-control" placeholder="Escribe algo más...">
+                </div>
+            </form>
+        `,
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: 'Enviar',
+        cancelButtonText: 'Cancelar',
+        preConfirm: () => {
+            // Obtener los valores de los campos del formulario
+            const usuario = document.getElementById('usuario').value;
+            const password = document.getElementById('password').value;
+            
+            // Validar que los campos no estén vacíos
+            if (!usuario || !password) {
+                Swal.showValidationMessage('Por favor, completa todos los campos');
+                return false; // No continuar si hay campos vacíos
+            }
+            
+            return { usuario, password }; // Retorna los valores de los campos
+        }
     });
 
-    // Si el usuario selecciona un archivo
-    if (file) {
-        // Si es una imagen, mostramos una vista previa
-        if (file.type.startsWith('image')) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                Swal.fire({
-                    title: "Vista previa de la imagen",
-                    imageUrl: e.target.result,
-                    imageAlt: "Imagen cargada",
-                    showCancelButton: true,
-                    confirmButtonText: 'Confirmar',
-                    cancelButtonText: 'Cancelar'
-                });
-            };
-            reader.readAsDataURL(file);
-        } else {
-            // Si no es una imagen, mostramos un mensaje que el archivo fue cargado
-            Swal.fire({
-                title: "Archivo cargado",
-                text: `Has seleccionado el archivo: ${file.name}`,
-                icon: 'success'
-            });
-        }
-
-        // 1. Ocultar el botón "Ingresar" completamente
-        botonIngresar.style.display = 'none';  // Ocultamos el botón "Ingresar"
-
-        // 2. Eliminar contenido residual de la celda
-        botonContainer.innerHTML = ''; // Eliminar todo el contenido (esto incluye el fondo y espacio residual)
-
-        // 3. Crear y mostrar el botón "Enviar" con un icono
-        const botonEnviar = document.createElement('button');
-        botonEnviar.classList.add('btn', 'btn-success');
-
-        // Agregar un icono dentro del botón (por ejemplo, el icono de "paper-plane" de Bootstrap Icons)
-        botonEnviar.innerHTML = '<i class="bi bi-send"></i>';  // Icono de enviar de Bootstrap Icons
-
-        // Establecer un evento para el botón "Enviar"
-        botonEnviar.addEventListener('click', () => {
-            // Al hacer clic en "Enviar", mostramos el alert
-            alert('Aquí se envía');
-        });
-
-        // Añadir el botón "Enviar" al contenedor de la celda
-        botonContainer.appendChild(botonEnviar);
-
-        // 4. Forzar que DataTable actualice el layout
-        datatable.draw();  // Forzamos el redibujado de la tabla
-    } else {
+    // Si se llenaron los campos correctamente
+    if (formData) {
+        // Mostrar los datos ingresados
         Swal.fire({
-            title: "No se seleccionó archivo",
-            text: "Por favor selecciona un archivo para continuar.",
-            icon: "error"
+            title: 'Datos Recibidos',
+            text: `Usuario: ${formData.usuario}\nContraseña: ${formData.password}`,
+            icon: 'success'
+        });
+    } else {
+        // Si el formulario es cancelado o hay errores
+        Swal.fire({
+            title: 'Operación cancelada',
+            text: 'No se enviaron los datos.',
+            icon: 'info'
         });
     }
 };
+
 
 
 
