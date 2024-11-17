@@ -39,6 +39,20 @@ const datatable = new DataTable('#tablaEstado', {
             data: 'sol_cred_modulo'
         },
         {
+            title: 'Fecha de Solicitud',
+            data: 'sol_cred_fecha_solicitud',
+            render: (data, type, row) => {
+                if (!data) return "";
+                // Crear objeto Date
+                const fecha = new Date(data);
+                // Formatear la fecha
+                const dia = fecha.getDate().toString().padStart(2, '0');
+                const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+                const año = fecha.getFullYear();
+                return `${dia}/${mes}/${año}`;
+            }
+        },
+        {
             title: 'Justificacion',
             data: 'sol_cred_justificacion'
         },
@@ -110,8 +124,8 @@ const ver = async (e) => {
                 title: 'Solicitud Recibida',
                 text: 'Su solicitud ha sido recibida y está en proceso de verificación.',
                 imageUrl: "/AccessEntry-Autocom/public/images/caso1.png",
-                imageWidth: 200,
-                imageHeight: 200,
+                imageWidth: 490,
+                imageHeight: 270,
                 imageAlt: "Custom image"
             });
         } else if (estado === 2) {
@@ -120,8 +134,8 @@ const ver = async (e) => {
                 title: 'Generando Usuario',
                 text: 'Estamos generando el usuario para usted. Espere un momento.',
                 imageUrl: "/AccessEntry-Autocom/public/images/caso2.png",
-                imageWidth: 400,
-                imageHeight: 200,
+                imageWidth: 490,
+                imageHeight: 270,
                 imageAlt: "Custom image"
             });
         } else if (estado === 3) {
@@ -130,8 +144,8 @@ const ver = async (e) => {
                 title: 'Otorgando Permisos',
                 text: 'Estamos otorgando los permisos necesarios para su cuenta.',
                 imageUrl: "/AccessEntry-Autocom/public/images/caso3.png",
-                imageWidth: 400,
-                imageHeight: 200,
+                imageWidth: 490,
+                imageHeight: 270,
                 imageAlt: "Custom image"
             });
         } else if (estado === 4) {
@@ -140,8 +154,8 @@ const ver = async (e) => {
                 title: 'Credenciales Enviadas',
                 text: 'Las credenciales han sido enviadas. Revise su correo para más detalles.',
                 imageUrl: "/AccessEntry-Autocom/public/images/caso4.png",
-                imageWidth: 400,
-                imageHeight: 200,
+                imageWidth: 490,
+                imageHeight: 270,
                 imageAlt: "Custom image"
             });
         } else if (estado === 5) {

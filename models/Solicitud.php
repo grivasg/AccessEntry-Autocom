@@ -54,9 +54,11 @@ class Solicitud extends ActiveRecord
             JOIN estado_credenciales e ON sc.sol_cred_estado_solicitud = e.estado_cred_id
             JOIN grados g ON m.per_grado = g.gra_codigo
             JOIN armas a ON m.per_arma = a.arm_codigo
-            WHERE sc.sol_cred_estado_solicitud > 0";
+            WHERE sc.sol_cred_estado_solicitud > 0
+            ORDER BY sc.solicitud_id ASC";  // Ordenar por solicitud_id de manera ascendente
         return self::fetchArray($sql);
     }
+
 
     public static function obtenerSolicitudes1()
     {
