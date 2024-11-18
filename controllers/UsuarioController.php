@@ -4,7 +4,6 @@ namespace Controllers;
 
 use Exception;
 use Model\Solicitud;
-use Model\Usuario;
 use MVC\Router;
 
 class UsuarioController
@@ -35,49 +34,61 @@ class UsuarioController
         }
     }
 
-    public static function guardarAPI()
+    public static function actualizarPasswordAPI()
     {
-        // Recibir los datos como JSON
+        // Recibir los datos de la petición (en este caso solo el password y el solicitud_id)
         $data = json_decode(file_get_contents("php://input"), true);
 
-        if (isset($data['usu_id'], $data['usuario'], $data['password'])) {
-            // Sanitizar los datos
-            $usu_id = htmlspecialchars($data['usu_id']);
-            $usuario = htmlspecialchars($data['usuario']);
+        // Verificar que la solicitud_id y el password estén presentes
+        if (isset($data['solicitud_id']) && isset($data['password'])) {
+
+            // Sanitizar los datos para evitar problemas de seguridad
+            $solicitud_id = htmlspecialchars($data['solicitud_id']);
             $password = htmlspecialchars($data['password']);
 
+            // Hacer el hash de la contraseña
+            $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+
             try {
-                // Crear un nuevo objeto Usuario con los datos recibidos
-                $usuarioModel = new Usuario([
-                    'usu_id' => $usu_id,
-                    'usuario' => $usuario,  // El nombre de usuario o ID de usuario
-                    'password' => $password  // Contraseña
-                ]);
+                // Actualizar el campo password de la solicitud correspondiente
+                $solicitud = Solicitud::find($solicitud_id); // Buscar la solicitud por ID
 
-                // Guardar el nuevo usuario en la base de datos
-                $resultado = $usuarioModel->crear();
+                if ($solicitud) {
+                    // Si la solicitud existe, actualizamos el password
+                    $solicitud->password = $hashedPassword;
 
-                // Retornar respuesta de éxito
-                http_response_code(200);
-                echo json_encode([
-                    'codigo' => 1,
-                    'mensaje' => 'Credenciales Guardadas Exitosamente',
-                ]);
+                    // Guardar los cambios en la base de datos
+                    $solicitud->guardar();
+
+                    // Retornar respuesta de éxito
+                    http_response_code(200);
+                    echo json_encode([
+                        'codigo' => 1,
+                        'mensaje' => 'Contraseña actualizada exitosamente'
+                    ]);
+                } else {
+                    // Si la solicitud no existe
+                    http_response_code(404);
+                    echo json_encode([
+                        'codigo' => 0,
+                        'mensaje' => 'Solicitud no encontrada'
+                    ]);
+                }
             } catch (Exception $e) {
-                // Manejo de errores
+                // Si ocurre algún error
                 http_response_code(500);
                 echo json_encode([
                     'codigo' => 0,
-                    'mensaje' => 'Error al Guardar Credenciales',
+                    'mensaje' => 'Error al actualizar la contraseña',
                     'detalle' => $e->getMessage(),
                 ]);
             }
         } else {
-            // Si faltan datos
+            // Si falta alguno de los datos requeridos
             http_response_code(400);
             echo json_encode([
                 'codigo' => 0,
-                'mensaje' => 'Datos incompletos'
+                'mensaje' => 'Datos incompletos, falta la solicitud_id o la contraseña'
             ]);
         }
     }

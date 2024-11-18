@@ -110,18 +110,34 @@ const ingresar = async (e) => {
     const fila = e.target.closest('tr');
     const datos = datatable.row(fila).data();
 
-    // Mostrar el formulario con dos campos usando HTML personalizado
+    // Primer paso: Confirmar si los permisos a nivel base de datos han sido concedidos
+    const { value: permisosConcedidos } = await Swal.fire({
+        title: '¿Ha concedido los permisos a nivel base de datos?',
+        text: 'Por favor, asegúrese de haber otorgado los permisos necesarios antes de continuar.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, ya se concedieron',
+        cancelButtonText: 'No, aún no'
+    });
+
+    // Si el usuario no confirma los permisos, se detiene el flujo
+    if (!permisosConcedidos) {
+        Swal.fire({
+            title: 'Acción cancelada',
+            text: 'Debe conceder los permisos antes de continuar.',
+            icon: 'info'
+        });
+        return; // No continuar si no se concedieron los permisos
+    }
+
+    // Segundo paso: Si los permisos fueron concedidos, mostrar el formulario para ingresar la contraseña
     const { value: formData } = await Swal.fire({
         title: 'Ingrese los credenciales del Usuario Creado',
         html: ` 
-            <form id="formulariousu">
-                <div class="mb-3">
-                    <label for="usuario" class="form-label">Ingrese Usuario</label>
-                    <input type="number" id="usuario" class="form-control" placeholder="Escriba el Usuario...">
-                </div>
+            <form id="formularioSolicitud">
                 <div class="mb-3">
                     <label for="password" class="form-label">Ingrese Contraseña</label>
-                    <input type="text" id="password" class="form-control" placeholder="Escriba la Contraseña...">
+                    <input type="text" id="password" class="form-control" placeholder="Escriba la Contraseña..." required>
                 </div>
             </form>
         `,
@@ -130,31 +146,28 @@ const ingresar = async (e) => {
         confirmButtonText: 'Enviar',
         cancelButtonText: 'Cancelar',
         preConfirm: () => {
-            const usuario = document.getElementById('usuario').value;
             const password = document.getElementById('password').value;
-
-            if (!usuario || !password) {
-                Swal.showValidationMessage('Por favor, completa todos los campos');
+            if (!password) {
+                Swal.showValidationMessage('Por favor, complete el campo de la contraseña');
                 return false;
             }
-
-            return { usuario, password };
+            return { password };
         }
     });
 
+    // Si el usuario ingresó la contraseña, proceder con la actualización
     if (formData) {
         try {
-            // Hacer una solicitud POST al backend para guardar los datos
-            const url = '/AccessEntry-Autocom/API/usuario/guardar'; // URL de la API
+            // Hacer una solicitud POST al backend para actualizar la contraseña
+            const url = '/AccessEntry-Autocom/API/solicitud/actualizarPassword'; // URL de la API
             const config = {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    usu_id: datos.solicitud_id, // Usar el ID de la solicitud
-                    usuario: formData.usuario,
-                    password: formData.password
+                    solicitud_id: datos.solicitud_id,  // Usamos el ID de la solicitud
+                    password: formData.password  // La contraseña que ingresó el usuario
                 })
             };
 
@@ -163,13 +176,14 @@ const ingresar = async (e) => {
 
             if (data.codigo === 1) {
                 // Los datos se guardaron correctamente en la base de datos
-                // Cambiar el botón "Ingresar Datos" a "Enviar"
+                // Guardamos el estado en localStorage para persistencia
+                localStorage.setItem(`datosGuardados_${datos.solicitud_id}`, true);
                 datatable.row(fila).invalidate().draw();
 
                 // Mostrar mensaje de éxito
                 Swal.fire({
-                    title: 'Datos Ingresados',
-                    text: 'Los datos se han guardado correctamente.',
+                    title: 'Contraseña Generada',
+                    text: 'La contraseña ha sido guardada correctamente.',
                     icon: 'success'
                 });
             } else {
@@ -202,4 +216,5 @@ const enviar = (e) => {
 datatable.on('click', '.ingresar', ingresar);
 datatable.on('click', '.enviar', enviar);
 
+// Asegurarnos de cargar los datos y mostrar el estado correcto después de recargar la página
 buscar();
