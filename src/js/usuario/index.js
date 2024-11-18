@@ -68,7 +68,7 @@ const datatable = new DataTable('#tablaUsuario', {
                 const generatedPdf = localStorage.getItem(`pdfGenerated_${data}`);
                 if (generatedPdf) {
                     return `
-                        <button class='btn btn-success enviar'>
+                        <button class='btn btn-success subir'>
                             <i class="bi bi-file-earmark-arrow-up-fill"></i>
                         </button>`;
                 } else {
@@ -213,13 +213,67 @@ const ingresar = async (e) => {
 };
 
 
-const enviar = async () => {
-    alert('aqui se debe enviar')
+const subirArchivo = async () => {
+    // Crear el Swal para seleccionar el archivo
+    const { value: archivo } = await Swal.fire({
+        title: 'Sube un archivo PDF',
+        input: 'file',
+        inputAttributes: {
+            'accept': 'application/pdf', // solo aceptar PDF
+            'aria-label': 'Selecciona un archivo PDF'
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Subir',
+        cancelButtonText: 'Cancelar',
+        inputValidator: (value) => {
+            if (!value) {
+                return '¡Necesitas seleccionar un archivo!';
+            }
+        }
+    });
 
+    // Si el usuario no cancela y selecciona un archivo
+    if (archivo) {
+        try {
+            const formData = new FormData();
+            formData.append('archivo', archivo);
+            console.log(formData)
 
+            const url = '/AccessEntry-Autocom/API/usuario/subir'; // URL del controlador PHP
+            const config = {
+                method: 'POST',
+                body: formData
+            };
+
+            const respuesta = await fetch(url, config);
+            const data = await respuesta.json();
+            const { codigo, mensaje, detalle } = data;
+
+            // Respuesta según el resultado
+            if (codigo === 1) {
+                Toast.fire({
+                    icon: 'success',
+                    title: mensaje
+                });
+            } else {
+                Toast.fire({
+                    icon: 'error',
+                    title: mensaje
+                });
+                console.log(detalle);
+            }
+        } catch (error) {
+            console.error(error);
+            Toast.fire({
+                icon: 'error',
+                title: 'Hubo un error al intentar subir el archivo'
+            });
+        }
+    }
 };
+
 
 buscar();
 
 datatable.on('click', '.ingresar', ingresar);
-datatable.on('click', '.enviar', enviar);
+datatable.on('click', '.subir', subirArchivo);
