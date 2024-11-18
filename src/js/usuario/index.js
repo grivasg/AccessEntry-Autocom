@@ -1,3 +1,4 @@
+import { jsPDF } from "jspdf";
 import { Dropdown } from "bootstrap";
 import { Toast, validarFormulario } from "../funciones";
 import Swal from "sweetalert2";
@@ -97,7 +98,10 @@ const buscar = async () => {
 };
 
 const ingresar = async (e) => {
-    e.preventDefault(); // Evitar el comportamiento por defecto
+    e.preventDefault();
+
+    const fila = e.target.closest('tr');
+    const datos = datatable.row(fila).data();
 
     // Mostrar el formulario con dos campos usando HTML personalizado
     const { value: formData } = await Swal.fire({
@@ -110,7 +114,7 @@ const ingresar = async (e) => {
                 </div>
                 <div class="mb-3">
                     <label for="password" class="form-label">Ingrese Contraseña</label>
-                    <input type="text" id="password" class="form-control" placeholder="Escribe algo más...">
+                    <input type="text" id="password" class="form-control" placeholder="Escribe algo...">
                 </div>
             </form>
         `,
@@ -119,52 +123,78 @@ const ingresar = async (e) => {
         confirmButtonText: 'Enviar',
         cancelButtonText: 'Cancelar',
         preConfirm: () => {
-            // Obtener los valores de los campos del formulario
             const usuario = document.getElementById('usuario').value;
             const password = document.getElementById('password').value;
-            
-            // Validar que los campos no estén vacíos
+
             if (!usuario || !password) {
                 Swal.showValidationMessage('Por favor, completa todos los campos');
-                return false; // No continuar si hay campos vacíos
+                return false;
             }
-            
-            return { usuario, password }; // Retorna los valores de los campos
+
+            return { usuario, password };
         }
     });
 
-    // Si se llenaron los campos correctamente
     if (formData) {
-        // Mostrar los datos ingresados
+        // Crear PDF con los datos
+        const pdf = new jsPDF();
+
+        // Encabezado - "RESERVADO" en rojo y tamaño 16
+        pdf.setTextColor(255, 0, 0);  // Color rojo
+        pdf.setFontSize(16);
+        pdf.text('RESERVADO', 105, 20, null, null, 'center');  // Centrado en la parte superior
+
+        // Configurar el contenido del PDF
+        pdf.setTextColor(0, 0, 0);  // Volver al color negro para el contenido
+        pdf.setFontSize(16);
+        pdf.text('Credenciales de Usuario', 20, 40);
+
+        pdf.setFontSize(12);
+        // Agregar datos del usuario de la fila seleccionada
+        pdf.text(`Grado y Arma: ${datos.grado_arma}`, 20, 60);
+        pdf.text(`Nombres: ${datos.nombres_apellidos}`, 20, 70);
+        pdf.text(`Puesto: ${datos.puesto_dependencia}`, 20, 80);
+
+        // Agregar línea separadora
+        pdf.line(20, 90, 190, 90);
+
+        // Agregar credenciales
+        pdf.text('Credenciales de Acceso:', 20, 105);
+        pdf.text(`Usuario: ${formData.usuario}`, 20, 115);
+        pdf.text(`Contraseña: ${formData.password}`, 20, 125);
+
+        // Obtener fecha y hora actual
+        const fecha = new Date();
+        const fechaFormateada = fecha.toLocaleDateString(); // Formato de fecha
+        const horaFormateada = fecha.toLocaleTimeString(); // Formato de hora
+
+        // Agregar fecha y hora al PDF
+        pdf.setFontSize(10);
+        pdf.text(`Documento generado el: ${fechaFormateada} a las ${horaFormateada}`, 20, 140);
+
+        // Pie de página - "RESERVADO" en rojo y tamaño 16
+        pdf.setTextColor(255, 0, 0);  // Color rojo
+        pdf.setFontSize(16);
+        pdf.text('RESERVADO', 105, 285, null, null, 'center');  // Centrado en la parte inferior
+
+        // Guardar el PDF
+        pdf.save(`credenciales_${formData.usuario}.pdf`);
+
+        // Mostrar mensaje de éxito
         Swal.fire({
-            title: 'Datos Recibidos',
-            text: `Usuario: ${formData.usuario}\nContraseña: ${formData.password}`,
+            title: 'PDF Generado',
+            text: 'El archivo PDF con las credenciales ha sido generado exitosamente',
             icon: 'success'
         });
     } else {
-        // Si el formulario es cancelado o hay errores
         Swal.fire({
             title: 'Operación cancelada',
-            text: 'No se enviaron los datos.',
+            text: 'No se generó el PDF.',
             icon: 'info'
         });
     }
 };
 
-
-
-
-
-
-
-
-
-
-
 buscar();
 
-
-
 datatable.on('click', '.ingresar', ingresar);
-
-
