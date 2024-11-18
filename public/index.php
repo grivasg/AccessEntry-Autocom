@@ -45,6 +45,8 @@ $router->get('/API/finalizadas/buscar', [FinalizadasController::class, 'buscarAP
 // RUTAS DE CREACION DE USUARIO
 $router->get('/usuario', [UsuarioController::class, 'index']);
 $router->get('/API/usuario/buscar', [UsuarioController::class, 'buscarAPI']);
+$router->post('/API/usuario/guardar', [UsuarioController::class, 'guardarAPI']); // Guardar nueva solicitud
+
 
 $router->get('/subir', [FTPController::class, 'subir']);
 $router->post('/API/ftp/subir', [FTPController::class, 'subirAPI']);

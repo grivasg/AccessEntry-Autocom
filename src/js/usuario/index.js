@@ -65,16 +65,16 @@ const datatable = new DataTable('#tablaUsuario', {
             searchable: false,
             orderable: false,
             render: (data, type, row, meta) => {
-                const generatedPdf = localStorage.getItem(`pdfGenerated_${data}`);
-                if (generatedPdf) {
-                    return `
-                        <button class='btn btn-success subir'>
-                            <i class="bi bi-file-earmark-arrow-up-fill"></i>
+                const datosGuardados = localStorage.getItem(`datosGuardados_${data}`);
+                if (datosGuardados) {
+                    return ` 
+                        <button class='btn btn-success enviar'>
+                            <i class="bi bi-send-fill"></i>
                         </button>`;
                 } else {
-                    return `
+                    return ` 
                         <button class='btn btn-dark ingresar'>
-                            <i class="bi bi-file-earmark-arrow-up-fill"></i> 
+                            <i class="bi bi-pencil-square"></i>
                         </button>`;
                 }
             }
@@ -82,24 +82,20 @@ const datatable = new DataTable('#tablaUsuario', {
     ]
 });
 
+// Función para buscar los datos
 const buscar = async () => {
     try {
         const url = "/AccessEntry-Autocom/API/usuario/buscar";
-        const config = {
-            method: 'GET'
-        };
+        const config = { method: 'GET' };
 
         const respuesta = await fetch(url, config);
         const data = await respuesta.json();
-
-        console.log('Datos recibidos:', data);
 
         if (data && data.datos) {
             datatable.clear();
             datatable.rows.add(data.datos).draw();
         }
     } catch (error) {
-        console.error('Error en buscar:', error);
         Toast.fire({
             icon: 'error',
             title: 'Error al cargar los datos'
@@ -107,6 +103,7 @@ const buscar = async () => {
     }
 };
 
+// Función para ingresar datos en el formulario
 const ingresar = async (e) => {
     e.preventDefault();
 
@@ -116,15 +113,15 @@ const ingresar = async (e) => {
     // Mostrar el formulario con dos campos usando HTML personalizado
     const { value: formData } = await Swal.fire({
         title: 'Ingrese los credenciales del Usuario Creado',
-        html: `
-            <form id="FormCredenciales">
+        html: ` 
+            <form id="formulariousu">
                 <div class="mb-3">
                     <label for="usuario" class="form-label">Ingrese Usuario</label>
-                    <input type="text" id="usuario" class="form-control" placeholder="Escribe algo...">
+                    <input type="number" id="usuario" class="form-control" placeholder="Escriba el Usuario...">
                 </div>
                 <div class="mb-3">
                     <label for="password" class="form-label">Ingrese Contraseña</label>
-                    <input type="text" id="password" class="form-control" placeholder="Escribe algo...">
+                    <input type="text" id="password" class="form-control" placeholder="Escriba la Contraseña...">
                 </div>
             </form>
         `,
@@ -146,179 +143,63 @@ const ingresar = async (e) => {
     });
 
     if (formData) {
-        // Crear PDF con los datos
-        const pdf = new jsPDF();
-
-        // Encabezado - "RESERVADO" en rojo y tamaño 16
-        pdf.setTextColor(255, 0, 0);  // Color rojo
-        pdf.setFontSize(16);
-        pdf.text('RESERVADO', 105, 20, null, null, 'center');  // Centrado en la parte superior
-
-        // Configurar el contenido del PDF
-        pdf.setTextColor(0, 0, 0);  // Volver al color negro para el contenido
-        pdf.setFontSize(16);
-        pdf.text('Credenciales de Usuario', 20, 40);
-
-        pdf.setFontSize(12);
-        // Agregar datos del usuario de la fila seleccionada
-        pdf.text(`Grado y Arma: ${datos.grado_arma}`, 20, 60);
-        pdf.text(`Nombres: ${datos.nombres_apellidos}`, 20, 70);
-        pdf.text(`Puesto: ${datos.puesto_dependencia}`, 20, 80);
-
-        // Agregar línea separadora
-        pdf.line(20, 90, 190, 90);
-
-        // Agregar credenciales
-        pdf.text('Credenciales de Acceso:', 20, 105);
-        pdf.text(`Usuario: ${formData.usuario}`, 20, 115);
-        pdf.text(`Contraseña: ${formData.password}`, 20, 125);
-
-        // Obtener fecha y hora actual
-        const fecha = new Date();
-        const fechaFormateada = fecha.toLocaleDateString(); // Formato de fecha
-        const horaFormateada = fecha.toLocaleTimeString(); // Formato de hora
-
-        // Agregar fecha y hora al PDF
-        pdf.setFontSize(10);
-        pdf.text(`Documento generado el: ${fechaFormateada} a las ${horaFormateada}`, 20, 140);
-
-        // Pie de página - "RESERVADO" en rojo y tamaño 16
-        pdf.setTextColor(255, 0, 0);  // Color rojo
-        pdf.setFontSize(16);
-        pdf.text('RESERVADO', 105, 285, null, null, 'center');  // Centrado en la parte inferior
-
-        // Guardar el PDF
-        pdf.save(`credenciales_${formData.usuario}.pdf`);
-
-        // Guardar el estado de que el PDF ya fue generado
-        localStorage.setItem(`pdfGenerated_${datos.solicitud_id}`, 'true');
-
-        // Actualizar el botón para que diga "Aquí se envía PDF" y deshabilitarlo
-        Swal.fire({
-            title: 'PDF Generado',
-            text: 'El archivo PDF con las credenciales ha sido generado exitosamente',
-            icon: 'success'
-        });
-
-        // Recargar la tabla para reflejar el cambio de estado del botón
-        datatable.clear();
-        buscar();
-    } else {
-        Swal.fire({
-            title: 'Operación cancelada',
-            text: 'No se generó el PDF.',
-            icon: 'info'
-        });
-    }
-};
-
-
-
-let pdfUrl = '';  // Global variable to store PDF URL
-let solicitudId = null;  // Global variable to store current solicitud_id
-
-const subirArchivo = async (e) => {
-    // Obtener el ID de la solicitud desde la fila clicada
-    const fila = e.target.closest('tr');
-    solicitudId = datatable.row(fila).data().solicitud_id;
-
-    // Crear Swal para cargar el archivo PDF
-    const { value: archivo } = await Swal.fire({
-        title: 'Sube un archivo PDF',
-        input: 'file',
-        inputAttributes: {
-            'accept': 'application/pdf', // Solo aceptar archivos PDF
-            'aria-label': 'Selecciona un archivo PDF'
-        },
-        showCancelButton: true,
-        confirmButtonText: 'Subir',
-        cancelButtonText: 'Cancelar',
-        inputValidator: (value) => {
-            if (!value) {
-                return '¡Necesitas seleccionar un archivo!';
-            }
-        }
-    });
-
-    if (archivo) {
         try {
-            // Crear un FormData para enviar el archivo
-            const formData = new FormData();
-            formData.append('archivo', archivo);
-            formData.append('solicitudId', solicitudId);  // Agregar solicitud_id al FormData
-
-            const url = '/AccessEntry-Autocom/API/ftp/subir';
+            // Hacer una solicitud POST al backend para guardar los datos
+            const url = '/AccessEntry-Autocom/API/usuario/guardar'; // URL de la API
             const config = {
                 method: 'POST',
-                body: formData
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    usu_id: datos.solicitud_id, // Usar el ID de la solicitud
+                    usuario: formData.usuario,
+                    password: formData.password
+                })
             };
 
             const respuesta = await fetch(url, config);
             const data = await respuesta.json();
-            const { codigo, mensaje, archivoUrl } = data;
 
-            if (codigo === 1) {
-                Toast.fire({
-                    icon: 'success',
-                    title: mensaje
+            if (data.codigo === 1) {
+                // Los datos se guardaron correctamente en la base de datos
+                // Cambiar el botón "Ingresar Datos" a "Enviar"
+                datatable.row(fila).invalidate().draw();
+
+                // Mostrar mensaje de éxito
+                Swal.fire({
+                    title: 'Datos Ingresados',
+                    text: 'Los datos se han guardado correctamente.',
+                    icon: 'success'
                 });
-
-                pdfUrl = archivoUrl;
-
-                // Reemplazar el botón actual con dos nuevos botones
-                const cell = fila.querySelector('.subir').closest('td');
-                cell.innerHTML = `
-                    <div class="btn-group" role="group">
-                        <button class="btn btn-info ver-pdf" data-url="${pdfUrl}">
-                            <i class="bi bi-eye-fill"></i> Ver
-                        </button>
-                        <button class="btn btn-primary enviar-pdf">
-                            <i class="bi bi-send-fill"></i> Enviar
-                        </button>
-                    </div>
-                `;
             } else {
-                Toast.fire({
-                    icon: 'error',
-                    title: mensaje
+                // Hubo un error al guardar los datos
+                Swal.fire({
+                    title: 'Error',
+                    text: data.mensaje,
+                    icon: 'error'
                 });
             }
         } catch (error) {
-            console.error(error);
-            Toast.fire({
-                icon: 'error',
-                title: 'Hubo un error al intentar subir el archivo'
+            // Manejo de errores en la solicitud
+            Swal.fire({
+                title: 'Error',
+                text: 'Hubo un problema al guardar los datos.',
+                icon: 'error'
             });
         }
     }
 };
 
+
+// Función para enviar los datos (solo muestra un alert en este caso)
+const enviar = (e) => {
+    e.preventDefault();
+    alert('Los datos han sido enviados!');
+};
+
 // Delegar eventos para los botones dinámicos
-datatable.on('click', '.ver-pdf', function () {
-    const pdfUrl = this.dataset.url;
-
-    // Crear un iframe para mostrar el PDF
-    const iframeHtml = `
-        <iframe src="${pdfUrl}" width="100%" height="500px"></iframe>
-    `;
-
-    Swal.fire({
-        title: 'Vista previa del PDF',
-        html: iframeHtml,
-        width: '80%',
-        showCloseButton: true,
-        showConfirmButton: false
-    });
-});
-
-datatable.on('click', '.enviar-pdf', function () {
-    alert('Enviar PDF');
-});
-
-
-
+datatable.on('click', '.ingresar', ingresar);
+datatable.on('click', '.enviar', enviar);
 
 buscar();
-
-datatable.on('click', '.ingresar', ingresar);
-datatable.on('click', '.subir', subirArchivo);

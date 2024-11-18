@@ -2,7 +2,7 @@
 
 namespace Model;
 
-class Solicitud extends ActiveRecord
+class Usuario extends ActiveRecord
 {
     protected static $tabla = 'usu_cred';
     protected static $idTabla = 'usu_id';
