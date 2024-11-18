@@ -42,6 +42,9 @@
                                 <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/pendientes"><i class="bi bi-bell"></i> Solicitudes a Enviar</a>
                             </li>
                             <li>
+                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/permiso"><i class="bi bi-toggles2"></i><i class="bi bi-file-lock2-fill"></i> Otorgar Permisos</a>
+                            </li>
+                            <li>
                                 <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/finalizadas"><i class="bi bi-bookmark-check-fill"></i> Solicitudes Finalizadas</a>
                             </li>
                         </ul>
@@ -54,9 +57,6 @@
                             <!-- <h6 class="dropdown-header">Información</h6> -->
                             <li>
                                 <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/usuario"><i class="bi bi-person-plus-fill"></i> Crear Usuario</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/permiso"><i class="bi bi-toggles2"></i><i class="bi bi-database-lock"></i> Otorgar Permisos Base de Datos</a>
                             </li>
                         </ul>
                     </div>
