@@ -213,15 +213,21 @@ const ingresar = async (e) => {
 };
 
 
-let pdfUrl = '';  // Variable global para almacenar la URL del PDF subido
 
-const subirArchivo = async () => {
-    // Crear el Swal para seleccionar el archivo
+let pdfUrl = '';  // Global variable to store PDF URL
+let solicitudId = null;  // Global variable to store current solicitud_id
+
+const subirArchivo = async (e) => {
+    // Obtener el ID de la solicitud desde la fila clicada
+    const fila = e.target.closest('tr');
+    solicitudId = datatable.row(fila).data().solicitud_id;
+
+    // Crear Swal para cargar el archivo PDF
     const { value: archivo } = await Swal.fire({
         title: 'Sube un archivo PDF',
         input: 'file',
         inputAttributes: {
-            'accept': 'application/pdf', // solo aceptar PDF
+            'accept': 'application/pdf', // Solo aceptar archivos PDF
             'aria-label': 'Selecciona un archivo PDF'
         },
         showCancelButton: true,
@@ -234,40 +240,48 @@ const subirArchivo = async () => {
         }
     });
 
-    // Si el usuario no cancela y selecciona un archivo
     if (archivo) {
         try {
-            // Crear un objeto FormData
+            // Crear un FormData para enviar el archivo
             const formData = new FormData();
             formData.append('archivo', archivo);
+            formData.append('solicitudId', solicitudId);  // Agregar solicitud_id al FormData
 
-            const url = '/AccessEntry-Autocom/API/ftp/subir'; // URL del controlador PHP
+            const url = '/AccessEntry-Autocom/API/ftp/subir';
             const config = {
                 method: 'POST',
                 body: formData
             };
 
-            // Enviar el archivo al servidor
             const respuesta = await fetch(url, config);
             const data = await respuesta.json();
-            const { codigo, mensaje, detalle, archivoUrl } = data;  // Obtener la URL del archivo
+            const { codigo, mensaje, archivoUrl } = data;
 
-            // Respuesta según el resultado
             if (codigo === 1) {
-                // Alerta de éxito
                 Toast.fire({
                     icon: 'success',
                     title: mensaje
                 });
 
-                pdfUrl = archivoUrl;  // Almacenar la URL del archivo
+                pdfUrl = archivoUrl;
 
+                // Reemplazar el botón actual con dos nuevos botones
+                const cell = fila.querySelector('.subir').closest('td');
+                cell.innerHTML = `
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-info ver-pdf" data-url="${pdfUrl}">
+                            <i class="bi bi-eye-fill"></i> Ver
+                        </button>
+                        <button class="btn btn-primary enviar-pdf">
+                            <i class="bi bi-send-fill"></i> Enviar
+                        </button>
+                    </div>
+                `;
             } else {
                 Toast.fire({
                     icon: 'error',
                     title: mensaje
                 });
-                console.log(detalle);
             }
         } catch (error) {
             console.error(error);
@@ -279,39 +293,28 @@ const subirArchivo = async () => {
     }
 };
 
-// Crear el botón "Nuevo"
-const botonNuevo = document.createElement('button');
-botonNuevo.textContent = 'Nuevo';
-botonNuevo.classList.add('btn', 'btn-primary');
-document.body.appendChild(botonNuevo);  // Añadir el botón al cuerpo de la página
+// Delegar eventos para los botones dinámicos
+datatable.on('click', '.ver-pdf', function () {
+    const pdfUrl = this.dataset.url;
 
-// Función para mostrar el PDF cuando se presione el botón
-botonNuevo.addEventListener('click', () => {
-    if (pdfUrl) {
-        // Crear un iframe para mostrar el PDF
-        const iframe = document.createElement('iframe');
-        iframe.src = pdfUrl;
-        iframe.width = '100%';
-        iframe.height = '600px';
+    // Crear un iframe para mostrar el PDF
+    const iframeHtml = `
+        <iframe src="${pdfUrl}" width="100%" height="500px"></iframe>
+    `;
 
-        // Mostrar el iframe en un contenedor específico
-        const contenedorPdf = document.getElementById('contenedor-pdf');  // Asegúrate de tener este contenedor en tu HTML
-        if (!contenedorPdf) {
-            const nuevoContenedor = document.createElement('div');
-            nuevoContenedor.id = 'contenedor-pdf';
-            nuevoContenedor.appendChild(iframe);
-            document.body.appendChild(nuevoContenedor);
-        } else {
-            contenedorPdf.innerHTML = '';  // Limpiar el contenedor
-            contenedorPdf.appendChild(iframe);  // Insertar el nuevo iframe
-        }
-    } else {
-        Toast.fire({
-            icon: 'warning',
-            title: 'No se ha subido ningún archivo PDF'
-        });
-    }
+    Swal.fire({
+        title: 'Vista previa del PDF',
+        html: iframeHtml,
+        width: '80%',
+        showCloseButton: true,
+        showConfirmButton: false
+    });
 });
+
+datatable.on('click', '.enviar-pdf', function () {
+    alert('Enviar PDF');
+});
+
 
 
 
