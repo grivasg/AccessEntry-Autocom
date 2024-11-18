@@ -65,8 +65,18 @@ const datatable = new DataTable('#tablaUsuario', {
             searchable: false,
             orderable: false,
             render: (data, type, row, meta) => {
-                return `
-                    <button class='btn btn-dark ingresar'><i class="bi bi-file-earmark-arrow-up-fill"></i> </button>`;
+                const generatedPdf = localStorage.getItem(`pdfGenerated_${data}`);
+                if (generatedPdf) {
+                    return `
+                        <button class='btn btn-success enviar'>
+                            <i class="bi bi-file-earmark-arrow-up-fill"></i>
+                        </button>`;
+                } else {
+                    return `
+                        <button class='btn btn-dark ingresar'>
+                            <i class="bi bi-file-earmark-arrow-up-fill"></i> 
+                        </button>`;
+                }
             }
         }
     ]
@@ -180,12 +190,19 @@ const ingresar = async (e) => {
         // Guardar el PDF
         pdf.save(`credenciales_${formData.usuario}.pdf`);
 
-        // Mostrar mensaje de éxito
+        // Guardar el estado de que el PDF ya fue generado
+        localStorage.setItem(`pdfGenerated_${datos.solicitud_id}`, 'true');
+
+        // Actualizar el botón para que diga "Aquí se envía PDF" y deshabilitarlo
         Swal.fire({
             title: 'PDF Generado',
             text: 'El archivo PDF con las credenciales ha sido generado exitosamente',
             icon: 'success'
         });
+
+        // Recargar la tabla para reflejar el cambio de estado del botón
+        datatable.clear();
+        buscar();
     } else {
         Swal.fire({
             title: 'Operación cancelada',
@@ -195,6 +212,14 @@ const ingresar = async (e) => {
     }
 };
 
+
+const enviar = async () => {
+    alert('aqui se debe enviar')
+
+
+};
+
 buscar();
 
 datatable.on('click', '.ingresar', ingresar);
+datatable.on('click', '.enviar', enviar);
