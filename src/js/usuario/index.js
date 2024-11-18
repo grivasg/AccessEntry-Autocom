@@ -213,6 +213,8 @@ const ingresar = async (e) => {
 };
 
 
+let pdfUrl = '';  // Variable global para almacenar la URL del PDF subido
+
 const subirArchivo = async () => {
     // Crear el Swal para seleccionar el archivo
     const { value: archivo } = await Swal.fire({
@@ -235,26 +237,31 @@ const subirArchivo = async () => {
     // Si el usuario no cancela y selecciona un archivo
     if (archivo) {
         try {
+            // Crear un objeto FormData
             const formData = new FormData();
             formData.append('archivo', archivo);
-            console.log(formData)
 
-            const url = '/AccessEntry-Autocom/API/usuario/subir'; // URL del controlador PHP
+            const url = '/AccessEntry-Autocom/API/ftp/subir'; // URL del controlador PHP
             const config = {
                 method: 'POST',
                 body: formData
             };
 
+            // Enviar el archivo al servidor
             const respuesta = await fetch(url, config);
             const data = await respuesta.json();
-            const { codigo, mensaje, detalle } = data;
+            const { codigo, mensaje, detalle, archivoUrl } = data;  // Obtener la URL del archivo
 
             // Respuesta según el resultado
             if (codigo === 1) {
+                // Alerta de éxito
                 Toast.fire({
                     icon: 'success',
                     title: mensaje
                 });
+
+                pdfUrl = archivoUrl;  // Almacenar la URL del archivo
+
             } else {
                 Toast.fire({
                     icon: 'error',
@@ -271,6 +278,41 @@ const subirArchivo = async () => {
         }
     }
 };
+
+// Crear el botón "Nuevo"
+const botonNuevo = document.createElement('button');
+botonNuevo.textContent = 'Nuevo';
+botonNuevo.classList.add('btn', 'btn-primary');
+document.body.appendChild(botonNuevo);  // Añadir el botón al cuerpo de la página
+
+// Función para mostrar el PDF cuando se presione el botón
+botonNuevo.addEventListener('click', () => {
+    if (pdfUrl) {
+        // Crear un iframe para mostrar el PDF
+        const iframe = document.createElement('iframe');
+        iframe.src = pdfUrl;
+        iframe.width = '100%';
+        iframe.height = '600px';
+
+        // Mostrar el iframe en un contenedor específico
+        const contenedorPdf = document.getElementById('contenedor-pdf');  // Asegúrate de tener este contenedor en tu HTML
+        if (!contenedorPdf) {
+            const nuevoContenedor = document.createElement('div');
+            nuevoContenedor.id = 'contenedor-pdf';
+            nuevoContenedor.appendChild(iframe);
+            document.body.appendChild(nuevoContenedor);
+        } else {
+            contenedorPdf.innerHTML = '';  // Limpiar el contenedor
+            contenedorPdf.appendChild(iframe);  // Insertar el nuevo iframe
+        }
+    } else {
+        Toast.fire({
+            icon: 'warning',
+            title: 'No se ha subido ningún archivo PDF'
+        });
+    }
+});
+
 
 
 buscar();
