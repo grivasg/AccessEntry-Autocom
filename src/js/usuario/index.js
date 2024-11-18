@@ -207,10 +207,59 @@ const ingresar = async (e) => {
 
 
 // Función para enviar los datos (solo muestra un alert en este caso)
-const enviar = (e) => {
-    e.preventDefault();
-    alert('Los datos han sido enviados!');
+
+const enviar = async (e) => {
+    try {
+        const row = datatable.row(e.target.closest('tr')).data();
+        const solicitud_id = row.solicitud_id;
+
+        const confirmacion = await Swal.fire({
+            title: '<strong>Por favor, revise que los datos sean correctos.</u></strong>',
+            text: "Esta Solicitud será enviada a la Compañia de Atención al Usuario con los Permisos y contraseñas creadas ",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#206617',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, Enviar',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (!confirmacion.isConfirmed) return;
+
+        const formData = new FormData();
+        formData.append('solicitud_id', solicitud_id);
+
+        const url = "/AccessEntry-Autocom/API/usuario/enviar";
+        const config = {
+            method: 'POST',
+            body: formData
+        };
+
+        const respuesta = await fetch(url, config);
+        const data = await respuesta.json();
+
+        if (data.codigo === 1) {
+            Toast.fire({
+                icon: 'success',
+                title: data.mensaje
+            });
+            await buscar(); // Actualiza la tabla
+        } else {
+            throw new Error(data.detalle);
+        }
+    } catch (error) {
+        console.error('Error en verificar:', error);
+        Toast.fire({
+            icon: 'error',
+            title: 'Error al verificar la solicitud'
+        });
+    }
 };
+
+
+
+
+
 
 // Delegar eventos para los botones dinámicos
 datatable.on('click', '.ingresar', ingresar);

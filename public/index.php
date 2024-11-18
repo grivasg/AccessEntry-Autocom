@@ -27,6 +27,7 @@ $router->post('API/solicitud/verificar', [SolicitudController::class, 'verificar
 $router->post('/API/solicitud/verificar', [SolicitudController::class, 'verificarAPI']);
 $router->post('/API/solicitud/catalogoExiste', [SolicitudController::class, 'catalogoExisteAPI']);
 $router->post('/API/solicitud/obtenerDatosPersonal', [SolicitudController::class, 'obtenerDatosPersonalAPI']);
+$router->post('/API/solicitud/actualizarPassword', [UsuarioController::class, 'actualizarPasswordAPI']); // Guardar nueva solicitud
 
 // RUTAS DE ESTADO
 $router->get('/estado', [EstadoController::class, 'index']);
@@ -45,7 +46,7 @@ $router->get('/API/finalizadas/buscar', [FinalizadasController::class, 'buscarAP
 // RUTAS DE CREACION DE USUARIO
 $router->get('/usuario', [UsuarioController::class, 'index']);
 $router->get('/API/usuario/buscar', [UsuarioController::class, 'buscarAPI']);
-$router->post('/API/solicitud/actualizarPassword', [UsuarioController::class, 'actualizarPasswordAPI']); // Guardar nueva solicitud
+$router->post('/API/usuario/enviar', [UsuarioController::class, 'enviarAPI']);
 
 
 $router->get('/subir', [FTPController::class, 'subir']);
