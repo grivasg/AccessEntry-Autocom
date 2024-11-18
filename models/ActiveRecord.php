@@ -274,4 +274,10 @@ class ActiveRecord
     {
         return self::$db->prepare($sql);
     }
+
+
+    public static function getDB(): PDO
+    {
+        return self::$db;
+    }
 };

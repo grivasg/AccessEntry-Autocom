@@ -12,6 +12,7 @@ module.exports = {
     'js/usuario/index' : './src/js/usuario/index.js',
     'js/permiso/index' : './src/js/permiso/index.js',
     'js/pendientes/index' : './src/js/pendientes/index.js',
+    'js/ftp/index' : './src/js/ftp/index.js',
 
   },
   output: {

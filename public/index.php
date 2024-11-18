@@ -5,6 +5,7 @@ use MVC\Router;
 use Controllers\AppController;
 use Controllers\EstadoController;
 use Controllers\FinalizadasController;
+use Controllers\FTPController;
 use Controllers\NuevasController;
 use Controllers\PendientesController;
 use Controllers\PermisoController;
@@ -44,6 +45,10 @@ $router->get('/API/finalizadas/buscar', [FinalizadasController::class, 'buscarAP
 // RUTAS DE CREACION DE USUARIO
 $router->get('/usuario', [UsuarioController::class, 'index']);
 $router->get('/API/usuario/buscar', [UsuarioController::class, 'buscarAPI']);
+
+$router->get('/subir', [FTPController::class, 'subir']);
+$router->post('/API/ftp/subir', [FTPController::class, 'subirAPI']);
+$router->get('/mostrar', [FTPController::class, 'mostrar']);
 
 // RUTAS DE ASIGNACION DE PERMISOS
 $router->get('/permiso', [PermisoController::class, 'index']);
