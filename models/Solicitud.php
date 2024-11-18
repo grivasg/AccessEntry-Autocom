@@ -6,7 +6,7 @@ class Solicitud extends ActiveRecord
 {
     protected static $tabla = 'solicitud_credenciales';
     protected static $idTabla = 'solicitud_id';
-    protected static $columnasDB = ['sol_cred_catalogo', 'sol_cred_correo', 'sol_cred_telefono', 'sol_cred_fecha_solicitud', 'sol_cred_modulo', 'sol_cred_justificacion', 'sol_cred_usuario', 'sol_cred_estado_solicitud'];
+    protected static $columnasDB = ['sol_cred_catalogo', 'sol_cred_correo', 'sol_cred_telefono', 'sol_cred_fecha_solicitud', 'sol_cred_modulo', 'sol_cred_justificacion', 'sol_cred_usuario', 'sol_cred_estado_solicitud', 'sol_cred_ruta_archivo'];
 
     public $solicitud_id;
     public $sol_cred_catalogo;
@@ -17,6 +17,8 @@ class Solicitud extends ActiveRecord
     public $sol_cred_fecha_solicitud;
     public $sol_cred_usuario;
     public $sol_cred_estado_solicitud;
+    public $sol_cred_ruta_archivo;
+
 
     public function __construct($args = [])
     {
@@ -29,6 +31,7 @@ class Solicitud extends ActiveRecord
         $this->sol_cred_fecha_solicitud = $args['sol_cred_fecha_solicitud'] ?? '';
         $this->sol_cred_usuario = $args['sol_cred_usuario'] ?? '';
         $this->sol_cred_estado_solicitud = $args['sol_cred_estado_solicitud'] ?? 1; // Valor por defecto
+        $this->sol_cred_ruta_archivo = $args['sol_cred_ruta_archivo'] ?? '';
     }
 
     public static function obtenerSolicitudes()
