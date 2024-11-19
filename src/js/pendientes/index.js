@@ -35,16 +35,8 @@ const datatable = new DataTable('#tablaPendientes', {
             data: 'sol_cred_catalogo'
         },
         {
-            title: 'Modulos para habilitar',
-            data: 'sol_cred_modulo'
-        },
-        {
-            title: 'Justificacion',
-            data: 'sol_cred_justificacion'
-        },
-        {
-            title: '¿Tiene Usuario de AUTOCOM?',
-            data: 'sol_cred_usuario'
+            title: 'Modulos Habilitados',
+            data: 'sol_cred_modulos_autorizados'
         },
         {
             title: 'Fecha de Solicitud',
@@ -89,9 +81,7 @@ const datatable = new DataTable('#tablaPendientes', {
             orderable: false,
             render: (data, type, row, meta) => {
                 return `
-                    <button class='btn btn-success verificar'><i class="bi bi-clipboard-check"></i> </button>
-
-                    <button class='btn btn-danger rechazar'><i class="bi bi-hand-thumbs-down"></i></button>`;
+                    <button class='btn btn-success generar'><i class="bi bi-clipboard-check"></i> </button>`;
             }
         }
     ]
@@ -122,20 +112,17 @@ const buscar = async () => {
     }
 };
 
-const verificar = async () => {
-    alert('SU SOLICITUD HA SIDO VERIFICADA')
+const generar = async () => {
+    alert('ESTA FUNCION ES PARA CREAR UN PDF Y ENVIARLO POR CORREO')
 };
 
-const rechazar = async () => {
-    alert('SU SOLICITUD HA SIDO RECHAZADA')
-};
+
 
 
 buscar();
 
 
 
-datatable.on('click', '.verificar', verificar);
-datatable.on('click', '.rechazar', rechazar);
+datatable.on('click', '.generar', generar);
 
 

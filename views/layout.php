@@ -31,7 +31,7 @@
 
                     <div class="nav-item dropdown ">
                         <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-raised-hand"></i> Administradores Atención al Usuario
+                            <i class="bi bi-person-raised-hand"></i> Admin Atención al Usuario
                         </a>
                         <ul class="dropdown-menu  dropdown-menu-dark " id="dropwdownRevision" style="margin: 0;">
                             <!-- <h6 class="dropdown-header">Información</h6> -->
@@ -52,7 +52,7 @@
                     </div>
                     <div class="nav-item dropdown ">
                         <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                            <i class="bi bi-terminal"></i> Administradores Sistemas
+                            <i class="bi bi-terminal"></i> Admin Sistemas
                         </a>
                         <ul class="dropdown-menu  dropdown-menu-dark " id="dropwdownRevision" style="margin: 0;">
                             <!-- <h6 class="dropdown-header">Información</h6> -->
@@ -74,6 +74,17 @@
                                 <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/estado"><i class="bi bi-hourglass-split"></i> Verificar Estado </a>
                             </li>
 
+                        </ul>
+                    </div>
+                    <div class="nav-item dropdown ">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                            <i class="bi bi-card-checklist"></i> Reportes
+                        </a>
+                        <ul class="dropdown-menu  dropdown-menu-dark " id="dropwdownRevision" style="margin: 0;">
+                            <!-- <h6 class="dropdown-header">Información</h6> -->
+                            <li>
+                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/usuario"><i class="bi bi-hourglass-split"></i> Historial de Envios</a>
+                            </li>
                         </ul>
                     </div>
 

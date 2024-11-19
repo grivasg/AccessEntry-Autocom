@@ -239,7 +239,7 @@ class Solicitud extends ActiveRecord
                 sc.sol_cred_correo,
                 sc.sol_cred_telefono,
                 sc.sol_cred_fecha_solicitud,
-                sc.sol_cred_modulo, 
+                sc.sol_cred_modulos_autorizados, 
                 sc.sol_cred_justificacion,
                 sc.sol_cred_usuario,
                 e.estado_cred_id,
