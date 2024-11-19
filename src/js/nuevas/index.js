@@ -254,8 +254,12 @@ const mostrarJustificacion = async (e) => {
     const row = datatable.row(e.target.closest('tr')).data();
     const solicitud_id = row.solicitud_id;
 
-    // Split the modules string into an array
-    const modulosSeleccionadosOriginales = row.sol_cred_modulo.split(',').map(m => m.trim());
+    // Limpiar la cadena de módulos, eliminando posibles caracteres no deseados
+    const modulosSeleccionadosOriginales = row.sol_cred_modulo
+        .replace(/[\\"\[\]]/g, '') // Elimina barras, comillas, corchetes
+        .split(',')
+        .map(m => m.trim())
+        .filter(m => m); // Elimina elementos vacíos
 
     const { value: formValues } = await Swal.fire({
         title: 'Justificación de Módulos',
@@ -287,6 +291,7 @@ const mostrarJustificacion = async (e) => {
                 });
             });
         },
+
         preConfirm: () => {
             const checkboxes = document.querySelectorAll('input[name="modulos"]:checked');
             const modulosSeleccionados = Array.from(checkboxes).map(cb => cb.value);
@@ -313,7 +318,11 @@ const mostrarJustificacion = async (e) => {
         try {
             const formData = new FormData();
             formData.append('solicitud_id', solicitud_id);
-            formData.append('modulos_seleccionados', formValues.modulosSeleccionados.join(','));
+
+            // Limpiar y formatear los módulos seleccionados
+            const modulosLimpios = formValues.modulosSeleccionados.map(m => m.trim());
+            formData.append('modulos_seleccionados', modulosLimpios.join(','));
+
             formData.append('justificacion', formValues.justificacion);
 
             const url = "/AccessEntry-Autocom/API/nuevas/justificar";

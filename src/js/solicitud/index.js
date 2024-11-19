@@ -79,21 +79,60 @@ const guardar = async (e) => {
         const formData = new FormData(formulario);
         const dataToSend = new FormData();
 
-        // Añadir solo los campos que corresponden a la tabla
+        // Añadir solo los campos requeridos a la base de datos
         dataToSend.append('sol_cred_catalogo', formData.get('sol_cred_catalogo'));
         dataToSend.append('sol_cred_correo', formData.get('sol_cred_correo'));
         dataToSend.append('sol_cred_telefono', formData.get('sol_cred_telefono'));
         dataToSend.append('sol_cred_usuario', formData.get('sol_cred_usuario'));
         dataToSend.append('sol_cred_fecha_solicitud', new Date().toISOString().split('T')[0]);
 
-        // Obtener todos los módulos y justificaciones
-        const modulos = formData.getAll('modulos[]');
-        const justificaciones = formData.getAll('justificaciones[]');
+        // Limpiar y obtener los módulos y justificaciones
+        const moduloInputs = document.querySelectorAll('input[name="modulos[]"]');
+        const justificacionInputs = document.querySelectorAll('input[name="justificaciones[]"]');
 
-        // Convertir a JSON para enviar como un solo campo
+        // Limpiar módulos
+        const modulos = Array.from(moduloInputs).map(input => {
+            return input.value
+                .replace(/[^a-zA-Z0-9\s]/g, '') // Eliminar caracteres especiales
+                .replace(/\s+/g, ' ') // Reemplazar múltiples espacios por uno
+                .trim()
+                .slice(0, 50); // Limitar a 50 caracteres
+        }).filter(modulo => modulo !== '');
+
+        // Limpiar justificaciones
+        const justificaciones = Array.from(justificacionInputs).map(input => {
+            return input.value
+                .replace(/[<>]/g, '') // Eliminar signos < >
+                .replace(/\s+/g, ' ') // Reemplazar múltiples espacios por uno
+                .trim()
+                .slice(0, 200); // Limitar a 200 caracteres
+        }).filter(justificacion => justificacion !== '');
+
+        // Validar máximo 4 módulos
+        if (modulos.length > 4) {
+            Swal.fire({
+                title: "Límite Excedido",
+                text: "Solo puede solicitar un máximo de 4 módulos",
+                icon: "warning"
+            });
+            return;
+        }
+
+        // Validar si hay módulos y justificaciones antes de enviarlas
+        if (modulos.length === 0 || justificaciones.length === 0) {
+            Swal.fire({
+                title: "Datos Incompletos",
+                text: "Debe llenar al menos un módulo y su justificación correspondiente.",
+                icon: "info"
+            });
+            return;
+        }
+
+        // Convertir módulos y justificaciones a JSON para enviarlos como un solo campo
         dataToSend.append('modulos', JSON.stringify(modulos));
         dataToSend.append('justificaciones', JSON.stringify(justificaciones));
 
+        // Enviar los datos al servidor
         const url = "/AccessEntry-Autocom/API/solicitud/guardar";
         const config = {
             method: 'POST',
@@ -116,7 +155,7 @@ const guardar = async (e) => {
             document.getElementById('step-2').style.display = 'none';
             document.getElementById('step-1').style.display = 'block';
 
-            // Mostrar un mensaje de éxito en un Swal fuera del formulario
+            // Mostrar mensaje de éxito
             Swal.fire({
                 title: "Solicitud Generada con Éxito",
                 text: "Su solicitud ha sido registrada. Actualmente se encuentra en proceso. Será notificado oportunamente sobre cualquier actualización respecto al estado de su solicitud.",
@@ -142,17 +181,40 @@ const guardar = async (e) => {
     }
 };
 
+
 const agregarModulo = () => {
     const container = document.getElementById('modulos-container');
+    const modulosActuales = container.querySelectorAll('.modulo-grupo').length;
+
+    // Validar máximo 4 módulos
+    if (modulosActuales >= 4) {
+        Swal.fire({
+            title: "Límite Alcanzado",
+            text: "Solo puede solicitar un máximo de 4 módulos",
+            icon: "warning"
+        });
+        return;
+    }
+
     const nuevoModulo = document.createElement('div');
     nuevoModulo.className = 'modulo-grupo mb-2';
     nuevoModulo.innerHTML = `
         <div class="row">
             <div class="col-md-5">
-                <input type="text" name="modulos[]" class="form-control" placeholder="Nombre del Módulo">
+                <input type="text" 
+                    name="modulos[]" 
+                    class="form-control modulo-input" 
+                    placeholder="Nombre del Módulo"
+                    maxlength="50"
+                >
             </div>
             <div class="col-md-5">
-                <input type="text" name="justificaciones[]" class="form-control" placeholder="Justificación">
+                <input type="text" 
+                    name="justificaciones[]" 
+                    class="form-control justificacion-input" 
+                    placeholder="Justificación"
+                    maxlength="200"
+                >
             </div>
             <div class="col-md-2">
                 <button type="button" class="btn btn-danger btn-remove-modulo">
@@ -162,12 +224,35 @@ const agregarModulo = () => {
         </div>`;
     container.appendChild(nuevoModulo);
 
+    // Limpiar y validar inputs de módulos
+    const moduloInputs = document.querySelectorAll('.modulo-input');
+    const justificacionInputs = document.querySelectorAll('.justificacion-input');
+
+    moduloInputs.forEach(input => {
+        input.addEventListener('input', function () {
+            // Limpiar caracteres especiales y espacios extras
+            this.value = this.value
+                .replace(/[^a-zA-Z0-9\s]/g, '') // Eliminar caracteres especiales
+                .replace(/\s+/g, ' ') // Reemplazar múltiples espacios por uno
+                .trim(); // Eliminar espacios al inicio y final
+        });
+    });
+
+    justificacionInputs.forEach(input => {
+        input.addEventListener('input', function () {
+            // Limpiar caracteres especiales y espacios extras
+            this.value = this.value
+                .replace(/[<>]/g, '') // Eliminar signos < >
+                .replace(/\s+/g, ' ') // Reemplazar múltiples espacios por uno
+                .trim(); // Eliminar espacios al inicio y final
+        });
+    });
+
     // Mostrar el botón de eliminar solo para los campos agregados
     const removeButtons = document.querySelectorAll('.btn-remove-modulo');
-    // Para todos los botones de eliminar, aseguramos que el primero esté oculto
     removeButtons.forEach((btn, index) => {
         if (index === 0) {
-            // Ocultar el botón de eliminar para el primer campo (el primero cargado en la página)
+            // Ocultar el botón de eliminar para el primer campo
             btn.style.display = 'none';
         } else {
             // Mostrar el botón de eliminar solo para los campos adicionales
