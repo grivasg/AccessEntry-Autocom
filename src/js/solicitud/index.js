@@ -34,7 +34,7 @@ if (backStepBtn) {
     });
 }
 
-// Función para guardar la solicitud
+
 const guardar = async (e) => {
     e.preventDefault();
 
@@ -77,20 +77,22 @@ const guardar = async (e) => {
 
     try {
         const formData = new FormData(formulario);
-
-        // Crear un nuevo FormData solo con los campos que queremos enviar
         const dataToSend = new FormData();
 
         // Añadir solo los campos que corresponden a la tabla
         dataToSend.append('sol_cred_catalogo', formData.get('sol_cred_catalogo'));
         dataToSend.append('sol_cred_correo', formData.get('sol_cred_correo'));
         dataToSend.append('sol_cred_telefono', formData.get('sol_cred_telefono'));
-        dataToSend.append('sol_cred_modulo', formData.get('sol_cred_modulo'));
-        dataToSend.append('sol_cred_justificacion', formData.get('sol_cred_justificacion'));
         dataToSend.append('sol_cred_usuario', formData.get('sol_cred_usuario'));
-
-        // Si tienes un campo de fecha que se llena automáticamente
         dataToSend.append('sol_cred_fecha_solicitud', new Date().toISOString().split('T')[0]);
+
+        // Obtener todos los módulos y justificaciones
+        const modulos = formData.getAll('modulos[]');
+        const justificaciones = formData.getAll('justificaciones[]');
+
+        // Convertir a JSON para enviar como un solo campo
+        dataToSend.append('modulos', JSON.stringify(modulos));
+        dataToSend.append('justificaciones', JSON.stringify(justificaciones));
 
         const url = "/AccessEntry-Autocom/API/solicitud/guardar";
         const config = {
@@ -100,11 +102,13 @@ const guardar = async (e) => {
 
         const respuesta = await fetch(url, config);
         const data = await respuesta.json();
+
         const { codigo, mensaje, detalle } = data;
-        let icon = 'info';
+        let icono = 'info';
 
         if (codigo === 1) {
-            icon = 'success';
+            icono = 'success';
+
             // Vaciar el formulario
             formulario.reset();
 
@@ -112,7 +116,7 @@ const guardar = async (e) => {
             document.getElementById('step-2').style.display = 'none';
             document.getElementById('step-1').style.display = 'block';
 
-            // Mostrar un mensaje de éxito
+            // Mostrar un mensaje de éxito en un Swal fuera del formulario
             Swal.fire({
                 title: "Solicitud Generada con Éxito",
                 text: "Su solicitud ha sido registrada. Actualmente se encuentra en proceso. Será notificado oportunamente sobre cualquier actualización respecto al estado de su solicitud.",
@@ -120,10 +124,14 @@ const guardar = async (e) => {
                 footer: '<a href="/AccessEntry-Autocom/estado">Ver Estado de Solicitud</a>',
             });
         } else {
-            icon = 'error';
+            icono = 'error';
             console.error(detalle);
+            Swal.fire({
+                title: "Error",
+                text: detalle || "Ocurrió un error al guardar la solicitud.",
+                icon: icono,
+            });
         }
-
     } catch (error) {
         console.error('Error al guardar la solicitud:', error);
         Swal.fire({
@@ -133,6 +141,68 @@ const guardar = async (e) => {
         });
     }
 };
+
+const agregarModulo = () => {
+    const container = document.getElementById('modulos-container');
+    const nuevoModulo = document.createElement('div');
+    nuevoModulo.className = 'modulo-grupo mb-2';
+    nuevoModulo.innerHTML = `
+        <div class="row">
+            <div class="col-md-5">
+                <input type="text" name="modulos[]" class="form-control" placeholder="Nombre del Módulo">
+            </div>
+            <div class="col-md-5">
+                <input type="text" name="justificaciones[]" class="form-control" placeholder="Justificación">
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-danger btn-remove-modulo">
+                    <i class="bi bi-x-circle-fill"></i>
+                </button>
+            </div>
+        </div>`;
+    container.appendChild(nuevoModulo);
+
+    // Mostrar el botón de eliminar solo para los campos agregados
+    const removeButtons = document.querySelectorAll('.btn-remove-modulo');
+    // Para todos los botones de eliminar, aseguramos que el primero esté oculto
+    removeButtons.forEach((btn, index) => {
+        if (index === 0) {
+            // Ocultar el botón de eliminar para el primer campo (el primero cargado en la página)
+            btn.style.display = 'none';
+        } else {
+            // Mostrar el botón de eliminar solo para los campos adicionales
+            btn.style.display = 'block';
+        }
+    });
+};
+
+// Manejar la eliminación de módulos
+document.addEventListener('click', function (e) {
+    if (e.target.closest('.btn-remove-modulo')) {
+        const moduloGrupo = e.target.closest('.modulo-grupo');
+        const container = document.getElementById('modulos-container');
+
+        // Eliminar el módulo seleccionado
+        if (container.children.length > 1) {
+            moduloGrupo.remove();
+
+            // Actualizar la visibilidad de los botones de eliminar después de eliminar un módulo
+            const removeButtons = document.querySelectorAll('.btn-remove-modulo');
+            removeButtons.forEach((btn, index) => {
+                if (index === 0) {
+                    // Asegurarse de que el primer campo siga ocultando el botón de eliminar
+                    btn.style.display = 'none';
+                } else {
+                    // Mostrar el botón de eliminar para los campos restantes
+                    btn.style.display = 'block';
+                }
+            });
+        }
+    }
+});
+
+
+
 
 
 
@@ -216,7 +286,7 @@ const siguiente = async (e) => {
     }
 };
 
-
 // Event Listeners
 formulario.addEventListener('submit', guardar);
 next_step.addEventListener('click', siguiente);
+document.getElementById('agregar-modulo').addEventListener('click', agregarModulo);

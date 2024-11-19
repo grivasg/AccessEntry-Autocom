@@ -33,6 +33,32 @@ class Solicitud extends ActiveRecord
         $this->sol_cred_estado_solicitud = $args['sol_cred_estado_solicitud'] ?? 1;
         $this->password = $args['password'] ?? '';
     }
+    public function guardars()
+    {
+        // Decodificar los arrays JSON de módulos y justificaciones
+        if (isset($this->modulos) && isset($this->justificaciones)) {
+            $this->sol_cred_modulo = json_encode($this->modulos);
+            $this->sol_cred_justificacion = json_encode($this->justificaciones);
+        }
+
+        if (!is_null($this->solicitud_id)) {
+            return $this->actualizar();
+        } else {
+            return $this->crear();
+        }
+    }
+
+    // Método para obtener los módulos y justificaciones como array
+    public function getModulosJustificaciones()
+    {
+        return [
+            'modulos' => json_decode($this->sol_cred_modulo, true) ?? [],
+            'justificaciones' => json_decode($this->sol_cred_justificacion, true) ?? []
+        ];
+    }
+
+
+
 
     public static function obtenerSolicitudes()
     {

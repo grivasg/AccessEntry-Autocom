@@ -15,22 +15,45 @@ class SolicitudController
 
     public static function guardarAPI()
     {
-        $_POST['sol_cred_catalogo'] = htmlspecialchars($_POST['sol_cred_catalogo']);
-
         try {
+            // Sanitizar entrada básica
+            $_POST['sol_cred_catalogo'] = htmlspecialchars($_POST['sol_cred_catalogo']);
+
+            // Decodificar los arrays JSON recibidos
+            $modulos = json_decode($_POST['modulos'], true);
+            $justificaciones = json_decode($_POST['justificaciones'], true);
+
+            // Validar que haya al menos un módulo y justificación
+            if (empty($modulos) || empty($justificaciones)) {
+                throw new Exception("Debe incluir al menos un módulo y justificación");
+            }
+
+            // Validar que la cantidad de módulos y justificaciones coincida
+            if (count($modulos) !== count($justificaciones)) {
+                throw new Exception("La cantidad de módulos y justificaciones debe coincidir");
+            }
+
             $solicitud = new Solicitud($_POST);
-            $resultado = $solicitud->crear();
-            http_response_code(200);
-            echo json_encode([
-                'codigo' => 1,
-                'mensaje' => 'Solicitud Generada Exitosamente',
-            ]);
+            $solicitud->modulos = $modulos;
+            $solicitud->justificaciones = $justificaciones;
+
+            $resultado = $solicitud->guardars();
+
+            if ($resultado) {
+                http_response_code(200);
+                echo json_encode([
+                    'codigo' => 1,
+                    'mensaje' => 'Solicitud Generada Exitosamente'
+                ]);
+            } else {
+                throw new Exception("Error al guardar la solicitud");
+            }
         } catch (Exception $e) {
             http_response_code(500);
             echo json_encode([
                 'codigo' => 0,
                 'mensaje' => 'Error al Generar Solicitud',
-                'detalle' => $e->getMessage(),
+                'detalle' => $e->getMessage()
             ]);
         }
     }
@@ -201,6 +224,4 @@ class SolicitudController
             ]);
         }
     }
-
-    
 };
