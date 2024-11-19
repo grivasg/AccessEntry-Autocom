@@ -234,6 +234,16 @@ class Solicitud extends ActiveRecord
         return $stmt->execute(); // Devuelve true si la actualización es exitosa, false si no lo es
     }
 
+    public static function verificarSolicitudSi($solicitud_id)
+    {
+        $sql = "UPDATE solicitud_credenciales 
+            SET sol_cred_estado_solicitud = 3 
+            WHERE solicitud_id = ?";
+        $stmt = self::prepare($sql);
+        $stmt->bindParam(1, $solicitud_id);
+        return $stmt->execute(); // Devuelve true si la actualización es exitosa, false si no lo es
+    }
+
     public static function enviarSolicitud($solicitud_id)
     {
         $sql = "UPDATE solicitud_credenciales 

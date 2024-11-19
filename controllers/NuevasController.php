@@ -44,13 +44,27 @@ class NuevasController
                     throw new Exception('ID de solicitud no proporcionado');
                 }
 
-                $resultado = Solicitud::verificarSolicitud($solicitud_id); // Pasamos $solicitud_id aquí
+                // Obtener la solicitud
+                $solicitud = Solicitud::find($solicitud_id);
+
+                if (!$solicitud) {
+                    throw new Exception('Solicitud no encontrada');
+                }
+
+                // Verificar si tiene usuario
+                if ($solicitud->sol_cred_usuario == 'SI') {
+                    // Si ya tiene usuario, cambiar el estado a 3
+                    $resultado = Solicitud::verificarSolicitudSi($solicitud_id);
+                } else {
+                    // Si no tiene usuario, cambiar el estado a 2
+                    $resultado = Solicitud::verificarSolicitud($solicitud_id);
+                }
 
                 if ($resultado) {
                     http_response_code(200);
                     echo json_encode([
                         'codigo' => 1,
-                        'mensaje' => 'Solicitud verificada exitosamente',
+                        'mensaje' => 'Solicitud procesada exitosamente',
                         'detalle' => ''
                     ]);
                 } else {
@@ -61,7 +75,7 @@ class NuevasController
             http_response_code(500);
             echo json_encode([
                 'codigo' => 0,
-                'mensaje' => 'Error al verificar la solicitud',
+                'mensaje' => 'Error al procesar la solicitud',
                 'detalle' => $e->getMessage()
             ]);
         }

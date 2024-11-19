@@ -59,30 +59,6 @@ const datatable = new DataTable('#tablaNuevas', {
             }
         },
         {
-            title: 'Estado de Solicitud',
-            data: 'estado_solicitud',
-            render: (data, type, row) => {
-                // Aquí decides qué imagen se mostrará dependiendo del valor del estado_solicitud
-                let imagen = '';
-                let estado = data.toUpperCase();
-
-                // Puedes agregar imágenes condicionales para cada estado
-                switch (estado) {
-                    case 'SOLICITUD RECIBIDA':
-                        imagen = `<img src='/AccessEntry-Autocom/public/images/RECIBIDA1.png' alt='Recibida' style='width: 80px; height: 80px;' />`;
-                        break;
-                }
-
-                // Retorna el HTML que incluye la imagen y el texto
-                return `
-                    <div style="display: flex; align-items: center;">
-                        ${imagen}
-                        <span style="margin-left: 5px;">${data}</span>
-                    </div>
-                `;
-            }
-        },
-        {
             title: 'Acciones',
             data: 'solicitud_id',
             searchable: false,
@@ -125,10 +101,24 @@ const verificar = async (e) => {
     try {
         const row = datatable.row(e.target.closest('tr')).data();
         const solicitud_id = row.solicitud_id;
-        
+        const tieneUsuario = row.sol_cred_usuario; // Valor de sol_cred_usuario (SI o NO)
+
+        // Verifica el estado inicial según el valor de 'sol_cred_usuario'
+        let nuevoEstado = 2; // Por defecto, el estado es 2
+        let mensajeConfirmacion = ''; // Mensaje a mostrar en la confirmación
+
+        if (tieneUsuario === 'SI') {
+            nuevoEstado = 3; // Si ya tiene usuario, el estado será 3
+            mensajeConfirmacion = 'El usuario de esta solicitud ya cuenta con credenciales para el Autocom, por lo que será enviada a la Generación de Permisos de CAU. ¿Desea Continuar?';
+        } else {
+            nuevoEstado = 2; // Si no tiene usuario, el estado será 2
+            mensajeConfirmacion = 'Esta Solicitud será enviada a la Compañía de Sistemas para la Generación de Usuario y Contraseña. ¿Está seguro de que desea enviar esta solicitud?';
+        }
+
+        // Mostrar una confirmación según el estado
         const confirmacion = await Swal.fire({
-            title:'<strong>Por favor, revise que los datos sean correctos.</u></strong>',
-            text: "Esta Solicitud será enviada a la Compañia de Sistemas para la Generación de Usuario y Contraseña ¿Está seguro de que desea enviar esta solicitud? ",
+            title: '<strong>Por favor, revise que los datos sean correctos.</strong>',
+            text: mensajeConfirmacion,
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#206617',
@@ -141,6 +131,7 @@ const verificar = async (e) => {
 
         const formData = new FormData();
         formData.append('solicitud_id', solicitud_id);
+        formData.append('nuevo_estado', nuevoEstado); // Enviar el nuevo estado (2 o 3)
 
         const url = "/AccessEntry-Autocom/API/nuevas/verificar";
         const config = {
@@ -156,7 +147,7 @@ const verificar = async (e) => {
                 icon: 'success',
                 title: data.mensaje
             });
-            await buscar(); // Actualiza la tabla
+            await buscar(); // Actualiza la tabla con la nueva información
         } else {
             throw new Error(data.detalle);
         }
@@ -168,6 +159,8 @@ const verificar = async (e) => {
         });
     }
 };
+
+
 
 const rechazar = async (e) => {
     try {
