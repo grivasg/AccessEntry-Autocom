@@ -157,7 +157,7 @@ class Solicitud extends ActiveRecord
                 sc.sol_cred_correo,
                 sc.sol_cred_telefono,
                 sc.sol_cred_fecha_solicitud,
-                sc.sol_cred_modulo, 
+                sc.sol_cred_modulos_autorizados, 
                 sc.sol_cred_justificacion,
                 sc.sol_cred_usuario,
                 e.estado_cred_id,
@@ -253,6 +253,16 @@ class Solicitud extends ActiveRecord
     {
         $sql = "UPDATE solicitud_credenciales 
             SET sol_cred_estado_solicitud = 3 
+            WHERE solicitud_id = ?";
+        $stmt = self::prepare($sql);
+        $stmt->bindParam(1, $solicitud_id);
+        return $stmt->execute(); // Devuelve true si la actualización es exitosa, false si no lo es
+    }
+
+    public static function permisoOtorgado($solicitud_id)
+    {
+        $sql = "UPDATE solicitud_credenciales 
+            SET sol_cred_estado_solicitud = 6 
             WHERE solicitud_id = ?";
         $stmt = self::prepare($sql);
         $stmt->bindParam(1, $solicitud_id);

@@ -49,7 +49,7 @@ $router->get('/usuario', [UsuarioController::class, 'index']);
 $router->get('/API/usuario/buscar', [UsuarioController::class, 'buscarAPI']);
 $router->post('/API/usuario/enviar', [UsuarioController::class, 'enviarAPI']);
 
-
+///FTP SUBIDA DE ARCHIVOS QAP
 $router->get('/subir', [FTPController::class, 'subir']);
 $router->post('/API/ftp/subir', [FTPController::class, 'subirAPI']);
 $router->get('/mostrar', [FTPController::class, 'mostrar']);
@@ -57,6 +57,8 @@ $router->get('/mostrar', [FTPController::class, 'mostrar']);
 // RUTAS DE ASIGNACION DE PERMISOS
 $router->get('/permiso', [PermisoController::class, 'index']);
 $router->get('/API/permiso/buscar', [PermisoController::class, 'buscarAPI']);
+$router->post('/API/permiso/otorgar', [PermisoController::class, 'otorgarAPI']);
+
 
 // RUTAS DE ASIGNACION DE PERMISOS
 $router->get('/pendientes', [PendientesController::class, 'index']);
