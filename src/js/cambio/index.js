@@ -50,7 +50,7 @@ const datatable = new DataTable('#tablaCambio', {
             orderable: false,
             render: (data, type, row, meta) => {
                 return `
-                    <button class='btn btn-success otorgar'><i class="bi bi-clipboard-check"></i> </button>`;
+                    <button class='btn btn-warning otorgar'><i class="bi bi-arrow-left-right"></i></button>`;
             }
         }
     ]

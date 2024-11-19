@@ -70,12 +70,12 @@ const datatable = new DataTable('#tablaNuevas', {
 
                 if (justificacionCompleta) {
                     return `
-                        <button class='btn btn-success verificar'><i class="bi bi-clipboard-check"></i> Verificar</button>`;
+                        <button class='btn btn-success verificar'><i class="bi bi-check-square-fill"></i></button>`;
                 } else {
                     return `
-                        <button class='btn btn-warning justificar'><i class="bi bi-question-circle"></i> Justificar</button>
-                        <button class='btn btn-danger rechazar'><i class="bi bi-hand-thumbs-down"></i> Rechazar</button>
-                        <button class='btn btn-success verificar' style='display:none;'><i class="bi bi-clipboard-check"></i> Verificar</button>`;
+                        <button class='btn btn-dark justificar'><i class="bi bi-toggles2"></i></button>
+                        <button class='btn btn-danger rechazar'><i class="bi bi-hand-thumbs-down"></i></button>
+                        <button class='btn btn-success verificar' style='display:none;'><i class="bi bi-clipboard-check"></i></button>`;
                 }
             }
         }
@@ -132,6 +132,114 @@ const buscar = async () => {
 };
 buscar();
 
+
+const mostrarJustificacion = async (e) => {
+    const row = datatable.row(e.target.closest('tr')).data();
+    const solicitud_id = row.solicitud_id;
+
+    // Limpiar la cadena de módulos, eliminando posibles caracteres no deseados
+    const modulosSeleccionadosOriginales = row.sol_cred_modulo
+        .replace(/[\\"\[\]]/g, '') // Elimina barras, comillas, corchetes
+        .split(',')
+        .map(m => m.trim())
+        .filter(m => m); // Elimina elementos vacíos
+
+    const { value: formValues } = await Swal.fire({
+        title: 'Selección de Módulos',
+        html: `
+            <div>
+                <h3>Porfavor elija los módulos que autoriza habilitar al Usuario:</h3>
+                ${modulosSeleccionadosOriginales.map(modulo => `
+                    <div>
+                        <input type="checkbox" id="${modulo}" name="modulos" value="${modulo}" checked>
+                        <label for="${modulo}">${modulo}</label>
+                    </div>
+                `).join('')}
+            </div>
+            <div id="justificacionContainer" style="display:none;">
+                <h3>¿Porqué no autoriza habilitar estos modulos?</h3>
+                <textarea id="justificacionTexto" rows="4" class="swal2-input" 
+                          placeholder="Justifique el Motivo"></textarea>
+            </div>
+        `,
+        focusConfirm: false,
+        didRender: () => {
+            const checkboxes = document.querySelectorAll('input[name="modulos"]');
+            const justificacionContainer = document.getElementById('justificacionContainer');
+
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', () => {
+                    const todosSeleccionados = Array.from(checkboxes).every(cb => cb.checked);
+                    justificacionContainer.style.display = todosSeleccionados ? 'none' : 'block';
+                });
+            });
+        },
+
+        preConfirm: () => {
+            const checkboxes = document.querySelectorAll('input[name="modulos"]:checked');
+            const modulosSeleccionados = Array.from(checkboxes).map(cb => cb.value);
+            const justificacion = document.getElementById('justificacionTexto').value;
+
+            if (modulosSeleccionados.length === 0) {
+                Swal.showValidationMessage('Debe seleccionar al menos un módulo');
+                return false;
+            }
+
+            if (modulosSeleccionados.length < modulosSeleccionadosOriginales.length && !justificacion.trim()) {
+                Swal.showValidationMessage('Debe proporcionar una justificación para los módulos no seleccionados');
+                return false;
+            }
+
+            return {
+                modulosSeleccionados,
+                justificacion
+            };
+        }
+    });
+
+    if (formValues) {
+        try {
+            const formData = new FormData();
+            formData.append('solicitud_id', solicitud_id);
+
+            // Limpiar y formatear los módulos seleccionados
+            const modulosLimpios = formValues.modulosSeleccionados.map(m => m.trim());
+            formData.append('modulos_seleccionados', modulosLimpios.join(','));
+
+            formData.append('justificacion', formValues.justificacion);
+
+            const url = "/AccessEntry-Autocom/API/nuevas/justificar";
+            const config = {
+                method: 'POST',
+                body: formData
+            };
+
+            const respuesta = await fetch(url, config);
+            const data = await respuesta.json();
+
+            if (data.codigo === 1) {
+                // Set localStorage to remember justification state
+                localStorage.setItem(`justificacion_${solicitud_id}`, 'true');
+
+                Toast.fire({
+                    icon: 'success',
+                    title: data.mensaje
+                });
+
+                await buscar(); // Actualiza la tabla
+            } else {
+                throw new Error(data.detalle);
+            }
+        } catch (error) {
+            console.error('Error en justificar:', error);
+            Toast.fire({
+                icon: 'error',
+                title: 'Error al justificar los módulos'
+            });
+        }
+    }
+};
+
 const verificar = async (e) => {
     try {
         const row = datatable.row(e.target.closest('tr')).data();
@@ -144,7 +252,7 @@ const verificar = async (e) => {
 
         if (tieneUsuario === 'SI') {
             nuevoEstado = 7; // Si ya tiene usuario, el estado será 3
-            mensajeConfirmacion = 'El usuario de esta solicitud ya cuenta con credenciales para el Autocom, por lo que será enviada a la Generación de Permisos de a Nivel Base de Datos. ¿Desea Continuar?';
+            mensajeConfirmacion = 'El usuario de esta solicitud ya cuenta con credenciales para el Autocom, por lo que será enviada para el cambio de Permisos a Nivel Base de Datos. ¿Desea Continuar?';
         } else {
             nuevoEstado = 2; // Si no tiene usuario, el estado será 2
             mensajeConfirmacion = 'Esta Solicitud será enviada a la Compañía de Sistemas para la Generación de Usuario y Contraseña. ¿Está seguro de que desea enviar esta solicitud?';
@@ -250,112 +358,7 @@ const rechazar = async (e) => {
     }
 };
 
-const mostrarJustificacion = async (e) => {
-    const row = datatable.row(e.target.closest('tr')).data();
-    const solicitud_id = row.solicitud_id;
 
-    // Limpiar la cadena de módulos, eliminando posibles caracteres no deseados
-    const modulosSeleccionadosOriginales = row.sol_cred_modulo
-        .replace(/[\\"\[\]]/g, '') // Elimina barras, comillas, corchetes
-        .split(',')
-        .map(m => m.trim())
-        .filter(m => m); // Elimina elementos vacíos
-
-    const { value: formValues } = await Swal.fire({
-        title: 'Justificación de Módulos',
-        html: `
-            <div>
-                <h3>Seleccione los módulos a habilitar:</h3>
-                ${modulosSeleccionadosOriginales.map(modulo => `
-                    <div>
-                        <input type="checkbox" id="${modulo}" name="modulos" value="${modulo}" checked>
-                        <label for="${modulo}">${modulo}</label>
-                    </div>
-                `).join('')}
-            </div>
-            <div id="justificacionContainer" style="display:none;">
-                <h3>Justificación para módulos no seleccionados:</h3>
-                <textarea id="justificacionTexto" rows="4" class="swal2-input" 
-                          placeholder="Explique por qué no se seleccionaron ciertos módulos"></textarea>
-            </div>
-        `,
-        focusConfirm: false,
-        didRender: () => {
-            const checkboxes = document.querySelectorAll('input[name="modulos"]');
-            const justificacionContainer = document.getElementById('justificacionContainer');
-
-            checkboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', () => {
-                    const todosSeleccionados = Array.from(checkboxes).every(cb => cb.checked);
-                    justificacionContainer.style.display = todosSeleccionados ? 'none' : 'block';
-                });
-            });
-        },
-
-        preConfirm: () => {
-            const checkboxes = document.querySelectorAll('input[name="modulos"]:checked');
-            const modulosSeleccionados = Array.from(checkboxes).map(cb => cb.value);
-            const justificacion = document.getElementById('justificacionTexto').value;
-
-            if (modulosSeleccionados.length === 0) {
-                Swal.showValidationMessage('Debe seleccionar al menos un módulo');
-                return false;
-            }
-
-            if (modulosSeleccionados.length < modulosSeleccionadosOriginales.length && !justificacion.trim()) {
-                Swal.showValidationMessage('Debe proporcionar una justificación para los módulos no seleccionados');
-                return false;
-            }
-
-            return {
-                modulosSeleccionados,
-                justificacion
-            };
-        }
-    });
-
-    if (formValues) {
-        try {
-            const formData = new FormData();
-            formData.append('solicitud_id', solicitud_id);
-
-            // Limpiar y formatear los módulos seleccionados
-            const modulosLimpios = formValues.modulosSeleccionados.map(m => m.trim());
-            formData.append('modulos_seleccionados', modulosLimpios.join(','));
-
-            formData.append('justificacion', formValues.justificacion);
-
-            const url = "/AccessEntry-Autocom/API/nuevas/justificar";
-            const config = {
-                method: 'POST',
-                body: formData
-            };
-
-            const respuesta = await fetch(url, config);
-            const data = await respuesta.json();
-
-            if (data.codigo === 1) {
-                // Set localStorage to remember justification state
-                localStorage.setItem(`justificacion_${solicitud_id}`, 'true');
-
-                Toast.fire({
-                    icon: 'success',
-                    title: data.mensaje
-                });
-
-                await buscar(); // Actualiza la tabla
-            } else {
-                throw new Error(data.detalle);
-            }
-        } catch (error) {
-            console.error('Error en justificar:', error);
-            Toast.fire({
-                icon: 'error',
-                title: 'Error al justificar los módulos'
-            });
-        }
-    }
-};
 
 datatable.on('click', '.justificar', mostrarJustificacion);
 datatable.on('click', '.verificar', verificar);
