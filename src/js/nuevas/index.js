@@ -65,9 +65,9 @@ const datatable = new DataTable('#tablaNuevas', {
             orderable: false,
             render: (data, type, row, meta) => {
                 return `
-                    <button class='btn btn-success verificar'><i class="bi bi-clipboard-check"></i> </button>
-
-                    <button class='btn btn-danger rechazar'><i class="bi bi-hand-thumbs-down"></i></button>`;
+                    <button class='btn btn-warning justificar'><i class="bi bi-question-circle"></i> Justificar</button>
+                    <button class='btn btn-success verificar' style='display:none;'><i class="bi bi-clipboard-check"></i> Verificar</button>
+                    <button class='btn btn-danger rechazar'><i class="bi bi-hand-thumbs-down"></i> Rechazar</button>`;
             }
         }
     ]
@@ -211,9 +211,103 @@ const rechazar = async (e) => {
     }
 };
 
+const mostrarJustificacion = async (e) => {
+    const row = datatable.row(e.target.closest('tr')).data();
+    const solicitud_id = row.solicitud_id;
 
+    // Split the modules string into an array
+    const modulosSeleccionadosOriginales = row.sol_cred_modulo.split(',').map(m => m.trim());
+
+    const { value: formValues } = await Swal.fire({
+        title: 'Justificación de Módulos',
+        html: `
+            <div>
+                <h3>Seleccione los módulos a habilitar:</h3>
+                ${modulosSeleccionadosOriginales.map(modulo => `
+                    <div>
+                        <input type="checkbox" id="${modulo}" name="modulos" value="${modulo}" checked>
+                        <label for="${modulo}">${modulo}</label>
+                    </div>
+                `).join('')}
+            </div>
+            <div id="justificacionContainer" style="display:none;">
+                <h3>Justificación para módulos no seleccionados:</h3>
+                <textarea id="justificacionTexto" rows="4" class="swal2-input" 
+                          placeholder="Explique por qué no se seleccionaron ciertos módulos"></textarea>
+            </div>
+        `,
+        focusConfirm: false,
+        didRender: () => {
+            const checkboxes = document.querySelectorAll('input[name="modulos"]');
+            const justificacionContainer = document.getElementById('justificacionContainer');
+
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', () => {
+                    const todosSeleccionados = Array.from(checkboxes).every(cb => cb.checked);
+                    justificacionContainer.style.display = todosSeleccionados ? 'none' : 'block';
+                });
+            });
+        },
+        preConfirm: () => {
+            const checkboxes = document.querySelectorAll('input[name="modulos"]:checked');
+            const modulosSeleccionados = Array.from(checkboxes).map(cb => cb.value);
+            const justificacion = document.getElementById('justificacionTexto').value;
+
+            if (modulosSeleccionados.length === 0) {
+                Swal.showValidationMessage('Debe seleccionar al menos un módulo');
+                return false;
+            }
+
+            if (modulosSeleccionados.length < modulosSeleccionadosOriginales.length && !justificacion.trim()) {
+                Swal.showValidationMessage('Debe proporcionar una justificación para los módulos no seleccionados');
+                return false;
+            }
+
+            return {
+                modulosSeleccionados,
+                justificacion
+            };
+        }
+    });
+
+    // Add this new section to handle form submission
+    if (formValues) {
+        try {
+            const formData = new FormData();
+            formData.append('solicitud_id', solicitud_id);
+            formData.append('modulos_seleccionados', formValues.modulosSeleccionados.join(','));
+            formData.append('justificacion', formValues.justificacion);
+
+            const url = "/AccessEntry-Autocom/API/nuevas/justificar";
+            const config = {
+                method: 'POST',
+                body: formData
+            };
+
+            const respuesta = await fetch(url, config);
+            const data = await respuesta.json();
+
+            if (data.codigo === 1) {
+                Toast.fire({
+                    icon: 'success',
+                    title: data.mensaje
+                });
+                await buscar(); // Actualiza la tabla
+            } else {
+                throw new Error(data.detalle);
+            }
+        } catch (error) {
+            console.error('Error en justificar:', error);
+            Toast.fire({
+                icon: 'error',
+                title: 'Error al justificar los módulos'
+            });
+        }
+    }
+};
+
+datatable.on('click', '.justificar', mostrarJustificacion);
 
 datatable.on('click', '.verificar', verificar);
 datatable.on('click', '.rechazar', rechazar);
-
 

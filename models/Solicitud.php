@@ -355,4 +355,22 @@ WHERE m.per_catalogo = ?
         }
         return null;  // Si no se encuentra la solicitud
     }
+
+    public static function justificarModulos($solicitud_id, $modulosSeleccionados, $justificacion)
+    {
+        // Convertir módulos a JSON
+        $modulosAutorizados = json_encode($modulosSeleccionados);
+
+        $sql = "UPDATE solicitud_credenciales 
+            SET sol_cred_modulos_autorizados = :modulos,
+                sol_cred_justificacion_autorizacion = :justificacion -- Cambia el estado a pendiente de confirmación
+            WHERE solicitud_id = :solicitud_id";
+
+        $stmt = self::prepare($sql);
+        $stmt->bindParam(':modulos', $modulosAutorizados);
+        $stmt->bindParam(':justificacion', $justificacion);
+        $stmt->bindParam(':solicitud_id', $solicitud_id);
+
+        return $stmt->execute();
+    }
 };
