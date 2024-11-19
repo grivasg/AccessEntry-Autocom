@@ -60,7 +60,7 @@
                                 <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/usuario"><i class="bi bi-person-plus-fill"></i> Creación de Usuarios</a>
                             </li>
                             <li>
-                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/usuario"><i class="bi bi-database-lock"></i> Cambio de Permisos</a>
+                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/cambio"><i class="bi bi-database-lock"></i> Cambio de Permisos</a>
                             </li>
                         </ul>
                     </div>

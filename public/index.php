@@ -3,6 +3,7 @@ require_once __DIR__ . '/../includes/app.php';
 
 use MVC\Router;
 use Controllers\AppController;
+use Controllers\CambioController;
 use Controllers\EstadoController;
 use Controllers\FinalizadasController;
 use Controllers\FTPController;
@@ -60,9 +61,9 @@ $router->get('/API/permiso/buscar', [PermisoController::class, 'buscarAPI']);
 $router->post('/API/permiso/otorgar', [PermisoController::class, 'otorgarAPI']);
 
 
-// RUTAS DE ASIGNACION DE PERMISOS
-$router->get('/pendientes', [PendientesController::class, 'index']);
-$router->get('/API/pendientes/buscar', [PendientesController::class, 'buscarAPI']);
+// RUTAS DE ASIGNACION DE PERMISOS a Base de datos
+$router->get('/cambio', [CambioController::class, 'index']);
+$router->get('/API/cambio/buscar', [CambioController::class, 'buscarAPI']);
 
 
 // Comprueba y valida las rutas, que existan y les asigna las funciones del Controlador
