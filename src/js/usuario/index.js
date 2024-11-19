@@ -44,10 +44,6 @@ const datatable = new DataTable('#tablaUsuario', {
             data: 'sol_cred_justificacion'
         },
         {
-            title: '¿Tiene Usuario de AUTOCOM?',
-            data: 'sol_cred_usuario'
-        },
-        {
             title: 'Fecha de Solicitud',
             data: 'sol_cred_fecha_solicitud',
             render: (data, type, row) => {
