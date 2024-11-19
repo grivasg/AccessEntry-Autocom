@@ -6,7 +6,7 @@ class Solicitud extends ActiveRecord
 {
     protected static $tabla = 'solicitud_credenciales';
     protected static $idTabla = 'solicitud_id';
-    protected static $columnasDB = ['sol_cred_catalogo', 'sol_cred_correo', 'sol_cred_telefono', 'sol_cred_fecha_solicitud', 'sol_cred_modulo', 'sol_cred_justificacion', 'sol_cred_usuario', 'sol_cred_estado_solicitud', 'password'];
+    protected static $columnasDB = ['sol_cred_catalogo', 'sol_cred_correo', 'sol_cred_telefono', 'sol_cred_fecha_solicitud', 'sol_cred_modulo', 'sol_cred_justificacion', 'sol_cred_usuario', 'sol_cred_estado_solicitud', 'password', 'sol_cred_modulos_autorizados', 'sol_cred_justificacion_autorizacion'];
 
     public $solicitud_id;
     public $sol_cred_catalogo;
@@ -18,6 +18,8 @@ class Solicitud extends ActiveRecord
     public $sol_cred_usuario;
     public $sol_cred_estado_solicitud;
     public $password;
+    public $sol_cred_modulos_autorizados;
+    public $sol_cred_justificacion_autorizacion;
 
 
     public function __construct($args = [])
@@ -32,7 +34,10 @@ class Solicitud extends ActiveRecord
         $this->sol_cred_usuario = $args['sol_cred_usuario'] ?? '';
         $this->sol_cred_estado_solicitud = $args['sol_cred_estado_solicitud'] ?? 1;
         $this->password = $args['password'] ?? '';
+        $this->sol_cred_modulos_autorizados = $args['sol_cred_modulos_autorizados'] ?? '';
+        $this->sol_cred_justificacion_autorizacion = $args['sol_cred_justificacion_autorizacion'] ?? '';
     }
+
     public function guardars()
     {
         // Decodificar los arrays JSON de módulos y justificaciones
@@ -298,4 +303,56 @@ WHERE m.per_catalogo = ?
         $stmt->execute();
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
-}
+
+
+    public static function actualizarJustificacion($solicitud_id, $modulosAutorizados, $justificacion)
+    {
+        // Validar y escapar adecuadamente los datos, evitando un escape doble
+        $modulosAutorizados = json_encode($modulosAutorizados);  // Convertir array a JSON
+
+        // Consulta SQL para actualizar los campos de la solicitud
+        $sql = "UPDATE solicitud_credenciales
+            SET sol_cred_modulos_autorizados = :modulosAutorizados,
+                sol_cred_justificacion_autorizacion = :justificacion
+            WHERE solicitud_id = :solicitud_id";
+
+        // Preparar la consulta
+        $stmt = self::prepare($sql);
+
+        // Vincular los parámetros
+        $stmt->bindParam(':modulosAutorizados', $modulosAutorizados);
+        $stmt->bindParam(':justificacion', $justificacion);
+        $stmt->bindParam(':solicitud_id', $solicitud_id);
+
+        // Ejecutar la consulta
+        $stmt->execute();
+
+        // Verificar si la actualización fue exitosa
+        return $stmt->rowCount() > 0;
+    }
+
+
+    public static function obtenerDatosSolicitud($solicitud_id)
+    {
+        $sql = "SELECT solicitud_id, sol_cred_modulos_autorizados, sol_cred_justificacion_autorizacion, sol_cred_usuario FROM solicitud_credenciales WHERE solicitud_id = :solicitud_id";
+        $stmt = self::prepare($sql);
+        $stmt->bindParam(':solicitud_id', $solicitud_id);
+        $stmt->execute();
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($row) {
+            // Desescapar el JSON en caso de que sea necesario
+            $modulosAutorizados = json_decode($row['sol_cred_modulos_autorizados'], true);
+
+            // Si el JSON es válido, devolvemos la data
+            return [
+                'solicitud_id' => $row['solicitud_id'],
+                'sol_cred_modulos_autorizados' => $modulosAutorizados,
+                'sol_cred_justificacion_autorizacion' => $row['sol_cred_justificacion_autorizacion'],
+                'sol_cred_usuario' => $row['sol_cred_usuario']
+            ];
+        }
+        return null;  // Si no se encuentra la solicitud
+    }
+};
