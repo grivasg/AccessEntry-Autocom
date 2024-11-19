@@ -43,10 +43,6 @@ const datatable = new DataTable('#tablaPermisos', {
             data: 'sol_cred_justificacion'
         },
         {
-            title: '¿Tiene Usuario de AUTOCOM?',
-            data: 'sol_cred_usuario'
-        },
-        {
             title: 'Fecha de Solicitud',
             data: 'sol_cred_fecha_solicitud',
             render: (data, type, row) => {
@@ -56,30 +52,6 @@ const datatable = new DataTable('#tablaPermisos', {
                 const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
                 const año = fecha.getFullYear();
                 return `${dia}/${mes}/${año}`;
-            }
-        },
-        {
-            title: 'Estado de Solicitud',
-            data: 'estado_solicitud',
-            render: (data, type, row) => {
-                // Aquí decides qué imagen se mostrará dependiendo del valor del estado_solicitud
-                let imagen = '';
-                let estado = data.toUpperCase();
-
-                // Puedes agregar imágenes condicionales para cada estado
-                switch (estado) {
-                    case 'OTORGANDO PERMISOS':
-                        imagen = `<img src='/AccessEntry-Autocom/public/images/PERMISOS1.png' alt='Permisos' style='width: 80px; height: 80px;' />`;
-                        break;
-                }
-
-                // Retorna el HTML que incluye la imagen y el texto
-                return `
-                    <div style="display: flex; align-items: center;">
-                        ${imagen}
-                        <span style="margin-left: 5px;">${data}</span>
-                    </div>
-                `;
             }
         },
         {
