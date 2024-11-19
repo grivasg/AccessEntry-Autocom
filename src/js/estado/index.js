@@ -179,6 +179,16 @@ const ver = async (e) => {
                 imageHeight: 270,
                 imageAlt: "Custom image"
             });
+        } else if (estado === 7) {
+            // console.log('El estado de la solicitud es 3');
+            Swal.fire({
+                title: 'Otorgando Permisos',
+                text: 'Estamos otorgando los permisos necesarios para su cuenta.',
+                imageUrl: "/AccessEntry-Autocom/public/images/caso3.png",
+                imageWidth: 490,
+                imageHeight: 270,
+                imageAlt: "Custom image"
+            });
         } else {
             console.log('Estado desconocido');
             Swal.fire({

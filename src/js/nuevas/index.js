@@ -108,8 +108,8 @@ const verificar = async (e) => {
         let mensajeConfirmacion = ''; // Mensaje a mostrar en la confirmación
 
         if (tieneUsuario === 'SI') {
-            nuevoEstado = 3; // Si ya tiene usuario, el estado será 3
-            mensajeConfirmacion = 'El usuario de esta solicitud ya cuenta con credenciales para el Autocom, por lo que será enviada a la Generación de Permisos de CAU. ¿Desea Continuar?';
+            nuevoEstado = 7; // Si ya tiene usuario, el estado será 3
+            mensajeConfirmacion = 'El usuario de esta solicitud ya cuenta con credenciales para el Autocom, por lo que será enviada a la Generación de Permisos de a Nivel Base de Datos. ¿Desea Continuar?';
         } else {
             nuevoEstado = 2; // Si no tiene usuario, el estado será 2
             mensajeConfirmacion = 'Esta Solicitud será enviada a la Compañía de Sistemas para la Generación de Usuario y Contraseña. ¿Está seguro de que desea enviar esta solicitud?';
