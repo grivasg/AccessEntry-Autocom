@@ -37,7 +37,7 @@ const datatable = new DataTable('#tablaUsuario', {
         },
         {
             title: 'Modulos para habilitar',
-            data: 'sol_cred_modulo'
+            data: 'sol_cred_modulos_autorizados'
         },
         {
             title: 'Permisos Solicitados',
