@@ -49,18 +49,8 @@ const datatable = new DataTable('#tablaCambio', {
             searchable: false,
             orderable: false,
             render: (data, type, row, meta) => {
-                const datosGuardados = localStorage.getItem(`datosGuardados_${data}`);
-                if (datosGuardados) {
-                    return ` 
-                        <button class='btn btn-success enviar'>
-                            <i class="bi bi-send-fill"></i>
-                        </button>`;
-                } else {
-                    return ` 
-                        <button class='btn btn-dark ingresar'>
-                            <i class="bi bi-pencil-square"></i>
-                        </button>`;
-                }
+                return `
+                    <button class='btn btn-success otorgar'><i class="bi bi-clipboard-check"></i> </button>`;
             }
         }
     ]
@@ -81,29 +71,78 @@ const buscar = async () => {
         }
     } catch (error) {
         Toast.fire({
-            icon: 'error',
-            title: 'Error al cargar los datos'
+            icon: 'info',
+            title: 'No se encontraron Datos en esta pagina'
         });
     }
 };
 
 
-const ingresar = async () => {
-    alert('funcion ingresar');
-    
+const otorgar = async (e) => {
+    e.preventDefault();
+
+    const fila = e.target.closest('tr');
+    const datos = datatable.row(fila).data(); // Asegúrate de obtener los datos correctos de la fila
+
+    // Confirmación de si los permisos han sido concedidos
+    const { value: permisosConcedidos } = await Swal.fire({
+        title: '¿Ha actualizado los permisos a nivel de base de datos, concediendo los nuevos y retirando los anteriores?',
+        text: 'Por favor, asegúrese de haber otorgado los permisos necesarios antes de continuar.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, ya se concedieron',
+        cancelButtonText: 'No, aún no'
+    });
+
+    // Si el usuario no confirma los permisos, se detiene el flujo
+    if (!permisosConcedidos) {
+        Swal.fire({
+            title: 'Acción cancelada',
+            text: 'Debe conceder los permisos antes de continuar.',
+            icon: 'info'
+        });
+        return; // No continuar si no se concedieron los permisos
+    }
+
+    try {
+
+        // Preparar los datos para enviarlos
+        const formData = new FormData();
+        formData.append('solicitud_id', datos.solicitud_id); // Usamos 'solicitud_id' desde los datos de la fila
+
+        // URL de la API para enviar la solicitud
+        const url = "/AccessEntry-Autocom/API/cambio/otorgar";
+        const config = {
+            method: 'POST',
+            body: formData
+        };
+
+        // Enviar los datos al servidor
+        const respuesta = await fetch(url, config);
+        const data = await respuesta.json();
+
+        if (data.codigo === 1) {
+            // Mostrar mensaje de éxito
+            Toast.fire({
+                icon: 'success',
+                title: data.mensaje
+            });
+            await buscar(); // Actualiza la tabla con los nuevos datos
+        } else {
+            // Mostrar mensaje de error si la respuesta no es exitosa
+            throw new Error(data.detalle || 'Hubo un problema al otorgar los Permisos');
+        }
+    } catch (error) {
+        console.error('Error al otorgar permisos:', error);
+        Toast.fire({
+            icon: 'error',
+            title: 'Error al verificar la solicitud'
+        });
+    }
 };
 
-const enviar = async () => {
-    alert('funcion enviar');
-
-    
-};
-
-
-
-// Delegar eventos para los botones dinámicos
-datatable.on('click', '.ingresar', ingresar);
-datatable.on('click', '.enviar', enviar);
-
-// Asegurarnos de cargar los datos y mostrar el estado correcto después de recargar la página
 buscar();
+
+
+
+datatable.on('click', '.otorgar', otorgar);

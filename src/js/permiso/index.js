@@ -70,8 +70,8 @@ const buscar = async () => {
     } catch (error) {
         console.error('Error en buscar:', error);
         Toast.fire({
-            icon: 'error',
-            title: 'Error al cargar los datos'
+            icon: 'info',
+            title: 'No se encontraron Datos en esta pagina'
         });
     }
 };
@@ -103,7 +103,7 @@ const otorgar = async (e) => {
     }
 
     try {
-        
+
         // Preparar los datos para enviarlos
         const formData = new FormData();
         formData.append('solicitud_id', datos.solicitud_id); // Usamos 'solicitud_id' desde los datos de la fila

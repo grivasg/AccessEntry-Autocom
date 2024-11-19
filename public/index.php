@@ -64,6 +64,7 @@ $router->post('/API/permiso/otorgar', [PermisoController::class, 'otorgarAPI']);
 // RUTAS DE ASIGNACION DE PERMISOS a Base de datos
 $router->get('/cambio', [CambioController::class, 'index']);
 $router->get('/API/cambio/buscar', [CambioController::class, 'buscarAPI']);
+$router->post('/API/cambio/otorgar', [CambioController::class, 'otorgarAPI']);
 
 
 // Comprueba y valida las rutas, que existan y les asigna las funciones del Controlador

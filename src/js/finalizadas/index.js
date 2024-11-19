@@ -116,8 +116,8 @@ const buscar = async () => {
     } catch (error) {
         console.error('Error en buscar:', error);
         Toast.fire({
-            icon: 'error',
-            title: 'Error al cargar los datos'
+            icon: 'info',
+            title: 'No se encontraron Datos en esta pagina'
         });
     }
 };
