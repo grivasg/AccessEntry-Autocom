@@ -40,20 +40,8 @@ const datatable = new DataTable('#tablaUsuario', {
             data: 'sol_cred_modulo'
         },
         {
-            title: 'Justificacion',
+            title: 'Permisos Solicitados',
             data: 'sol_cred_justificacion'
-        },
-        {
-            title: 'Fecha de Solicitud',
-            data: 'sol_cred_fecha_solicitud',
-            render: (data, type, row) => {
-                if (!data) return "";
-                const fecha = new Date(data);
-                const dia = fecha.getDate().toString().padStart(2, '0');
-                const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
-                const año = fecha.getFullYear();
-                return `${dia}/${mes}/${año}`;
-            }
         },
         {
             title: 'Acciones',

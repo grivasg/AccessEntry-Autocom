@@ -64,10 +64,19 @@ const datatable = new DataTable('#tablaNuevas', {
             searchable: false,
             orderable: false,
             render: (data, type, row, meta) => {
-                return `
-                    <button class='btn btn-warning justificar'><i class="bi bi-question-circle"></i> Justificar</button>
-                    <button class='btn btn-success verificar' style='display:none;'><i class="bi bi-clipboard-check"></i> Verificar</button>
-                    <button class='btn btn-danger rechazar'><i class="bi bi-hand-thumbs-down"></i> Rechazar</button>`;
+                // Check localStorage for justification state
+                const justificacionKey = `justificacion_${data}`;
+                const justificacionCompleta = localStorage.getItem(justificacionKey) === 'true';
+
+                if (justificacionCompleta) {
+                    return `
+                        <button class='btn btn-success verificar'><i class="bi bi-clipboard-check"></i> Verificar</button>`;
+                } else {
+                    return `
+                        <button class='btn btn-warning justificar'><i class="bi bi-question-circle"></i> Justificar</button>
+                        <button class='btn btn-danger rechazar'><i class="bi bi-hand-thumbs-down"></i> Rechazar</button>
+                        <button class='btn btn-success verificar' style='display:none;'><i class="bi bi-clipboard-check"></i> Verificar</button>`;
+                }
             }
         }
     ]
@@ -87,15 +96,41 @@ const buscar = async () => {
         datatable.clear().draw();
 
         if (datos) {
+            // Add rows and then modify button visibility
             datatable.rows.add(datos).draw();
+
+            // After drawing the table, adjust button visibility
+            datos.forEach((row) => {
+                // Check localStorage for justification state
+                const justificacionKey = `justificacion_${row.solicitud_id}`;
+                const justificacionCompleta = localStorage.getItem(justificacionKey) === 'true';
+
+                const rowElement = document.querySelector(`#tablaNuevas tbody tr:has([data-solicitud-id="${row.solicitud_id}"])`);
+
+                if (rowElement) {
+                    const justificarBtn = rowElement.querySelector('.justificar');
+                    const rechazarBtn = rowElement.querySelector('.rechazar');
+                    const verificarBtn = rowElement.querySelector('.verificar');
+
+                    if (justificacionCompleta) {
+                        // If justification is complete, hide justificar and rechazar, show verificar
+                        if (justificarBtn) justificarBtn.style.display = 'none';
+                        if (rechazarBtn) rechazarBtn.style.display = 'none';
+                        if (verificarBtn) verificarBtn.style.display = 'inline-block';
+                    } else {
+                        // Default state
+                        if (justificarBtn) justificarBtn.style.display = 'inline-block';
+                        if (rechazarBtn) rechazarBtn.style.display = 'inline-block';
+                        if (verificarBtn) verificarBtn.style.display = 'none';
+                    }
+                }
+            });
         }
     } catch (error) {
         console.log(error);
     }
 };
 buscar();
-
-
 
 const verificar = async (e) => {
     try {
@@ -115,7 +150,6 @@ const verificar = async (e) => {
             mensajeConfirmacion = 'Esta Solicitud será enviada a la Compañía de Sistemas para la Generación de Usuario y Contraseña. ¿Está seguro de que desea enviar esta solicitud?';
         }
 
-        // Mostrar una confirmación según el estado
         const confirmacion = await Swal.fire({
             title: '<strong>Por favor, revise que los datos sean correctos.</strong>',
             text: mensajeConfirmacion,
@@ -131,7 +165,7 @@ const verificar = async (e) => {
 
         const formData = new FormData();
         formData.append('solicitud_id', solicitud_id);
-        formData.append('nuevo_estado', nuevoEstado); // Enviar el nuevo estado (2 o 3)
+        formData.append('nuevo_estado', nuevoEstado);
 
         const url = "/AccessEntry-Autocom/API/nuevas/verificar";
         const config = {
@@ -147,6 +181,10 @@ const verificar = async (e) => {
                 icon: 'success',
                 title: data.mensaje
             });
+
+            // Remove localStorage item when verified
+            localStorage.removeItem(`justificacion_${solicitud_id}`);
+
             await buscar(); // Actualiza la tabla con la nueva información
         } else {
             throw new Error(data.detalle);
@@ -160,12 +198,9 @@ const verificar = async (e) => {
     }
 };
 
-
-
 const rechazar = async (e) => {
     try {
         const row = datatable.row(e.target.closest('tr')).data();
-
         const solicitud_id = row.solicitud_id;
 
         const confirmacion = await Swal.fire({
@@ -198,6 +233,10 @@ const rechazar = async (e) => {
                 icon: 'success',
                 title: data.mensaje
             });
+
+            // Remove localStorage item when rejected
+            localStorage.removeItem(`justificacion_${solicitud_id}`);
+
             await buscar(); // Actualiza la tabla
         } else {
             throw new Error(data.detalle);
@@ -270,7 +309,6 @@ const mostrarJustificacion = async (e) => {
         }
     });
 
-    // Add this new section to handle form submission
     if (formValues) {
         try {
             const formData = new FormData();
@@ -288,10 +326,14 @@ const mostrarJustificacion = async (e) => {
             const data = await respuesta.json();
 
             if (data.codigo === 1) {
+                // Set localStorage to remember justification state
+                localStorage.setItem(`justificacion_${solicitud_id}`, 'true');
+
                 Toast.fire({
                     icon: 'success',
                     title: data.mensaje
                 });
+
                 await buscar(); // Actualiza la tabla
             } else {
                 throw new Error(data.detalle);
@@ -307,7 +349,5 @@ const mostrarJustificacion = async (e) => {
 };
 
 datatable.on('click', '.justificar', mostrarJustificacion);
-
 datatable.on('click', '.verificar', verificar);
 datatable.on('click', '.rechazar', rechazar);
-

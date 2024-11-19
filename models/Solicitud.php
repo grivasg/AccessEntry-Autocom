@@ -242,7 +242,7 @@ class Solicitud extends ActiveRecord
     public static function verificarSolicitudSi($solicitud_id)
     {
         $sql = "UPDATE solicitud_credenciales 
-            SET sol_cred_estado_solicitud = 3 
+            SET sol_cred_estado_solicitud = 7 
             WHERE solicitud_id = ?";
         $stmt = self::prepare($sql);
         $stmt->bindParam(1, $solicitud_id);
