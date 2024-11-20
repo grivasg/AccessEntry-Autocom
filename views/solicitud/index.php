@@ -75,9 +75,17 @@
                         </div>
                     </div>
                 </div>
-                <button type="button" id="agregar-modulo" class="btn btn-primary mt-2">
-                    <i class="fas fa-plus"></i> Agregar Módulo
-                </button>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                </div>
+                <div class="col">
+                    <button type="button" id="agregar-modulo" class="btn btn-primary mt-2">
+                        <i class="bi bi-plus-circle"></i> Agregar Modulo
+                    </button>
+                </div>
+                <div class="col">
+                </div>
             </div>
             <div class="row mb-3">
                 <div class="col">
