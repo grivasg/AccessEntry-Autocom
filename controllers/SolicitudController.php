@@ -3,6 +3,7 @@
 namespace Controllers;
 
 use Exception;
+use Model\Modulos;
 use Model\Solicitud;
 use MVC\Router;
 
@@ -10,8 +11,35 @@ class SolicitudController
 {
     public static function index(Router $router)
     {
-        $router->render('solicitud/index', []);
+        $modulos = Modulos::obtenerModeloconQuery();
+
+        $router->render('solicitud/index', [
+            'modulos' => $modulos
+        ]);
     }
+
+
+    public static function obtenerModulosAPI()
+    {
+        header('Content-Type: application/json');
+
+        try {
+            $modulos = Modulos::obtenerModeloconQuery();
+
+            echo json_encode([
+                'codigo' => 1,
+                'modulos' => $modulos
+            ]);
+        } catch (Exception $e) {
+            echo json_encode([
+                'codigo' => 0,
+                'mensaje' => 'Error al obtener módulos',
+                'detalle' => $e->getMessage()
+            ]);
+        }
+        exit;
+    }
+
 
     public static function guardarAPI()
     {

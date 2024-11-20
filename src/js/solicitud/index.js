@@ -60,8 +60,6 @@ const guardar = async (e) => {
         'sol_cred_catalogo',
         'sol_cred_correo',
         'sol_cred_telefono',
-        'sol_cred_modulo',
-        'sol_cred_justificacion',
         'sol_cred_usuario'
     ];
 
@@ -71,6 +69,39 @@ const guardar = async (e) => {
             title: "Campos vacíos",
             text: "Debe llenar todos los campos requeridos",
             icon: "info",
+        });
+        return;
+    }
+
+    // Limpiar y obtener los módulos y justificaciones
+    const moduloInputs = document.querySelectorAll('select[name="modulos[]"]');
+    const justificacionInputs = document.querySelectorAll('input[name="justificaciones[]"]');
+
+    // Filtrar solo los módulos y justificaciones no vacíos
+    const modulos = Array.from(moduloInputs)
+        .map(input => input.value.trim())
+        .filter(modulo => modulo !== '' && modulo !== '#');
+
+    const justificaciones = Array.from(justificacionInputs)
+        .map(input => input.value.trim())
+        .filter(justificacion => justificacion !== '');
+
+    // Validar módulos y justificaciones
+    if (modulos.length === 0 || justificaciones.length === 0 || modulos.length !== justificaciones.length) {
+        Swal.fire({
+            title: "Datos Incompletos",
+            text: "Debe llenar todos los módulos con sus justificaciones correspondientes.",
+            icon: "info"
+        });
+        return;
+    }
+
+    // Validar máximo 4 módulos
+    if (modulos.length > 4) {
+        Swal.fire({
+            title: "Límite Excedido",
+            text: "Solo puede solicitar un máximo de 4 módulos",
+            icon: "warning"
         });
         return;
     }
@@ -85,48 +116,6 @@ const guardar = async (e) => {
         dataToSend.append('sol_cred_telefono', formData.get('sol_cred_telefono'));
         dataToSend.append('sol_cred_usuario', formData.get('sol_cred_usuario'));
         dataToSend.append('sol_cred_fecha_solicitud', new Date().toISOString().split('T')[0]);
-
-        // Limpiar y obtener los módulos y justificaciones
-        const moduloInputs = document.querySelectorAll('input[name="modulos[]"]');
-        const justificacionInputs = document.querySelectorAll('input[name="justificaciones[]"]');
-
-        // Limpiar módulos
-        const modulos = Array.from(moduloInputs).map(input => {
-            return input.value
-                .replace(/[^a-zA-Z0-9\s]/g, '') // Eliminar caracteres especiales
-                .replace(/\s+/g, ' ') // Reemplazar múltiples espacios por uno
-                .trim()
-                .slice(0, 50); // Limitar a 50 caracteres
-        }).filter(modulo => modulo !== '');
-
-        // Limpiar justificaciones
-        const justificaciones = Array.from(justificacionInputs).map(input => {
-            return input.value
-                .replace(/[<>]/g, '') // Eliminar signos < >
-                .replace(/\s+/g, ' ') // Reemplazar múltiples espacios por uno
-                .trim()
-                .slice(0, 200); // Limitar a 200 caracteres
-        }).filter(justificacion => justificacion !== '');
-
-        // Validar máximo 4 módulos
-        if (modulos.length > 4) {
-            Swal.fire({
-                title: "Límite Excedido",
-                text: "Solo puede solicitar un máximo de 4 módulos",
-                icon: "warning"
-            });
-            return;
-        }
-
-        // Validar si hay módulos y justificaciones antes de enviarlas
-        if (modulos.length === 0 || justificaciones.length === 0) {
-            Swal.fire({
-                title: "Datos Incompletos",
-                text: "Debe llenar al menos un módulo y su justificación correspondiente.",
-                icon: "info"
-            });
-            return;
-        }
 
         // Convertir módulos y justificaciones a JSON para enviarlos como un solo campo
         dataToSend.append('modulos', JSON.stringify(modulos));
@@ -175,18 +164,28 @@ const guardar = async (e) => {
         console.error('Error al guardar la solicitud:', error);
         Swal.fire({
             title: "Error",
-            text: "Hubo un problema al procesar la solicitud. Inténtalo de nuevo más tarde.",
+            text: "Hubo un problema al procesar la solicitud. Inténtelo de nuevo más tarde.",
             icon: "error",
         });
     }
 };
 
 
-const agregarModulo = () => {
+const fetchModulos = async () => {
+    try {
+        const response = await fetch("/AccessEntry-Autocom/API/solicitud/obtenerModulos");
+        const data = await response.json();
+        return data.modulos || [];
+    } catch (error) {
+        console.error('Error al obtener módulos:', error);
+        return [];
+    }
+};
+
+const agregarModulo = async () => {
     const container = document.getElementById('modulos-container');
     const modulosActuales = container.querySelectorAll('.modulo-grupo').length;
 
-    // Validar máximo 4 módulos
     if (modulosActuales >= 4) {
         Swal.fire({
             title: "Límite Alcanzado",
@@ -196,69 +195,62 @@ const agregarModulo = () => {
         return;
     }
 
-    const nuevoModulo = document.createElement('div');
-    nuevoModulo.className = 'modulo-grupo mb-2';
-    nuevoModulo.innerHTML = `
-        <div class="row">
-            <div class="col-md-5">
-                <input type="text" 
-                    name="modulos[]" 
-                    class="form-control modulo-input" 
-                    placeholder="Nombre del Módulo"
-                    maxlength="50"
-                >
-            </div>
-            <div class="col-md-5">
-                <input type="text" 
-                    name="justificaciones[]" 
-                    class="form-control justificacion-input" 
-                    placeholder="Justificación"
-                    maxlength="200"
-                >
-            </div>
-            <div class="col-md-2">
-                <button type="button" class="btn btn-danger btn-remove-modulo">
-                    <i class="bi bi-x-circle-fill"></i>
-                </button>
-            </div>
-        </div>`;
-    container.appendChild(nuevoModulo);
+    try {
+        const response = await fetch("/AccessEntry-Autocom/API/solicitud/obtenerModulos");
+        const data = await response.json();
 
-    // Limpiar y validar inputs de módulos
-    const moduloInputs = document.querySelectorAll('.modulo-input');
-    const justificacionInputs = document.querySelectorAll('.justificacion-input');
-
-    moduloInputs.forEach(input => {
-        input.addEventListener('input', function () {
-            // Limpiar caracteres especiales y espacios extras
-            this.value = this.value
-                .replace(/[^a-zA-Z0-9\s]/g, '') // Eliminar caracteres especiales
-                .replace(/\s+/g, ' ') // Reemplazar múltiples espacios por uno
-                .trim(); // Eliminar espacios al inicio y final
-        });
-    });
-
-    justificacionInputs.forEach(input => {
-        input.addEventListener('input', function () {
-            // Limpiar caracteres especiales y espacios extras
-            this.value = this.value
-                .replace(/[<>]/g, '') // Eliminar signos < >
-                .replace(/\s+/g, ' ') // Reemplazar múltiples espacios por uno
-                .trim(); // Eliminar espacios al inicio y final
-        });
-    });
-
-    // Mostrar el botón de eliminar solo para los campos agregados
-    const removeButtons = document.querySelectorAll('.btn-remove-modulo');
-    removeButtons.forEach((btn, index) => {
-        if (index === 0) {
-            // Ocultar el botón de eliminar para el primer campo
-            btn.style.display = 'none';
-        } else {
-            // Mostrar el botón de eliminar solo para los campos adicionales
-            btn.style.display = 'block';
+        if (data.codigo !== 1) {
+            throw new Error("No se pudieron obtener los módulos");
         }
-    });
+
+        const modulos = data.modulos;
+
+        const nuevoModulo = document.createElement('div');
+        nuevoModulo.className = 'modulo-grupo mb-2';
+        nuevoModulo.innerHTML = `
+            <div class="row">
+                <div class="col-md-5">
+                    <label for="modulos[]" class="form-label">Seleccione Módulo</label>
+                    <select name="modulos[]" id="modulos[]" class="form-control modulo-select">
+                        <option value="#">Seleccione...</option>
+                        ${modulos.map(modulo =>
+            `<option value="${modulo.gma_codigo}">${modulo.gma_desc}</option>`
+        ).join('')}
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <label for="justificaciones[]" class="form-label">Justificación</label>
+                    <input type="text" 
+                        name="justificaciones[]" 
+                        id="justificaciones[]" 
+                        class="form-control justificacion-input" 
+                        placeholder="Justificación"
+                        maxlength="200"
+                    >
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-danger btn-remove-modulo">
+                        <i class="bi bi-x-circle-fill"></i>
+                    </button>
+                </div>
+            </div>`;
+
+        container.appendChild(nuevoModulo);
+
+        // Update remove button visibility
+        const removeButtons = document.querySelectorAll('.btn-remove-modulo');
+        removeButtons.forEach((btn, index) => {
+            btn.style.display = index === 0 ? 'none' : 'block';
+        });
+
+    } catch (error) {
+        console.error('Error al obtener módulos:', error);
+        Swal.fire({
+            title: "Error",
+            text: "No se pudieron cargar los módulos",
+            icon: "error"
+        });
+    }
 };
 
 // Manejar la eliminación de módulos
@@ -370,6 +362,9 @@ const siguiente = async (e) => {
         });
     }
 };
+
+
+
 
 // Event Listeners
 formulario.addEventListener('submit', guardar);

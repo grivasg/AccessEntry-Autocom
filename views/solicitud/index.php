@@ -46,29 +46,38 @@
                 </div>
             </div>
             <div class="row mb-3">
-                <div class="col-12">
-                    <label class="form-label">Módulos y Justificaciones</label>
-                    <div id="modulos-container">
-                        <div class="modulo-grupo mb-2">
-                            <div class="row">
-                                <div class="col-md-5">
-                                    <input type="text" name="modulos[]" class="form-control" placeholder="Nombre del Módulo">
-                                </div>
-                                <div class="col-md-5">
-                                    <input type="text" name="justificaciones[]" class="form-control" placeholder="Justificación">
-                                </div>
-                                <div class="col-md-2">
-                                    <button type="button" class="btn btn-danger btn-remove-modulo" style="display: none;">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
+                <div id="modulos-container">
+                    <div class="modulo-grupo mb-2">
+                        <div class="row">
+                            <div class="col-md-5">
+                                <label for="modulos[]" class="form-label">Seleccione Módulo</label>
+                                <select name="modulos[]" id="modulos[]" class="form-control modulo-select">
+                                    <option value="#">Seleccione...</option>
+                                    <?php foreach ($modulos as $modulo) : ?>
+                                        <option value="<?= $modulo['gma_codigo'] ?>"> <?= $modulo['gma_desc'] ?> </option>
+                                    <?php endforeach ?>
+                                </select>
+                            </div>
+                            <div class="col-md-5">
+                                <label for="justificaciones[]" class="form-label">Justificación</label>
+                                <input type="text"
+                                    name="justificaciones[]"
+                                    id="justificaciones[]"
+                                    class="form-control justificacion-input"
+                                    placeholder="Justificación"
+                                    maxlength="200">
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-danger btn-remove-modulo" style="display: none;">
+                                    <i class="fas fa-times"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
-                    <button type="button" id="agregar-modulo" class="btn btn-primary mt-2">
-                        <i class="fas fa-plus"></i> Agregar Módulo
-                    </button>
                 </div>
+                <button type="button" id="agregar-modulo" class="btn btn-primary mt-2">
+                    <i class="fas fa-plus"></i> Agregar Módulo
+                </button>
             </div>
             <div class="row mb-3">
                 <div class="col">

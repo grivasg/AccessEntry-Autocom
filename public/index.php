@@ -21,6 +21,7 @@ $router->get('/', [AppController::class, 'index']);
 // RUTAS DE SOLICITUD
 $router->get('/solicitud', [SolicitudController::class, 'index']); // Vista principal de solicitudes
 $router->get('/API/solicitud/buscar', [SolicitudController::class, 'buscarAPI']); // Buscar solicitud
+$router->get('/API/solicitud/obtenerModulos', [SolicitudController::class, 'obtenerModulosAPI']);
 $router->post('/API/solicitud/guardar', [SolicitudController::class, 'guardarAPI']); // Guardar nueva solicitud
 $router->post('/API/solicitud/modificar', [SolicitudController::class, 'modificarAPI']); // Modificar solicitud existente
 $router->post('/API/solicitud/eliminar', [SolicitudController::class, 'eliminarAPI']); // Eliminar solicitud
