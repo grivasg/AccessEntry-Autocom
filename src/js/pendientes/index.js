@@ -51,39 +51,15 @@ const datatable = new DataTable('#tablaPendientes', {
             }
         },
         {
-            title: 'Estado de Solicitud',
-            data: 'estado_solicitud',
-            render: (data, type, row) => {
-                // Aquí decides qué imagen se mostrará dependiendo del valor del estado_solicitud
-                let imagen = '';
-                let estado = data.toUpperCase();
-
-                // Puedes agregar imágenes condicionales para cada estado
-                switch (estado) {
-                    case 'PENDIENTE REVISION':
-                        imagen = `<img src='/AccessEntry-Autocom/public/images/PENDIENTE.png' alt='Recibida' style='width: 80px; height: 80px;' />`;
-                        break;
-                }
-
-                // Retorna el HTML que incluye la imagen y el texto
-                return `
-                    <div style="display: flex; align-items: center;">
-                        ${imagen}
-                        <span style="margin-left: 5px;">${data}</span>
-                    </div>
-                `;
-            }
-        },
-        {
             title: 'Acciones',
             data: 'solicitud_id',
             searchable: false,
             orderable: false,
-            render: (data, type, row, meta) => {
-                return `
-                    <button class='btn btn-success generar'><i class="bi bi-clipboard-check"></i> </button>`;
-            }
-        }
+            render: (data, type, row, meta) => `
+                <button class='btn btn-success generar' 
+                data-solicitud_id="${data}">
+                <i class="bi bi-clipboard-check"></i></button>`
+        },
     ]
 });
 
@@ -112,12 +88,10 @@ const buscar = async () => {
     }
 };
 
-const generar = async () => {
-    alert('ESTA FUNCION ES PARA CREAR UN PDF Y ENVIARLO POR CORREO')
-};
+const generar = (e) => {
+    alert('generar')
 
-
-
+}
 
 buscar();
 
