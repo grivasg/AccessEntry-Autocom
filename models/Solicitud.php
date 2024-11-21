@@ -296,15 +296,23 @@ class Solicitud extends ActiveRecord
         return $stmt->execute(); // Devuelve true si la actualización es exitosa, false si no lo es
     }
 
-    public static function rechazarSolicitud($solicitud_id)
+    public static function rechazarSolicitud($solicitud_id, $justificacion_rechazo)
     {
+        // Aquí usamos el marcador de posición ? para los parámetros
         $sql = "UPDATE solicitud_credenciales 
-            SET sol_cred_estado_solicitud = 5 
+            SET sol_cred_estado_solicitud = 5,
+                sol_cred_justificacion_autorizacion = ?
             WHERE solicitud_id = ?";
+
         $stmt = self::prepare($sql);
-        $stmt->bindParam(1, $solicitud_id);
+        $stmt->bindParam(1, $justificacion_rechazo);
+        $stmt->bindParam(2, $solicitud_id);
+
+        // Ejecutamos la consulta
         return $stmt->execute(); // Devuelve true si la actualización es exitosa, false si no lo es
     }
+
+
 
 
 
@@ -400,7 +408,7 @@ WHERE m.per_catalogo = ?
 
         $sql = "UPDATE solicitud_credenciales 
             SET sol_cred_modulos_autorizados = :modulos,
-                sol_cred_justificacion_autorizacion = :justificacion -- Cambia el estado a pendiente de confirmación
+                sol_cred_justificacion_autorizacion = :justificacion
             WHERE solicitud_id = :solicitud_id";
 
         $stmt = self::prepare($sql);

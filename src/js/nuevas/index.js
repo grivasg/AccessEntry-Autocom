@@ -188,7 +188,7 @@ const mostrarJustificacion = async (e) => {
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-6 border-right">
-                        <h3 class="h4 font-weight-bold mb-4">Módulos Disponibles:</h3>
+                        <h3 class="h4 font-weight-bold mb-4">Módulos Solicitados:</h3>
                         <div class="list-group">
                             ${modulosSeleccionadosOriginales.map(modulo => `
                                 <div class="list-group-item list-group-item-action p-3">
@@ -433,21 +433,42 @@ const rechazar = async (e) => {
         const row = datatable.row(e.target.closest('tr')).data();
         const solicitud_id = row.solicitud_id;
 
-        const confirmacion = await Swal.fire({
+        const { value: justificacionRechazo } = await Swal.fire({
             title: 'Rechazo de Solicitud',
-            text: "¿Está seguro que desea rechazar esta solicitud?",
+            html: `
+                <div class="text-left mb-3">
+                    <h5>¿Está seguro que desea rechazar esta solicitud?</h5>
+                    <p class="text-muted">Por favor, proporcione una justificación detallada.</p>
+                </div>
+                <textarea 
+                    id="justificacion-rechazo" 
+                    class="form-control" 
+                    rows="4" 
+                    placeholder="Escriba el motivo detallado del rechazo"
+                    required
+                ></textarea>
+            `,
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#525252',
             confirmButtonText: 'Sí, rechazar',
-            cancelButtonText: 'Cancelar'
+            cancelButtonText: 'Cancelar',
+            preConfirm: () => {
+                const justificacion = document.getElementById('justificacion-rechazo').value;
+                if (!justificacion.trim()) {
+                    Swal.showValidationMessage('Debe proporcionar una justificación para el rechazo');
+                    return false;
+                }
+                return justificacion;
+            }
         });
 
-        if (!confirmacion.isConfirmed) return;
+        if (!justificacionRechazo) return;
 
         const formData = new FormData();
         formData.append('solicitud_id', solicitud_id);
+        formData.append('justificacion_rechazo', justificacionRechazo); // Agregamos la justificación aquí
 
         const url = "/AccessEntry-Autocom/API/nuevas/rechazar";
         const config = {
@@ -479,6 +500,7 @@ const rechazar = async (e) => {
         });
     }
 };
+
 
 
 

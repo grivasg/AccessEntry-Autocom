@@ -86,12 +86,14 @@ class NuevasController
         try {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $solicitud_id = $_POST['solicitud_id'] ?? null;
+                $justificacion_rechazo = $_POST['justificacion_rechazo'] ?? null;  // Capturamos la justificación de rechazo
 
                 if (!$solicitud_id) {
                     throw new Exception('ID de solicitud no proporcionado');
                 }
 
-                $resultado = Solicitud::rechazarSolicitud($solicitud_id); // Pasamos $solicitud_id aquí
+                // Llamamos al modelo para rechazar la solicitud con la justificación
+                $resultado = Solicitud::rechazarSolicitud($solicitud_id, $justificacion_rechazo);
 
                 if ($resultado) {
                     http_response_code(200);
@@ -113,6 +115,7 @@ class NuevasController
             ]);
         }
     }
+
 
     public static function justificarAPI()
     {
