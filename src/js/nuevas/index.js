@@ -256,8 +256,6 @@ const mostrarJustificacion = async (e) => {
                             `
                         });
 
-
-
                         return;
                     }
 
@@ -319,7 +317,8 @@ const mostrarJustificacion = async (e) => {
                 modulosSeleccionados,
                 justificaciones
             };
-        }
+        },
+        confirmButtonText: 'Autorizar' // Cambiar el texto del botón de confirmación a "Autorizar"
     });
 
     if (formValues) {
@@ -368,6 +367,7 @@ const mostrarJustificacion = async (e) => {
         }
     }
 };
+
 
 const verificar = async (e) => {
     try {

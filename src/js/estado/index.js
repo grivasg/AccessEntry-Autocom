@@ -35,12 +35,8 @@ const datatable = new DataTable('#tablaEstado', {
             data: 'puesto_dependencia'
         },
         {
-            title: 'Modulos para habilitar',
+            title: 'Modulos Solicitados',
             data: 'sol_cred_modulo'
-        },
-        {
-            title: 'Justificacion',
-            data: 'sol_cred_justificacion'
         },
         {
             title: 'Fecha de Solicitud',

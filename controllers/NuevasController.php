@@ -147,7 +147,7 @@ class NuevasController
                     http_response_code(200);
                     echo json_encode([
                         'codigo' => 1,
-                        'mensaje' => 'Módulos justificados exitosamente',
+                        'mensaje' => 'Módulos Autorizados Exitosamente',
                         'detalle' => ''
                     ]);
                 } else {
