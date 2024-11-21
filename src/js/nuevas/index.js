@@ -37,7 +37,7 @@ const datatable = new DataTable('#tablaNuevas', {
             data: 'sol_cred_catalogo'
         },
         {
-            title: 'Modulos para habilitar',
+            title: 'Modulos Solicitados',
             data: 'sol_cred_modulo',
             render: function (data) {
                 try {
@@ -171,7 +171,8 @@ const mostrarJustificacion = async (e) => {
         .filter(m => m); // Elimina elementos vacíos
 
     const { value: formValues } = await Swal.fire({
-        title: 'Selección de Módulos',
+        title: 'Autorización de Módulos.',
+        text: 'Seleccione los módulos que desea habilitar y proporcione justificación para los que no.',
         width: '1000px', // Más ancho para Bootstrap
         heightAuto: true,
         html: `
@@ -185,6 +186,11 @@ const mostrarJustificacion = async (e) => {
                     vertical-align: middle;
                 }
             </style>
+            <div class="alert alert-success mb-4" role="alert">
+                <strong>Instrucciones:</strong> Porfavor evalue los módulos que deben ser autorizados
+                para este usuario, en función de su Plaza y Empleo, y proporcione una justificación
+                detallada para aquellos que no sean autorizados.
+            </div>
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-6 border-right">
@@ -244,8 +250,9 @@ const mostrarJustificacion = async (e) => {
                             title: 'Debe seleccionar al menos un módulo',
                             timer: '5000',
                             html: `
-                                <p>Si no va a autorizar ningun módulo, utilice la opción de rechazo de solicitud</p>
-                                <i class="bi bi-hand-thumbs-down" style="font-size: 40px; color: #f31212; margin-top: 10px;"></i>
+                                <p>Si no va a autorizar ningun módulo, utilice la opción de <strong>Rechazo de 
+                                Solicitud</strong> en el apartado <strong>Acciones.</strong></p>
+                                <i class="bi bi-hand-thumbs-down" style="font-size: 40px; color: #f31212; margin-left: 80px;"></i>
                             `
                         });
 
@@ -261,7 +268,7 @@ const mostrarJustificacion = async (e) => {
                         justificacionDiv.className = 'card mb-3';
                         justificacionDiv.innerHTML = `
                             <div class="card-header bg-warning text-dark">
-                                Justificación para no habilitar ${modulo}
+                                JUSTIFIQUE PORQUÉ NO AUTORIZAR EL MODULO <strong>${modulo}</strong> A ESTE USUARIO
                             </div>
                             <div class="card-body">
                                 <textarea 
