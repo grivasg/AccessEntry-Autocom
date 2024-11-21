@@ -230,6 +230,30 @@ const mostrarJustificacion = async (e) => {
                 checkbox.addEventListener('change', (event) => {
                     const modulo = event.target.value;
 
+                    // Contar cuántos checkboxes están seleccionados
+                    const checkboxesSeleccionados = document.querySelectorAll('input[name="modulos"]:checked');
+
+                    // Si se intenta des-seleccionar el último módulo
+                    if (checkboxesSeleccionados.length === 0) {
+                        // Revertir la des-selección
+                        event.target.checked = true;
+
+                        // Mostrar toast de alerta
+                        Toast.fire({
+                            icon: 'warning',
+                            title: 'Debe seleccionar al menos un módulo',
+                            timer: '5000',
+                            html: `
+                                <p>Si no va a autorizar ningun módulo, utilice la opción de rechazo de solicitud</p>
+                                <i class="bi bi-hand-thumbs-down" style="font-size: 40px; color: #f31212; margin-top: 10px;"></i>
+                            `
+                        });
+
+
+
+                        return;
+                    }
+
                     if (!event.target.checked) {
                         // Crear un nuevo div para la justificación de este módulo
                         const justificacionDiv = document.createElement('div');
@@ -410,8 +434,8 @@ const rechazar = async (e) => {
         const solicitud_id = row.solicitud_id;
 
         const confirmacion = await Swal.fire({
-            title: '¿Está seguro?',
-            text: "¿Desea rechazar esta solicitud?",
+            title: 'Rechazo de Solicitud',
+            text: "¿Está seguro que desea rechazar esta solicitud?",
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#d33',
