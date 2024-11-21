@@ -172,31 +172,92 @@ const mostrarJustificacion = async (e) => {
 
     const { value: formValues } = await Swal.fire({
         title: 'Selección de Módulos',
+        width: '1000px', // Más ancho para Bootstrap
+        heightAuto: true,
         html: `
-            <div>
-                <h3>Porfavor elija los módulos que autoriza habilitar al Usuario:</h3>
-                ${modulosSeleccionadosOriginales.map(modulo => `
-                    <div>
-                        <input type="checkbox" id="${modulo}" name="modulos" value="${modulo}" checked>
-                        <label for="${modulo}">${modulo}</label>
+            <style>
+                .custom-checkbox {
+                    transform: scale(1.3);
+                    margin-right: 10px;
+                }
+                .custom-checkbox-label {
+                    font-size: 16px;
+                    vertical-align: middle;
+                }
+            </style>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-6 border-right">
+                        <h3 class="h4 font-weight-bold mb-4">Módulos Disponibles:</h3>
+                        <div class="list-group">
+                            ${modulosSeleccionadosOriginales.map(modulo => `
+                                <div class="list-group-item list-group-item-action p-3">
+                                    <div class="custom-control custom-checkbox">
+                                        <input 
+                                            type="checkbox" 
+                                            class="custom-control-input custom-checkbox" 
+                                            id="${modulo}" 
+                                            name="modulos" 
+                                            value="${modulo}" 
+                                            checked
+                                        >
+                                        <label 
+                                            class="custom-control-label custom-checkbox-label" 
+                                            for="${modulo}"
+                                        >
+                                            ${modulo}
+                                        </label>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
                     </div>
-                `).join('')}
-            </div>
-            <div id="justificacionContainer" style="display:none;">
-                <h3>¿Porqué no autoriza habilitar estos modulos?</h3>
-                <textarea id="justificacionTexto" rows="4" class="swal2-input" 
-                          placeholder="Justifique el Motivo"></textarea>
+                    <div class="col-md-6">
+                        <h3 class="h4 font-weight-bold mb-4">Justificaciones:</h3>
+                        <div id="justificacionesContainer" class="mt-3">
+                            <!-- Aquí se agregarán dinámicamente los campos de justificación -->
+                        </div>
+                    </div>
+                </div>
             </div>
         `,
         focusConfirm: false,
         didRender: () => {
             const checkboxes = document.querySelectorAll('input[name="modulos"]');
-            const justificacionContainer = document.getElementById('justificacionContainer');
+            const justificacionesContainer = document.getElementById('justificacionesContainer');
 
             checkboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', () => {
-                    const todosSeleccionados = Array.from(checkboxes).every(cb => cb.checked);
-                    justificacionContainer.style.display = todosSeleccionados ? 'none' : 'block';
+                checkbox.addEventListener('change', (event) => {
+                    const modulo = event.target.value;
+
+                    if (!event.target.checked) {
+                        // Crear un nuevo div para la justificación de este módulo
+                        const justificacionDiv = document.createElement('div');
+                        justificacionDiv.id = `justificacion-${modulo}`;
+                        justificacionDiv.className = 'card mb-3';
+                        justificacionDiv.innerHTML = `
+                            <div class="card-header bg-warning text-dark">
+                                Justificación para no habilitar ${modulo}
+                            </div>
+                            <div class="card-body">
+                                <textarea 
+                                    id="justificacion-texto-${modulo}" 
+                                    rows="4" 
+                                    class="form-control" 
+                                    placeholder="Escriba la justificación detallada para no habilitar este módulo"
+                                    required
+                                ></textarea>
+                            </div>
+                        `;
+
+                        justificacionesContainer.appendChild(justificacionDiv);
+                    } else {
+                        // Eliminar el div de justificación si se vuelve a seleccionar
+                        const justificacionDiv = document.getElementById(`justificacion-${modulo}`);
+                        if (justificacionDiv) {
+                            justificacionDiv.remove();
+                        }
+                    }
                 });
             });
         },
@@ -204,21 +265,28 @@ const mostrarJustificacion = async (e) => {
         preConfirm: () => {
             const checkboxes = document.querySelectorAll('input[name="modulos"]:checked');
             const modulosSeleccionados = Array.from(checkboxes).map(cb => cb.value);
-            const justificacion = document.getElementById('justificacionTexto').value;
+
+            // Recoger justificaciones para módulos no seleccionados
+            const justificaciones = {};
+            const modulosNoSeleccionados = modulosSeleccionadosOriginales.filter(m => !modulosSeleccionados.includes(m));
+
+            modulosNoSeleccionados.forEach(modulo => {
+                const justificacionTexto = document.getElementById(`justificacion-texto-${modulo}`);
+                if (!justificacionTexto || !justificacionTexto.value.trim()) {
+                    Swal.showValidationMessage(`Debe proporcionar una justificación para el módulo ${modulo}`);
+                    return false;
+                }
+                justificaciones[modulo] = justificacionTexto.value.trim();
+            });
 
             if (modulosSeleccionados.length === 0) {
                 Swal.showValidationMessage('Debe seleccionar al menos un módulo');
                 return false;
             }
 
-            if (modulosSeleccionados.length < modulosSeleccionadosOriginales.length && !justificacion.trim()) {
-                Swal.showValidationMessage('Debe proporcionar una justificación para los módulos no seleccionados');
-                return false;
-            }
-
             return {
                 modulosSeleccionados,
-                justificacion
+                justificaciones
             };
         }
     });
@@ -232,7 +300,11 @@ const mostrarJustificacion = async (e) => {
             const modulosLimpios = formValues.modulosSeleccionados.map(m => m.trim());
             formData.append('modulos_seleccionados', modulosLimpios.join(','));
 
-            formData.append('justificacion', formValues.justificacion);
+            // Concatenar justificaciones
+            const justificacionesConcatenadas = Object.entries(formValues.justificaciones)
+                .map(([modulo, justificacion]) => `${modulo}: ${justificacion}`)
+                .join(' | ');
+            formData.append('justificacion', justificacionesConcatenadas);
 
             const url = "/AccessEntry-Autocom/API/nuevas/justificar";
             const config = {
@@ -342,8 +414,8 @@ const rechazar = async (e) => {
             text: "¿Desea rechazar esta solicitud?",
             icon: 'question',
             showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#525252',
             confirmButtonText: 'Sí, rechazar',
             cancelButtonText: 'Cancelar'
         });
