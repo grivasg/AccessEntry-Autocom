@@ -1,4 +1,4 @@
-<h1 class="text-center">Asignación de Permisos</h1>
+<h1 class="text-center">Asignación de Permisos a Nivel Aplicaciones</h1>
 <div class="row">
     <div class="col table-responsive">
         <table class="table table-bordered table-hover w-100" id="tablaPermisos">

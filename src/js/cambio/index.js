@@ -40,10 +40,6 @@ const datatable = new DataTable('#tablaCambio', {
             data: 'sol_cred_modulos_autorizados'
         },
         {
-            title: 'Permisos Solicitados',
-            data: 'sol_cred_justificacion'
-        },
-        {
             title: 'Acciones',
             data: 'solicitud_id',
             searchable: false,
@@ -83,19 +79,91 @@ const otorgar = async (e) => {
 
     const fila = e.target.closest('tr');
     const datos = datatable.row(fila).data(); // Asegúrate de obtener los datos correctos de la fila
+    const solCredModulosAutorizados = datos.sol_cred_modulos_autorizados; // El campo con los módulos autorizados
+
+    // Convertir los módulos autorizados (cadena separada por comas) en un array
+    const modulosAutorizados = solCredModulosAutorizados
+        ? solCredModulosAutorizados.split(',').map(m => m.trim())
+        : [];
+
+    // Si no hay módulos autorizados, mostramos un mensaje de error
+    if (modulosAutorizados.length === 0) {
+        Swal.fire({
+            title: 'Error',
+            text: 'No hay módulos autorizados disponibles.',
+            icon: 'error'
+        });
+        return;
+    }
 
     // Confirmación de si los permisos han sido concedidos
-    const { value: permisosConcedidos } = await Swal.fire({
-        title: '¿Ha actualizado los permisos a nivel de base de datos, concediendo los nuevos y retirando los anteriores?',
-        text: 'Por favor, asegúrese de haber otorgado los permisos necesarios antes de continuar.',
+    const { value: permisosConcedidos, isConfirmed } = await Swal.fire({
+        title: 'Permisos a Nivel Base de Datos.',
+        html: `
+            <div class="alert alert-info mb-4" role="alert">
+                <strong>Instrucciones:</strong> Por favor, marque los módulos a los cuales
+                 ya se les ha <strong>Agregado Nuevos Permisos a Nivel de Base de Datos</strong>
+                 mediante el CLI, para el catálogo <strong>${datos.sol_cred_catalogo}</strong>.
+                 Recuerde que este usuario ya cuenta con acceso al AUTOCOM.
+            </div>
+            <p class="text-start mb-3">Por favor, marque los permisos que ha concedido:</p>
+            <div class="text-center" style="display: flex; justify-content: center; align-items: center; flex-direction: column; gap: 10px;">
+                ${modulosAutorizados.map((modulo, index) => `
+                    <div class="form-check">
+                        <input class="form-check-input modulo-checkbox" type="checkbox" id="modulo-${index}" value="${modulo}">
+                        <label class="form-check-label" for="modulo-${index}">
+                            ${modulo}
+                        </label>
+                    </div>
+                `).join('')}
+            </div>
+        `,
         icon: 'question',
+        showConfirmButton: false,
         showCancelButton: true,
+        cancelButtonText: 'No, aún no',
         confirmButtonText: 'Sí, ya se concedieron',
-        cancelButtonText: 'No, aún no'
+        didRender: () => {
+            // Deshabilitamos el botón de confirmación inicialmente
+            const confirmButton = Swal.getConfirmButton();
+            confirmButton.style.display = 'none';
+
+            // Ajustamos el ancho del modal
+            const modal = Swal.getPopup();
+            modal.style.width = '800px';
+
+            // Agregamos el listener para los checkboxes
+            const checkboxes = document.querySelectorAll('.modulo-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', () => {
+                    const checkedBoxes = Array.from(checkboxes).filter(cb => cb.checked);
+                    if (checkedBoxes.length === modulosAutorizados.length) {
+                        // Si todos los checkboxes están seleccionados, mostramos el botón de confirmación
+                        const confirmButton = Swal.getConfirmButton();
+                        confirmButton.style.display = 'block';
+                        confirmButton.textContent = 'Permisos Concedidos';
+                    } else {
+                        const confirmButton = Swal.getConfirmButton();
+                        confirmButton.style.display = 'none';
+                    }
+                });
+            });
+        },
+        preConfirm: () => {
+            const checkboxes = document.querySelectorAll('.modulo-checkbox');
+            const seleccionados = Array.from(checkboxes)
+                .filter(cb => cb.checked)
+                .map(cb => cb.value);
+
+            // Verificamos que todos los módulos estén seleccionados antes de continuar
+            return seleccionados.length === modulosAutorizados.length
+                ? seleccionados
+                : false;
+        }
     });
 
-    // Si el usuario no confirma los permisos, se detiene el flujo
-    if (!permisosConcedidos) {
+    // Si el usuario no confirma los módulos, cancelamos
+    if (!isConfirmed) {
         Swal.fire({
             title: 'Acción cancelada',
             text: 'Debe conceder los permisos antes de continuar.',
@@ -105,7 +173,6 @@ const otorgar = async (e) => {
     }
 
     try {
-
         // Preparar los datos para enviarlos
         const formData = new FormData();
         formData.append('solicitud_id', datos.solicitud_id); // Usamos 'solicitud_id' desde los datos de la fila
@@ -140,6 +207,7 @@ const otorgar = async (e) => {
         });
     }
 };
+
 
 buscar();
 
