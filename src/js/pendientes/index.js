@@ -94,7 +94,28 @@ const generar = (e) => {
 }
 
 buscar();
+// funcion que servira para desencriptar la contraseña para imprimir pdf
+// async function obtenerYDesencriptarPassword(solicitudId) {
+//     try {
+//         const response = await fetch(`/AccessEntry-Autocom/API/passwords/obtener/${solicitudId}`);
+//         const data = await response.json();
 
+//         if (data.codigo === 1) {
+//             // Desencriptamos usando la clave almacenada
+//             const bytes = CryptoJS.AES.decrypt(
+//                 data.datos.password_encriptada,
+//                 data.datos.encryption_key
+//             );
+//             const passwordDesencriptada = bytes.toString(CryptoJS.enc.Utf8);
+//             return passwordDesencriptada;
+//         } else {
+//             throw new Error(data.mensaje);
+//         }
+//     } catch (error) {
+//         console.error('Error al obtener o desencriptar la contraseña:', error);
+//         throw error;
+//     }
+// }
 
 
 datatable.on('click', '.generar', generar);

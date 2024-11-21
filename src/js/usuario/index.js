@@ -1,4 +1,4 @@
-import { jsPDF } from "jspdf";
+import CryptoJS from "crypto-js";
 import { Dropdown } from "bootstrap";
 import { Toast, validarFormulario } from "../funciones";
 import Swal from "sweetalert2";
@@ -201,47 +201,66 @@ const ingresar = async (e) => {
     // Si el usuario ingresó la contraseña, proceder con la actualización
     if (formData) {
         try {
-            // Hacer una solicitud POST al backend para actualizar la contraseña
-            const url = '/AccessEntry-Autocom/API/solicitud/actualizarPassword'; // URL de la API
+            // Generamos una clave de encriptación aleatoria
+            const secretKey = CryptoJS.lib.WordArray.random(32).toString();
+            const token = CryptoJS.lib.WordArray.random(32).toString();
+            const encryptedPassword = CryptoJS.AES.encrypt(formData.password, secretKey).toString();
+
+            // Log the data being sent
+            console.log('Sending data:', {
+                solicitud_id: datos.solicitud_id,
+                password_encriptada: encryptedPassword,
+                pass_token: token,
+                encryption_key: secretKey,
+                pass_fecha_creacion: new Date().toISOString().split('T')[0]
+            });
+
+            const url = '/AccessEntry-Autocom/API/passwords/guardarTemp';
             const config = {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    solicitud_id: datos.solicitud_id,  // Usamos el ID de la solicitud
-                    password: formData.password  // La contraseña que ingresó el usuario
+                    solicitud_id: datos.solicitud_id,
+                    password_encriptada: encryptedPassword,
+                    pass_token: token,
+                    encryption_key: secretKey,
+                    pass_fecha_creacion: new Date().toISOString().split('T')[0]
                 })
             };
 
             const respuesta = await fetch(url, config);
-            const data = await respuesta.json();
+            const responseText = await respuesta.text(); // Get raw response text first
+            console.log('Raw response:', responseText);
+
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (e) {
+                console.error('Failed to parse JSON response:', e);
+                throw new Error('Invalid JSON response from server');
+            }
+
+            console.log('Parsed response:', data);
 
             if (data.codigo === 1) {
-                // Los datos se guardaron correctamente en la base de datos
-                // Guardamos el estado en localStorage para persistencia
                 localStorage.setItem(`datosGuardados_${datos.solicitud_id}`, true);
                 datatable.row(fila).invalidate().draw();
 
-                // Mostrar mensaje de éxito
-                Swal.fire({
+                await Swal.fire({
                     title: 'Usuario Creado, Permisos Concedidos y Contraseña Registrada',
                     text: 'Las Credenciales del Usuario han sido Creadas Correctamente.',
                     icon: 'success'
                 });
             } else {
-                // Hubo un error al guardar los datos
-                Swal.fire({
-                    title: 'Error',
-                    text: data.mensaje,
-                    icon: 'error'
-                });
+                throw new Error(data.mensaje || 'Error desconocido en la respuesta del servidor');
             }
         } catch (error) {
-            // Manejo de errores en la solicitud
-            Swal.fire({
+            console.error('Error completo:', error);
+            await Swal.fire({
                 title: 'Error',
-                text: 'Hubo un problema al guardar los datos.',
+                text: `Error al guardar los datos: ${error.message}`,
                 icon: 'error'
             });
         }

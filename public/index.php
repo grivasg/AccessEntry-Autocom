@@ -8,6 +8,7 @@ use Controllers\EstadoController;
 use Controllers\FinalizadasController;
 use Controllers\FTPController;
 use Controllers\NuevasController;
+use Controllers\PasswordsController;
 use Controllers\PendientesController;
 use Controllers\PermisoController;
 use Controllers\SolicitudController;
@@ -71,6 +72,12 @@ $router->get('/API/pendientes/buscar', [PendientesController::class, 'buscarAPI'
 $router->get('/cambio', [CambioController::class, 'index']);
 $router->get('/API/cambio/buscar', [CambioController::class, 'buscarAPI']);
 $router->post('/API/cambio/otorgar', [CambioController::class, 'otorgarAPI']);
+
+
+//CONTRASSSSSSSSSSSSSSSSS
+$router->post('/API/passwords/guardarTemp', [PasswordsController::class, 'guardarTempAPI']);
+$router->get('/API/passwords/obtenerPassword', [PasswordsController::class, 'obtenerPasswordAPI']);
+
 
 
 // Comprueba y valida las rutas, que existan y les asigna las funciones del Controlador
