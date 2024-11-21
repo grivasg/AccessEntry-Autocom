@@ -61,10 +61,16 @@ class SolicitudController
                 throw new Exception("La cantidad de módulos y justificaciones debe coincidir");
             }
 
-            $solicitud = new Solicitud($_POST);
-            $solicitud->modulos = $modulos;
-            $solicitud->justificaciones = $justificaciones;
+            // Convertir los arrays a cadenas separadas por coma
+            $modulosString = implode(', ', $modulos);
+            $justificacionesString = implode(', ', $justificaciones);
 
+            // Crear la solicitud con los datos del POST y las cadenas de módulos y justificaciones
+            $solicitud = new Solicitud($_POST);
+            $solicitud->modulos = $modulosString; // Guardar como cadena
+            $solicitud->justificaciones = $justificacionesString; // Guardar como cadena
+
+            // Llamada al método guardar en el modelo o base de datos
             $resultado = $solicitud->guardars();
 
             if ($resultado) {
@@ -85,6 +91,7 @@ class SolicitudController
             ]);
         }
     }
+
 
     public static function buscarAPI()
     {

@@ -4,6 +4,8 @@ import Swal from "sweetalert2";
 import DataTable from "datatables.net-bs5";
 import { lenguaje } from "../lenguaje";
 
+
+
 const datatable = new DataTable('#tablaNuevas', {
     data: null,
     language: lenguaje,
@@ -36,11 +38,34 @@ const datatable = new DataTable('#tablaNuevas', {
         },
         {
             title: 'Modulos para habilitar',
-            data: 'sol_cred_modulo'
+            data: 'sol_cred_modulo',
+            render: function (data) {
+                try {
+                    // Si el dato es un string, intenta parsearlo como JSON
+                    const modulos = typeof data === 'string' ? JSON.parse(data) : data;
+                    // Limpia los caracteres especiales y une con comas
+                    return modulos
+                        .map(modulo => modulo.trim())  // Elimina posibles espacios extra
+                        .join(', ');  // Une con coma y espacio
+                } catch (e) {
+                    // Si no es un JSON válido, devuelve el dato tal cual
+                    return data;
+                }
+            }
         },
         {
             title: 'Justificacion',
-            data: 'sol_cred_justificacion'
+            data: 'sol_cred_justificacion',
+            render: function (data) {
+                try {
+                    const justificaciones = typeof data === 'string' ? JSON.parse(data) : data;
+                    return justificaciones
+                        .map(justificacion => justificacion.trim())  // Limpia los caracteres especiales
+                        .join(', ');  // Une con coma y espacio
+                } catch (e) {
+                    return data;
+                }
+            }
         },
         {
             title: '¿Tiene Usuario de AUTOCOM?',
@@ -81,6 +106,7 @@ const datatable = new DataTable('#tablaNuevas', {
         }
     ]
 });
+
 
 const buscar = async () => {
     try {

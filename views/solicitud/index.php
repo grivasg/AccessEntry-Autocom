@@ -54,7 +54,7 @@
                                 <select name="modulos[]" id="modulos[]" class="form-control modulo-select">
                                     <option value="#">Seleccione...</option>
                                     <?php foreach ($modulos as $modulo) : ?>
-                                        <option value="<?= $modulo['gma_codigo'] ?>"> <?= $modulo['gma_desc'] ?> </option>
+                                        <option value="<?= $modulo['gma_desc'] ?>"><?= $modulo['gma_desc'] ?></option>
                                     <?php endforeach ?>
                                 </select>
                             </div>

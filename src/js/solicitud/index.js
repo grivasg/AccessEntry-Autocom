@@ -35,10 +35,10 @@ if (backStepBtn) {
 }
 
 
+// Modificación de la función guardar
 const guardar = async (e) => {
     e.preventDefault();
 
-    // Mostrar mensaje de confirmación
     const result = await Swal.fire({
         title: "Confirmación",
         text: "Revise bien la Información ya que esta acción es Irreversible. ¿Está Seguro que desea continuar?",
@@ -50,12 +50,8 @@ const guardar = async (e) => {
         cancelButtonText: "Cancelar"
     });
 
-    // Si el usuario no confirma, no se hace nada
-    if (!result.isConfirmed) {
-        return;
-    }
+    if (!result.isConfirmed) return;
 
-    // Lista de campos requeridos que sí se guardarán en la BD
     const camposRequeridos = [
         'sol_cred_catalogo',
         'sol_cred_correo',
@@ -63,7 +59,6 @@ const guardar = async (e) => {
         'sol_cred_usuario'
     ];
 
-    // Validar solo los campos que se guardarán
     if (!validarFormulario(formulario, ['solicitud_id'], camposRequeridos)) {
         Swal.fire({
             title: "Campos vacíos",
@@ -73,20 +68,22 @@ const guardar = async (e) => {
         return;
     }
 
-    // Limpiar y obtener los módulos y justificaciones
-    const moduloInputs = document.querySelectorAll('select[name="modulos[]"]');
+    // Modificado para obtener tanto el valor como el texto de los módulos
+    const moduloSelects = document.querySelectorAll('select[name="modulos[]"]');
     const justificacionInputs = document.querySelectorAll('input[name="justificaciones[]"]');
 
-    // Filtrar solo los módulos y justificaciones no vacíos
-    const modulos = Array.from(moduloInputs)
-        .map(input => input.value.trim())
-        .filter(modulo => modulo !== '' && modulo !== '#');
+    // Obtener las descripciones de los módulos en lugar de los códigos
+    const modulos = Array.from(moduloSelects)
+        .map(select => {
+            const selectedOption = select.options[select.selectedIndex];
+            return selectedOption.text.trim(); // Obtener el texto en lugar del value
+        })
+        .filter(modulo => modulo !== 'Seleccione...');
 
     const justificaciones = Array.from(justificacionInputs)
         .map(input => input.value.trim())
         .filter(justificacion => justificacion !== '');
 
-    // Validar módulos y justificaciones
     if (modulos.length === 0 || justificaciones.length === 0 || modulos.length !== justificaciones.length) {
         Swal.fire({
             title: "Datos Incompletos",
@@ -96,7 +93,6 @@ const guardar = async (e) => {
         return;
     }
 
-    // Validar máximo 4 módulos
     if (modulos.length > 4) {
         Swal.fire({
             title: "Límite Excedido",
@@ -110,18 +106,17 @@ const guardar = async (e) => {
         const formData = new FormData(formulario);
         const dataToSend = new FormData();
 
-        // Añadir solo los campos requeridos a la base de datos
+        // Añadir campos básicos
         dataToSend.append('sol_cred_catalogo', formData.get('sol_cred_catalogo'));
         dataToSend.append('sol_cred_correo', formData.get('sol_cred_correo'));
         dataToSend.append('sol_cred_telefono', formData.get('sol_cred_telefono'));
         dataToSend.append('sol_cred_usuario', formData.get('sol_cred_usuario'));
         dataToSend.append('sol_cred_fecha_solicitud', new Date().toISOString().split('T')[0]);
 
-        // Convertir módulos y justificaciones a JSON para enviarlos como un solo campo
+        // Guardar las descripciones de los módulos y sus justificaciones
         dataToSend.append('modulos', JSON.stringify(modulos));
         dataToSend.append('justificaciones', JSON.stringify(justificaciones));
 
-        // Enviar los datos al servidor
         const url = "/AccessEntry-Autocom/API/solicitud/guardar";
         const config = {
             method: 'POST',
@@ -131,20 +126,11 @@ const guardar = async (e) => {
         const respuesta = await fetch(url, config);
         const data = await respuesta.json();
 
-        const { codigo, mensaje, detalle } = data;
-        let icono = 'info';
-
-        if (codigo === 1) {
-            icono = 'success';
-
-            // Vaciar el formulario
+        if (data.codigo === 1) {
             formulario.reset();
-
-            // Volver al primer paso
             document.getElementById('step-2').style.display = 'none';
             document.getElementById('step-1').style.display = 'block';
 
-            // Mostrar mensaje de éxito
             Swal.fire({
                 title: "Solicitud Generada con Éxito",
                 text: "Su solicitud ha sido registrada. Actualmente se encuentra en proceso. Será notificado oportunamente sobre cualquier actualización respecto al estado de su solicitud.",
@@ -152,12 +138,11 @@ const guardar = async (e) => {
                 footer: '<a href="/AccessEntry-Autocom/estado">Ver Estado de Solicitud</a>',
             });
         } else {
-            icono = 'error';
-            console.error(detalle);
+            console.error(data.detalle);
             Swal.fire({
                 title: "Error",
-                text: detalle || "Ocurrió un error al guardar la solicitud.",
-                icon: icono,
+                text: data.detalle || "Ocurrió un error al guardar la solicitud.",
+                icon: "error",
             });
         }
     } catch (error) {
@@ -170,18 +155,7 @@ const guardar = async (e) => {
     }
 };
 
-
-const fetchModulos = async () => {
-    try {
-        const response = await fetch("/AccessEntry-Autocom/API/solicitud/obtenerModulos");
-        const data = await response.json();
-        return data.modulos || [];
-    } catch (error) {
-        console.error('Error al obtener módulos:', error);
-        return [];
-    }
-};
-
+// Modificación de la función agregarModulo
 const agregarModulo = async () => {
     const container = document.getElementById('modulos-container');
     const modulosActuales = container.querySelectorAll('.modulo-grupo').length;
@@ -214,8 +188,8 @@ const agregarModulo = async () => {
                     <select name="modulos[]" id="modulos[]" class="form-control modulo-select">
                         <option value="#">Seleccione...</option>
                         ${modulos.map(modulo =>
-            `<option value="${modulo.gma_codigo}">${modulo.gma_desc}</option>`
-        ).join('')}
+                            `<option value="${modulo.gma_desc}">${modulo.gma_desc}</option>`
+                        ).join('')}
                     </select>
                 </div>
                 <div class="col-md-5">
@@ -237,7 +211,6 @@ const agregarModulo = async () => {
 
         container.appendChild(nuevoModulo);
 
-        // Update remove button visibility
         const removeButtons = document.querySelectorAll('.btn-remove-modulo');
         removeButtons.forEach((btn, index) => {
             btn.style.display = index === 0 ? 'none' : 'block';
@@ -252,6 +225,7 @@ const agregarModulo = async () => {
         });
     }
 };
+
 
 // Manejar la eliminación de módulos
 document.addEventListener('click', function (e) {
