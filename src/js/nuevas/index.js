@@ -42,14 +42,26 @@ const datatable = new DataTable('#tablaNuevas', {
             render: function (data) {
                 try {
                     // Si el dato es un string, intenta parsearlo como JSON
-                    const modulos = typeof data === 'string' ? JSON.parse(data) : data;
-                    // Limpia los caracteres especiales y une con comas
+                    const modulos = typeof data === 'string'
+                        ? JSON.parse(data.replace(/\\"/g, '"')) // Reemplaza comillas escapadas
+                        : data;
+
+                    // Limpia los caracteres especiales, elimina espacios extra y caracteres Unicode
                     return modulos
-                        .map(modulo => modulo.trim())  // Elimina posibles espacios extra
+                        .map(modulo =>
+                            modulo
+                                .replace(/[\\"\[\]]/g, '') // Elimina barras, comillas, corchetes
+                                .replace(/\\u00d1/g, 'Ñ') // Reemplaza la representación Unicode de Ñ
+                                .trim()  // Elimina posibles espacios extra
+                        )
+                        .filter(modulo => modulo) // Elimina módulos vacíos
                         .join(', ');  // Une con coma y espacio
                 } catch (e) {
-                    // Si no es un JSON válido, devuelve el dato tal cual
-                    return data;
+                    // Si no es un JSON válido, devuelve el dato limpio
+                    return data
+                        .replace(/[\\"\[\]]/g, '')
+                        .replace(/\\u00d1/g, 'Ñ')
+                        .trim();
                 }
             }
         },

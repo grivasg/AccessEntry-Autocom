@@ -36,7 +36,19 @@ const datatable = new DataTable('#tablaEstado', {
         },
         {
             title: 'Modulos Solicitados',
-            data: 'sol_cred_modulo'
+            data: 'sol_cred_modulo',
+            render: (data, type, row) => {
+                // Limpiar la cadena de módulos, eliminando posibles caracteres no deseados
+                const modulosSeleccionados = data
+                    .replace(/[\\"\[\]]/g, '') // Elimina barras, comillas, corchetes
+                    .replace(/\\u00d1/g, 'Ñ') // Reemplaza la representación Unicode de Ñ
+                    .split(',')
+                    .map(m => m.trim())
+                    .filter(m => m) // Elimina elementos vacíos
+                    .join(', '); // Reúne los módulos en una cadena legible
+
+                return modulosSeleccionados;
+            }
         },
         {
             title: 'Fecha de Solicitud',
