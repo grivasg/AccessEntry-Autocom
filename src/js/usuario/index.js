@@ -36,12 +36,8 @@ const datatable = new DataTable('#tablaUsuario', {
             data: 'sol_cred_catalogo'
         },
         {
-            title: 'Modulos para habilitar',
+            title: 'Modulos Autorizados para Habilitación',
             data: 'sol_cred_modulos_autorizados'
-        },
-        {
-            title: 'Permisos Solicitados',
-            data: 'sol_cred_justificacion'
         },
         {
             title: 'Acciones',
@@ -93,28 +89,91 @@ const ingresar = async (e) => {
 
     const fila = e.target.closest('tr');
     const datos = datatable.row(fila).data();
+    const sol_cred_catalogo = datos.sol_cred_catalogo; // Obtener el valor del campo sol_cred_catalogo de la fila
 
-    // Primer paso: Confirmar si los permisos a nivel base de datos han sido concedidos
-    const { value: permisosConcedidos } = await Swal.fire({
-        title: '¿Ha concedido los permisos a nivel base de datos?',
-        text: 'Por favor, asegúrese de haber otorgado los permisos necesarios antes de continuar.',
+    // Parsear los módulos autorizados
+    const modulosAutorizados = datos.sol_cred_modulos_autorizados
+        ? datos.sol_cred_modulos_autorizados.split(',').map(m => m.trim())
+        : [];
+
+    // Añadimos el checkbox para "Creación de Usuario en CLI"
+    const modulosConCreacionCLI = ["Creación de Usuario en CLI.", ...modulosAutorizados];
+
+    // Paso único: Confirmación de Permisos con Selección de Módulos
+    const { value: permisosConcedidos, isConfirmed } = await Swal.fire({
+        title: 'Creación de Usuarios y Permisos a Nivel Base de Datos.',
+        html: `
+            <div class="alert alert-success mb-4" role="alert">
+                <strong>Instrucciones:</strong> Por favor, seleccione las tareas 
+                que se han completado en la Compañía de Sistemas, con el fin de reflejar
+                la <strong>Creación de Usuario</strong> y la <strong>Asignación de Permisos</strong>
+                a nivel de Base de Datos para el Catálogo <strong>${sol_cred_catalogo}.</strong>
+            </div>
+            <p class="text-start mb-3">Por favor, marque las tareas ya Completadas:</p>
+            <div class="text-center" style="display: flex; justify-content: center; align-items: center; flex-direction: column; gap: 10px;">
+                ${modulosConCreacionCLI.map((modulo, index) => `
+                    <div class="form-check">
+                        <input 
+                            class="form-check-input modulo-checkbox" 
+                            type="checkbox" 
+                            id="modulo-${index}" 
+                            value="${modulo}"
+                        >
+                        <label class="form-check-label" for="modulo-${index}">
+                            ${modulo}
+                        </label>
+                    </div>
+                `).join('')}
+            </div>
+        `,
         icon: 'question',
+        showConfirmButton: false,
         showCancelButton: true,
-        confirmButtonText: 'Sí, ya se concedieron',
-        cancelButtonText: 'No, aún no'
+        cancelButtonText: 'Cancelar',
+        didRender: () => {
+            // Deshabilitamos el botón de confirmación inicialmente
+            const confirmButton = Swal.getConfirmButton();
+            confirmButton.style.display = 'none';
+
+            // Ajustamos el ancho del modal a 800px
+            const modal = Swal.getPopup();
+            modal.style.width = '800px';  // Ajuste del ancho aquí
+
+            // Agregamos listener para los checkboxes
+            const checkboxes = document.querySelectorAll('.modulo-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', () => {
+                    const checkedBoxes = Array.from(checkboxes).filter(cb => cb.checked);
+                    if (checkedBoxes.length === modulosConCreacionCLI.length) {
+                        // Si todos los checkboxes están marcados, mostramos el botón de confirmación
+                        const confirmButton = Swal.getConfirmButton();
+                        confirmButton.style.display = 'block';
+                        confirmButton.textContent = 'Finalizar Tareas';
+                    } else {
+                        const confirmButton = Swal.getConfirmButton();
+                        confirmButton.style.display = 'none';
+                    }
+                });
+            });
+        },
+        preConfirm: () => {
+            const checkboxes = document.querySelectorAll('.modulo-checkbox');
+            const seleccionados = Array.from(checkboxes)
+                .filter(cb => cb.checked)
+                .map(cb => cb.value);
+
+            return seleccionados.length === modulosConCreacionCLI.length
+                ? seleccionados
+                : false;
+        }
     });
 
-    // Si el usuario no confirma los permisos, se detiene el flujo
-    if (!permisosConcedidos) {
-        Swal.fire({
-            title: 'Acción cancelada',
-            text: 'Debe conceder los permisos antes de continuar.',
-            icon: 'info'
-        });
-        return; // No continuar si no se concedieron los permisos
+    // Si el usuario no confirma la selección de módulos, cancelamos
+    if (!isConfirmed) {
+        return;
     }
 
-    // Segundo paso: Si los permisos fueron concedidos, mostrar el formulario para ingresar la contraseña
+    // Segundo paso: Mostrar formulario para ingresar contraseña
     const { value: formData } = await Swal.fire({
         title: 'Ingrese los credenciales del Usuario Creado',
         html: ` 
@@ -166,8 +225,8 @@ const ingresar = async (e) => {
 
                 // Mostrar mensaje de éxito
                 Swal.fire({
-                    title: 'Contraseña Generada',
-                    text: 'La contraseña ha sido guardada correctamente.',
+                    title: 'Usuario Creado, Permisos Concedidos y Contraseña Registrada',
+                    text: 'Las Credenciales del Usuario han sido Creadas Correctamente.',
                     icon: 'success'
                 });
             } else {
@@ -188,6 +247,7 @@ const ingresar = async (e) => {
         }
     }
 };
+
 
 
 // Función para enviar los datos (solo muestra un alert en este caso)

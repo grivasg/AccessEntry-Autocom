@@ -35,7 +35,7 @@ const datatable = new DataTable('#tablaPermisos', {
             data: 'sol_cred_catalogo'
         },
         {
-            title: 'Modulos a Habilitar Permisos',
+            title: 'Permisos a Otorgar en Modulos',
             data: 'sol_cred_modulos_autorizados'
         },
         {
@@ -81,29 +81,82 @@ const otorgar = async (e) => {
 
     const fila = e.target.closest('tr');
     const datos = datatable.row(fila).data(); // Asegúrate de obtener los datos correctos de la fila
+    const sol_cred_catalogo = datos.sol_cred_catalogo; // Obtener el campo sol_cred_catalogo de la fila
 
-    // Confirmación de si los permisos han sido concedidos
-    const { value: permisosConcedidos } = await Swal.fire({
-        title: '¿Ha concedido los permisos a nivel Aplicación?',
-        text: 'Por favor, asegúrese de haber otorgado los permisos necesarios antes de continuar.',
+    // Parsear los módulos autorizados
+    const modulosAutorizados = datos.sol_cred_modulos_autorizados
+        ? datos.sol_cred_modulos_autorizados.split(',').map(m => m.trim())
+        : [];
+
+    // Confirmación de si los permisos han sido concedidos y selección de módulos
+    const { value: permisosConcedidos, isConfirmed } = await Swal.fire({
+        title: 'Permisos a Nivel Aplicación.',
+        html: `
+            <div class="alert alert-success mb-4" role="alert">
+                <strong>Instrucciones:</strong> Por favor, seleccione los módulos a los cuales
+                ha otorgado <strong>Permisos a Nivel de Aplicación</strong> para el 
+                <strong>Catálogo ${sol_cred_catalogo}</strong>.
+            </div>
+            <div class="text-start" style="display: flex; flex-direction: column; align-items: center;">
+                ${modulosAutorizados.map((modulo, index) => `
+                    <div class="form-check">
+                        <input 
+                            class="form-check-input modulo-checkbox" 
+                            type="checkbox" 
+                            id="modulo-${index}" 
+                            value="${modulo}"
+                        >
+                        <label class="form-check-label" for="modulo-${index}">
+                            ${modulo}
+                        </label>
+                    </div>
+                `).join('')}
+            </div>
+        `,
         icon: 'question',
+        showConfirmButton: false,
         showCancelButton: true,
-        confirmButtonText: 'Sí, ya se concedieron',
-        cancelButtonText: 'No, aún no'
+        cancelButtonText: 'Cancelar',
+        didRender: () => {
+            // Ajustamos el ancho del modal a 800px
+            const modal = Swal.getPopup();
+            modal.style.width = '800px';  // Ajuste del ancho aquí
+
+            // Agregamos listener para los checkboxes
+            const checkboxes = document.querySelectorAll('.modulo-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', () => {
+                    const checkedBoxes = Array.from(checkboxes).filter(cb => cb.checked);
+                    if (checkedBoxes.length === modulosAutorizados.length) {
+                        // Si todos los checkboxes están marcados, mostramos el botón de confirmación
+                        const confirmButton = Swal.getConfirmButton();
+                        confirmButton.style.display = 'block';
+                        confirmButton.textContent = 'Permisos Concedidos';
+                    } else {
+                        const confirmButton = Swal.getConfirmButton();
+                        confirmButton.style.display = 'none';
+                    }
+                });
+            });
+        },
+        preConfirm: () => {
+            const checkboxes = document.querySelectorAll('.modulo-checkbox');
+            const seleccionados = Array.from(checkboxes)
+                .filter(cb => cb.checked)
+                .map(cb => cb.value);
+
+            return seleccionados.length === modulosAutorizados.length
+                ? seleccionados
+                : false;
+        }
     });
 
-    // Si el usuario no confirma los permisos, se detiene el flujo
-    if (!permisosConcedidos) {
-        Swal.fire({
-            title: 'Acción cancelada',
-            text: 'Debe conceder los permisos antes de continuar.',
-            icon: 'info'
-        });
-        return; // No continuar si no se concedieron los permisos
+    // Si el usuario no confirma la selección de módulos, se detiene el flujo
+    if (!isConfirmed) {
+        return;
     }
 
     try {
-
         // Preparar los datos para enviarlos
         const formData = new FormData();
         formData.append('solicitud_id', datos.solicitud_id); // Usamos 'solicitud_id' desde los datos de la fila
