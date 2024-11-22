@@ -92,7 +92,7 @@ class PasswordsController
             $passwordTemp = PasswordTemp::recuperarPasswordTemporal($solicitudId);
 
             if (!$passwordTemp) {
-                throw new Exception('No se encontró password temporal para solicitudId: ' . $solicitudId);
+                throw new Exception('Este Usuario no cuenta con Acceso al AUTOCOM ');
             }
 
             echo json_encode([

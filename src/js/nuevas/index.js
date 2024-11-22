@@ -110,9 +110,9 @@ const datatable = new DataTable('#tablaNuevas', {
                         <button class='btn btn-success verificar'><i class="bi bi-check-square-fill"></i></button>`;
                 } else {
                     return `
-                        <button class='btn btn-dark justificar'><i class="bi bi-toggles2"></i></button>
-                        <button class='btn btn-danger rechazar'><i class="bi bi-hand-thumbs-down"></i></button>
-                        <button class='btn btn-success verificar' style='display:none;'><i class="bi bi-clipboard-check"></i></button>`;
+                        <button class='btn btn-dark justificar' title='JUSTIFICAR'><i class="bi bi-toggles2"></i></button>
+                        <button class='btn btn-danger rechazar' title='RECHAZAR'><i class="bi bi-hand-thumbs-down"></i></button>
+                        <button class='btn btn-success verificar' style='display:none;' title='ENVIAR'><i class="bi bi-clipboard-check"></i></button>`;
                 }
             }
         }

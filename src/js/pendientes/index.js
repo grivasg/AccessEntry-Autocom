@@ -92,15 +92,11 @@ const buscar = async () => {
 const generar = async (e) => {
     try {
         const solicitudId = e.currentTarget.dataset.solicitud_id;
-
-        console.log('Solicitud ID:', solicitudId);
-
         const url = `/AccessEntry-Autocom/API/passwords/obtenerPassword?solicitudId=${solicitudId}`;
         console.log('Full URL:', url);
 
         const respuesta = await fetch(url);
         const datos = await respuesta.json();
-        console.log('Response:', datos);
 
         if (datos.codigo !== 1) {
             throw new Error(datos.error || 'Error desconocido');
@@ -127,9 +123,8 @@ const generar = async (e) => {
         });
 
     } catch (error) {
-        console.error('Error al generar:', error);
         Swal.fire({
-            title: 'Error',
+            title: 'Error', 
             text: error.message,
             icon: 'error'
         });
