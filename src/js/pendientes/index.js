@@ -87,112 +87,54 @@ const buscar = async () => {
     }
 };
 
-async function obtenerYDesencriptarPassword(solicitudId) {
-    try {
-        const response = await fetch(`/AccessEntry-Autocom/API/passwords/obtener/${solicitudId}`);
-
-        // Capturar la respuesta como texto para ver si es HTML o JSON
-        const responseText = await response.text(); // Obtenemos la respuesta como texto
-
-        // Verificar si la respuesta tiene el tipo de contenido correcto
-        const contentType = response.headers.get("Content-Type");
-        if (!contentType || !contentType.includes("application/json")) {
-            console.error('La respuesta no es JSON, tipo de contenido:', contentType);
-            console.error('Respuesta del servidor:', responseText);
-            throw new Error('La respuesta del servidor no es válida JSON');
-        }
-
-        // Si la respuesta es JSON, la convertimos
-        const data = JSON.parse(responseText); // Convertimos el texto a JSON
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        if (data.codigo === 1) {
-            const bytes = CryptoJS.AES.decrypt(
-                data.datos.password_encriptada,
-                data.datos.encryption_key
-            );
-            return bytes.toString(CryptoJS.enc.Utf8);
-        } else {
-            throw new Error(data.mensaje);
-        }
-    } catch (error) {
-        console.error('Error al obtener o desencriptar la contraseña:', error);
-        throw error;
-    }
-}
-
 
 
 const generar = async (e) => {
     try {
-        const button = e.target.closest('.generar');
-        const solicitudId = button.dataset.solicitud_id;
+        const solicitudId = e.currentTarget.dataset.solicitud_id;
 
-        // Mostrar loading
-        Swal.fire({
-            title: 'Obteniendo credenciales',
-            text: 'Por favor espere...',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
+        console.log('Solicitud ID:', solicitudId);
+
+        const url = `/AccessEntry-Autocom/API/passwords/obtenerPassword?solicitudId=${solicitudId}`;
+        console.log('Full URL:', url);
+
+        const respuesta = await fetch(url);
+        const datos = await respuesta.json();
+        console.log('Response:', datos);
+
+        if (datos.codigo !== 1) {
+            throw new Error(datos.error || 'Error desconocido');
+        }
+
+        // Desencriptar la contraseña
+        const passwordDesencriptada = CryptoJS.AES.decrypt(
+            datos.password_encriptada,
+            datos.encryption_key,
+            {
+                iv: CryptoJS.enc.Hex.parse(datos.pass_token)
             }
-        });
+        ).toString(CryptoJS.enc.Utf8);
 
-        // Obtener y desencriptar la contraseña
-        const passwordDesencriptada = await obtenerYDesencriptarPassword(solicitudId);
+        if (!passwordDesencriptada) {
+            throw new Error('Error al desencriptar la contraseña');
+        }
 
-        // Cerrar el loading
-        Swal.close();
-
-        // Mostrar modal con la contraseña
+        // Mostrar la contraseña desencriptada
         await Swal.fire({
-            title: 'Contraseña del Usuario',
-            html: `
-                <div class="mb-3">
-                    <div class="input-group">
-                        <input type="text" 
-                            class="form-control" 
-                            value="${passwordDesencriptada}" 
-                            id="passwordField" 
-                            readonly>
-                        <button class="btn btn-outline-secondary" 
-                            type="button" 
-                            id="copyButton">
-                            <i class="bi bi-clipboard"></i>
-                        </button>
-                    </div>
-                </div>
-            `,
-            confirmButtonText: 'Cerrar',
-            confirmButtonColor: '#6c757d',
-            didRender: () => {
-                // Agregar funcionalidad de copiar al portapapeles
-                const copyButton = document.getElementById('copyButton');
-                const passwordField = document.getElementById('passwordField');
-
-                copyButton.addEventListener('click', () => {
-                    passwordField.select();
-                    document.execCommand('copy');
-                    Toast.fire({
-                        icon: 'success',
-                        title: 'Contraseña copiada al portapapeles'
-                    });
-                });
-            }
+            title: 'Contraseña Desencriptada',
+            text: passwordDesencriptada,
+            icon: 'success'
         });
+
     } catch (error) {
-        console.error('Error en generar:', error);
+        console.error('Error al generar:', error);
         Swal.fire({
-            icon: 'error',
             title: 'Error',
-            text: 'No se pudo obtener la contraseña del usuario'
+            text: error.message,
+            icon: 'error'
         });
     }
 };
-
 // Event listeners
 buscar();
 datatable.on('click', '.generar', generar);

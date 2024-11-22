@@ -26,6 +26,15 @@ class PasswordTemp extends ActiveRecord
         $this->pass_fecha_creacion = $args['pass_fecha_creacion'] ?? '';
     }
 
+    public static function recuperarPasswordTemporal($solicitudId)
+    {
+        $sql = "SELECT 
+                    password_encriptada, 
+                    pass_token, 
+                    encryption_key 
+                FROM passwords_temp 
+                WHERE pass_solicitud_id = $solicitudId";
 
-
+        return self::fetchFirst($sql);
+    }
 };

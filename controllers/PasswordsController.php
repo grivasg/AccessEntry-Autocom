@@ -69,34 +69,46 @@ class PasswordsController
                 'detalle' => $e->getMessage()
             ]);
         }
+
+
     }
 
 
     
-    public static function obtenerPasswordAPI($id)
+    public static function obtenerPasswordAPI()
     {
-        try {
-            $passwordTemp = PasswordTemp::where('pass_solicitud_id', $id);
+        ob_clean();
+        header('Content-Type: application/json');
 
-            if ($passwordTemp) {
-                echo json_encode([
-                    'codigo' => 1,
-                    'mensaje' => 'Datos encontrados',
-                    'datos' => [
-                        'password_encriptada' => $passwordTemp->password_encriptada,
-                        'encryption_key' => $passwordTemp->encryption_key,
-                        'pass_token' => $passwordTemp->pass_token
-                    ]
-                ]);
-            } else {
-                throw new Exception('No se encontró la contraseña temporal');
+        try {
+            $solicitudId = $_GET['solicitudId'] ?? null;
+
+            error_log("Received solicitudId: " . print_r($solicitudId, true));
+
+            if (!$solicitudId) {
+                throw new Exception('ID de solicitud no proporcionado');
             }
+
+            $passwordTemp = PasswordTemp::recuperarPasswordTemporal($solicitudId);
+
+            if (!$passwordTemp) {
+                throw new Exception('No se encontró password temporal para solicitudId: ' . $solicitudId);
+            }
+
+            echo json_encode([
+                'codigo' => 1,
+                'password_encriptada' => $passwordTemp['password_encriptada'],
+                'pass_token' => $passwordTemp['pass_token'],  // Add this line
+                'encryption_key' => $passwordTemp['encryption_key']
+            ]);
+            exit;
         } catch (Exception $e) {
+            error_log("Error in obtenerPasswordAPI: " . $e->getMessage());
             echo json_encode([
                 'codigo' => 0,
-                'mensaje' => 'Error al obtener la contraseña temporal',
-                'detalle' => $e->getMessage()
+                'error' => $e->getMessage()
             ]);
+            exit;
         }
     }
 };
