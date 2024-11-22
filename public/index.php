@@ -11,6 +11,7 @@ use Controllers\NuevasController;
 use Controllers\PasswordsController;
 use Controllers\PendientesController;
 use Controllers\PermisoController;
+use Controllers\ReporteController;
 use Controllers\SolicitudController;
 use Controllers\UsuarioController;
 
@@ -77,6 +78,10 @@ $router->post('/API/cambio/otorgar', [CambioController::class, 'otorgarAPI']);
 //CONTRASSSSSSSSSSSSSSSSS
 $router->post('/API/passwords/guardarTemp', [PasswordsController::class, 'guardarTempAPI']);
 $router->get('/API/passwords/obtenerPassword', [PasswordsController::class, 'obtenerPasswordAPI']);
+
+
+$router->get('/reporte/generarCredenciales', [ReporteController::class, 'pdf']);
+
 
 
 

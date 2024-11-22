@@ -59,7 +59,10 @@ const datatable = new DataTable('#tablaPendientes', {
             render: (data, type, row, meta) => `
                 <button class='btn btn-success generar' 
                 data-solicitud_id="${data}">
-                <i class="bi bi-clipboard-check"></i></button>`
+                <i class="bi bi-clipboard-check"></i></button>
+                <button class='btn btn-danger pdf' 
+                data-solicitud_id="${data}">
+                <i class="bi bi-file-earmark-pdf-fill" title="GENERAR PDF"></i></button>`
         },
     ]
 });
@@ -124,12 +127,31 @@ const generar = async (e) => {
 
     } catch (error) {
         Swal.fire({
-            title: 'Error', 
+            title: 'Error',
             text: error.message,
             icon: 'error'
         });
     }
 };
 // Event listeners
+
+
+
+const pdf = async (e) => {
+    e.preventDefault();
+    const width = 1200, height = 600;
+    const left = (screen.width - width) / 2;
+    const top = (screen.height - height) / 2;
+    const data = e.currentTarget.dataset;
+    const solicitud = data.solicitud_id;
+
+    console.log('esta es lAAAAAA', solicitud);
+    const options = `width = ${width}, height = ${height}, top = ${top}, left = ${left}, resizable = yes, scrollbars = yes, status = yes`;
+    const win = window.open(`/AccessEntry-Autocom/reporte/generarCredenciales?solicitud=${solicitud}`, 'PDF', options);
+    win.focus();
+
+};
+
 buscar();
 datatable.on('click', '.generar', generar);
+datatable.on('click', '.pdf', pdf);
