@@ -59,12 +59,9 @@ const datatable = new DataTable('#tablaPendientes', {
             searchable: false,
             orderable: false,
             render: (data, type, row, meta) => `
-                <button class='btn btn-success generar' 
-                data-solicitud_id="${data}">
-                <i class="bi bi-clipboard-check"></i></button>
                 <button class='btn btn-danger pdf' 
                 data-solicitud_id="${data}">
-                <i class="bi bi-file-earmark-pdf-fill" title="GENERAR PDF"></i></button>`
+                <i class="bi bi-file-earmark-pdf-fill" title="GENERAR Y ENVIAR CREDENCIALES"></i><i class="bi bi-send-check-fill"></i></button>`
         },
     ]
 });
@@ -248,14 +245,38 @@ const pdf = async (e) => {
         initializePdfModal();
     }
 
+    Swal.fire({
+        title: 'Generando PDF',
+        html: `
+            <div class="progress-bar-container">
+                <div class="progress-bar"></div>
+            </div>
+            <div class="progress-text">Procesando credenciales...</div>
+        `,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+
     try {
         const passwordDesencriptada = await generar(solicitudId);
         const pdfUrlModified = await modificarPdfConContraseña(pdfUrl, passwordDesencriptada);
+        Swal.close();
 
         jQuery('#pdfViewer').attr('src', pdfUrlModified);
         showModal();
 
     } catch (error) {
+        Swal.fire({
+            title: 'Error',
+            text: 'Hubo un problema al generar el PDF',
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+        });
         console.error('Error al generar o modificar el PDF:', error);
     }
 };
@@ -265,6 +286,70 @@ jQuery(document).ready(function ($) {
     datatable.on('click', '.pdf', pdf);
 });
 
+const styles = `
+<style>
+    .swal2-popup {
+        background: rgba(255, 255, 255, 0.98) !important;
+        backdrop-filter: blur(10px);
+        padding: 2em;
+        border-radius: 15px;
+    }
+
+    .swal2-title {
+        color: #333;
+        font-size: 1.4em;
+        margin-bottom: 1.5em;
+    }
+
+    .progress-bar-container {
+        width: 100%;
+        height: 4px;
+        background: #f0f0f0;
+        margin: 20px auto;
+        border-radius: 2px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .progress-bar {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, #4CAF50, #8BC34A);
+        animation: progressAnimation 2s infinite linear;
+        transform-origin: left;
+    }
+
+    .progress-text {
+        color: #666;
+        font-size: 0.9em;
+        margin-top: 15px;
+        text-align: center;
+    }
+
+    @keyframes progressAnimation {
+        0% {
+            transform: translateX(-100%);
+        }
+        50% {
+            transform: translateX(0);
+        }
+        100% {
+            transform: translateX(100%);
+        }
+    }
+
+    /* Ocultar el spinner predeterminado de SweetAlert2 */
+    .swal2-loading {
+        .swal2-loader {
+            display: none !important;
+        }
+    }
+</style>
+`;
+
+
+// Agregar los estilos al documento
+jQuery('head').append(styles);
 buscar();
 datatable.on('click', '.generar', generar);
 datatable.on('click', '.pdf', pdf);
