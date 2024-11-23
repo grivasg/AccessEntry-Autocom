@@ -80,7 +80,9 @@ $router->post('/API/passwords/guardarTemp', [PasswordsController::class, 'guarda
 $router->get('/API/passwords/obtenerPassword', [PasswordsController::class, 'obtenerPasswordAPI']);
 
 
-$router->get('/reporte/generarCredenciales', [ReporteController::class, 'pdf']);
+$router->get('/reporte/generarCredenciales', [ReporteController::class, 'reportePDF']);
+$router->get('/API/reporte/obtenernombre', [ReporteController::class, 'obtenernombreAPI']);
+
 
 
 
