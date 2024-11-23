@@ -5,7 +5,7 @@
 </table>
 <div style="text-align: center; margin-bottom: 20px;">
     <div style="color: red; font-size: 40px; font-weight: bold;">RESERVADO</div>
-    <div style="font-size: 25px; font-weight: bold; margin-top: 10px;">ACCESO A AUTOCOM GENERADO CON ÉXITO</div>
+    <div style="font-size: 25px; font-weight: bold; margin-top: 10px;">USUARIO DE AUTOCOM GENERADO CON EXITO</div>
 </div>
 <div style="text-align: center; font-size: 18px; margin: 20px 0;">
     <div style="font-weight: bold;">

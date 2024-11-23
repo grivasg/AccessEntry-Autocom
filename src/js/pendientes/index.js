@@ -1,4 +1,5 @@
 import CryptoJS from 'crypto-js';
+import { PDFDocument, rgb } from 'pdf-lib';
 import jQuery from 'jquery';
 import { Dropdown } from "bootstrap";
 import { Toast } from "../funciones";
@@ -91,11 +92,8 @@ const buscar = async () => {
     }
 };
 
-
-
-const generar = async (e) => {
+const generar = async (solicitudId) => {
     try {
-        const solicitudId = e.currentTarget.dataset.solicitud_id;
         const url = `/AccessEntry-Autocom/API/passwords/obtenerPassword?solicitudId=${solicitudId}`;
         console.log('Full URL:', url);
 
@@ -119,12 +117,7 @@ const generar = async (e) => {
             throw new Error('Error al desencriptar la contraseña');
         }
 
-        // Mostrar la contraseña desencriptada
-        await Swal.fire({
-            title: 'Contraseña Desencriptada',
-            text: passwordDesencriptada,
-            icon: 'success'
-        });
+        return passwordDesencriptada;
 
     } catch (error) {
         Swal.fire({
@@ -132,18 +125,37 @@ const generar = async (e) => {
             text: error.message,
             icon: 'error'
         });
+        throw error; // Lanza el error para manejarlo fuera de la función
     }
 };
-// Event listeners
 
+const modificarPdfConContraseña = async (pdfUrl, passwordDesencriptada) => {
+    const pdfBytes = await fetch(pdfUrl).then(res => res.arrayBuffer());
+    const pdfDoc = await PDFDocument.load(pdfBytes);
 
+    const pages = pdfDoc.getPages();
+    const page = pages[0];  // Edita la primera página
 
-// Primero creamos una función para inicializar todo el modal y sus listeners
+    // POSISICON DE IMPRESION DE CONTRASEÑA
+    page.drawText(`_____________ ${passwordDesencriptada}`, {
+        x: 58,  // Distancia desde la izquierda
+        y: page.getHeight() - 240,  // Distancia desde la parte superior
+        size: 16,  // Tamaño de la fuente
+        color: rgb(0, 0, 0)  // Color negro
+    });
+
+    const pdfBytesModified = await pdfDoc.save();
+    const pdfBlob = new Blob([pdfBytesModified], { type: 'application/pdf' });
+    const pdfUrlModified = URL.createObjectURL(pdfBlob);
+
+    return pdfUrlModified;
+};
+
 function initializePdfModal() {
     const modalHTML = `
         <div id="pdfModal" class="modal-background">
             <div class="modal-container">
-                <iframe id="pdfViewer" style="width: 800px; height: 450px; border: none;"></iframe>
+                <iframe id="pdfViewer" style="width: 1000px; height: 450px; border: none;"></iframe>
                 <div class="button-container">
                     <button class="btn-enviar">Enviar</button>
                     <button class="btn-rechazar">Rechazar</button>
@@ -201,10 +213,8 @@ function initializePdfModal() {
         </style>
     `;
 
-    // Insertamos el modal usando jQuery
     jQuery('body').append(modalHTML);
 
-    // Agregamos los event listeners usando jQuery
     jQuery('#pdfModal .btn-enviar').on('click', function () {
         alert('procedimiento para enviar');
         closeModal();
@@ -212,7 +222,6 @@ function initializePdfModal() {
 
     jQuery('#pdfModal .btn-rechazar').on('click', closeModal);
 
-    // Opcional: cerrar al hacer clic fuera
     jQuery('#pdfModal').on('click', function (e) {
         if (e.target === this) {
             closeModal();
@@ -220,7 +229,6 @@ function initializePdfModal() {
     });
 }
 
-// Funciones para manejar el modal
 function showModal() {
     jQuery('#pdfModal').show();
 }
@@ -230,24 +238,28 @@ function closeModal() {
     jQuery('#pdfViewer').attr('src', '');
 }
 
-// Función para mostrar el PDF
 const pdf = async (e) => {
     e.preventDefault();
     const data = e.currentTarget.dataset;
-    const solicitud = data.solicitud_id;
-    const pdfUrl = `/AccessEntry-Autocom/reporte/generarCredenciales?solicitud=${solicitud}`;
+    const solicitudId = data.solicitud_id;
+    const pdfUrl = `/AccessEntry-Autocom/reporte/generarCredenciales?solicitud=${solicitudId}`;
 
-    // Asegurarnos de que el modal existe antes de usarlo
     if (!jQuery('#pdfModal').length) {
         initializePdfModal();
     }
 
-    // Cargar el PDF en el iframe
-    jQuery('#pdfViewer').attr('src', pdfUrl);
-    showModal();
+    try {
+        const passwordDesencriptada = await generar(solicitudId);
+        const pdfUrlModified = await modificarPdfConContraseña(pdfUrl, passwordDesencriptada);
+
+        jQuery('#pdfViewer').attr('src', pdfUrlModified);
+        showModal();
+
+    } catch (error) {
+        console.error('Error al generar o modificar el PDF:', error);
+    }
 };
 
-// Asegurarnos de que jQuery está disponible y luego inicializar
 jQuery(document).ready(function ($) {
     var datatable = $('#tuDataTable').DataTable();
     datatable.on('click', '.pdf', pdf);

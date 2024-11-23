@@ -11,14 +11,19 @@
 <div style="text-align: justify; margin: 15px 0; font-size: 18px;"><strong>PUESTO :</strong>
     <?php echo $solicitud['puesto_dependencia'] ?? ''; ?>
 </div>
-
 <div style="text-align: justify; font-size: 18px; margin: 20px 0;">
     <table style="width: 100%;">
         <tr>
-            <td style="padding: 5px; font-size: 18px;"><strong>MÓDULOS AUTORIZADOS:</strong> <?php echo $solicitud['sol_cred_modulos_autorizados'] ?? ''; ?></td>
+            <td style="text-align: center; padding: 5px; font-size: 18px;"><strong>MÓDULOS AUTORIZADOS:</strong></td>
         </tr>
         <tr>
-            <td style="padding: 5px; font-size: 18px;"><strong>MÓDULOS NO AUTORIZADOS:</strong> <?php echo $solicitud['sol_cred_justificacion_autorizacion'] ?? ''; ?></td>
+            <td style="padding: 5px; font-size: 18px;">✔ <?php echo $solicitud['sol_cred_modulos_autorizados'] ?? ''; ?></td>
+        </tr>
+        <tr>
+            <td style="text-align: center; padding: 5px; font-size: 18px;"><strong>MÓDULOS NO AUTORIZADOS</strong></td>
+        </tr>
+        <tr>
+            <td style="font-size: 18px;"><?php echo $solicitud['sol_cred_justificacion_autorizacion'] ?? ''; ?></td>
         </tr>
     </table>
 </div>
@@ -33,7 +38,7 @@
         TRANSMISIÓN DE INFORMACIÓN MILITAR (NO. MDN-009-SAGE-2009), LE CORRESPONDA.</strong>
 </div>
 
-<div style="margin-top: 80px; text-align: center;">
+<div style="margin-top: 10px; text-align: center;">
     <div style="margin: 20px 0; font-size: 14pt;"><strong>
             Fecha de Generación y Envío de Usuario:
         </strong>
