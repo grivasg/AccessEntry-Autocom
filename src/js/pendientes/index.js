@@ -218,54 +218,55 @@ function initializePdfModal() {
             title: 'Ingresar Catálogo',
             html: `
                 <input type="text" id="catalogoInput" class="swal2-input" placeholder="Ingrese el catálogo" />
-                <button id="validarCatalogo" class="swal2-confirm swal2-styled" style="display:none">Validar</button>
             `,
-            preConfirm: () => {
-                const catalogo = jQuery('#catalogoInput').val();
-                if (!catalogo) {
-                    Swal.showValidationMessage('Por favor ingrese un catálogo.');
-                    return false;
-                }
-                return catalogo;
-            },
             showCancelButton: true,
+            confirmButtonText: 'Validar',
             cancelButtonText: 'Cancelar',
-            willOpen: () => {
-                jQuery('#validarCatalogo').show();  // Muestra el botón de "Validar"
-            }
+            showConfirmButton: true,
+            showDenyButton: false,
+            allowOutsideClick: false
         }).then(async (result) => {
             if (result.isConfirmed) {
-                const catalogo = result.value;
-                const valid = await validarCatalogo(catalogo);
-                if (valid) {
-                    Swal.fire('Catálogo válido', '', 'success');
-                    // Aquí puedes agregar la lógica para continuar con el envío
+                const catalogo = document.getElementById('catalogoInput').value;
+                if (!catalogo) {
+                    Swal.showValidationMessage('Por favor ingrese un catálogo.');
+                    return;
+                }
+
+                // Validar el catálogo
+                const isValid = await validarCatalogo(catalogo);
+
+                if (isValid) {
+                    // Si es válido, mostrar nuevo modal con solo el botón de enviar
+                    Swal.fire({
+                        title: 'Catálogo Validado',
+                        text: 'El catálogo ha sido validado correctamente',
+                        icon: 'success',
+                        showCancelButton: false,
+                        confirmButtonText: 'Enviar',
+                        allowOutsideClick: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            alert('esta funcion envia');
+                            closeModal(); // Cerrar el modal principal después de enviar
+                        }
+                    });
                 } else {
-                    Swal.fire('Catálogo no encontrado', '', 'error');
+                    // Si no es válido, mostrar error y mantener el modal de validación
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Catálogo no encontrado',
+                        icon: 'error',
+                        confirmButtonText: 'Intentar de nuevo'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Volver a mostrar el modal de validación
+                            jQuery('#pdfModal .btn-enviar').click();
+                        }
+                    });
                 }
             }
         });
-
-        // Cuando se haga clic en el botón de "Validar"
-        jQuery('#validarCatalogo').on('click', async function () {
-            const catalogo = jQuery('#catalogoInput').val();
-            const valid = await validarCatalogo(catalogo);
-            if (valid) {
-                Swal.fire('Catálogo válido', '', 'success');
-            } else {
-                Swal.fire('Catálogo no encontrado', '', 'error');
-            }
-        });
-    });
-
-    // Manejo del botón de "Rechazar"
-    jQuery('#pdfModal .btn-rechazar').on('click', closeModal);
-
-    // Cerrar el modal si se hace clic fuera de la caja
-    jQuery('#pdfModal').on('click', function (e) {
-        if (e.target === this) {
-            closeModal();
-        }
     });
 }
 
