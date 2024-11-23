@@ -53,4 +53,8 @@
             de <?php echo date('Y'); ?>
         </strong>
     </div>
+    <div style="margin-top: 10px; font-size: 14pt;"><strong>
+            Hora: <?php echo date('H:i:s'); ?>
+        </strong>
+    </div>
 </div>
