@@ -239,7 +239,7 @@ function initializePdfModal() {
     // Manejo del botón de "Enviar"
     jQuery('#pdfModal .btn-enviar').on('click', function () {
         Swal.fire({
-            title: 'Ingresar Catálogo',
+            title: 'Por favor, ingrese el catálogo del usuario que está enviando esta solicitud.',
             html: `
                 <input type="text" id="catalogoInput" class="swal2-input" placeholder="Ingrese el catálogo" />
             `,
@@ -263,8 +263,8 @@ function initializePdfModal() {
                 if (isValid) {
                     // Si es válido, mostrar nuevo modal con solo el botón de enviar
                     Swal.fire({
-                        title: 'Catálogo Validado',
-                        text: 'El catálogo ha sido validado correctamente',
+                        title: 'Usuario Verificado',
+                        text: 'El catálogo ha sido verficado Correctamente para el Control interno de CAU.',
                         icon: 'success',
                         showCancelButton: false,
                         confirmButtonText: 'Enviar',
