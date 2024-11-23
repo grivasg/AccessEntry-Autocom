@@ -212,19 +212,86 @@ function initializePdfModal() {
 
     jQuery('body').append(modalHTML);
 
+    // Manejo del botón de "Enviar"
     jQuery('#pdfModal .btn-enviar').on('click', function () {
-        alert('procedimiento para enviar');
-        closeModal();
+        Swal.fire({
+            title: 'Ingresar Catálogo',
+            html: `
+                <input type="text" id="catalogoInput" class="swal2-input" placeholder="Ingrese el catálogo" />
+                <button id="validarCatalogo" class="swal2-confirm swal2-styled" style="display:none">Validar</button>
+            `,
+            preConfirm: () => {
+                const catalogo = jQuery('#catalogoInput').val();
+                if (!catalogo) {
+                    Swal.showValidationMessage('Por favor ingrese un catálogo.');
+                    return false;
+                }
+                return catalogo;
+            },
+            showCancelButton: true,
+            cancelButtonText: 'Cancelar',
+            willOpen: () => {
+                jQuery('#validarCatalogo').show();  // Muestra el botón de "Validar"
+            }
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const catalogo = result.value;
+                const valid = await validarCatalogo(catalogo);
+                if (valid) {
+                    Swal.fire('Catálogo válido', '', 'success');
+                    // Aquí puedes agregar la lógica para continuar con el envío
+                } else {
+                    Swal.fire('Catálogo no encontrado', '', 'error');
+                }
+            }
+        });
+
+        // Cuando se haga clic en el botón de "Validar"
+        jQuery('#validarCatalogo').on('click', async function () {
+            const catalogo = jQuery('#catalogoInput').val();
+            const valid = await validarCatalogo(catalogo);
+            if (valid) {
+                Swal.fire('Catálogo válido', '', 'success');
+            } else {
+                Swal.fire('Catálogo no encontrado', '', 'error');
+            }
+        });
     });
 
+    // Manejo del botón de "Rechazar"
     jQuery('#pdfModal .btn-rechazar').on('click', closeModal);
 
+    // Cerrar el modal si se hace clic fuera de la caja
     jQuery('#pdfModal').on('click', function (e) {
         if (e.target === this) {
             closeModal();
         }
     });
 }
+
+
+const validarCatalogo = async (catalogo) => {
+    try {
+        const url = '/AccessEntry-Autocom/API/pendientes/catalogoexiste'; // La URL correcta para la API
+        const formData = new FormData();
+        formData.append('sol_cred_catalogo', catalogo);  // Agregamos el parámetro al FormData
+
+        const response = await fetch(url, {
+            method: 'POST',  // Cambiar a POST
+            body: formData   // Enviar los datos como body en POST
+        });
+
+        const data = await response.json();
+
+        // Si el código es 1, el catálogo es válido
+        return data.codigo === 1;
+    } catch (error) {
+        Swal.fire('Error', 'Hubo un problema al verificar el catálogo', 'error');
+        return false;
+    }
+};
+
+
 
 function showModal() {
     jQuery('#pdfModal').show();

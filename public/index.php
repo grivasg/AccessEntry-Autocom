@@ -67,6 +67,9 @@ $router->post('/API/permiso/otorgar', [PermisoController::class, 'otorgarAPI']);
 // RUTAS PARA PENDIENTES A ENVIAR
 $router->get('/pendientes', [PendientesController::class, 'index']);
 $router->get('/API/pendientes/buscar', [PendientesController::class, 'buscarAPI']);
+$router->post('/API/pendientes/catalogoexiste', [PendientesController::class, 'catalogoExisteAPI']);
+
+
 
 
 // RUTAS DE ASIGNACION DE PERMISOS a Base de datos
