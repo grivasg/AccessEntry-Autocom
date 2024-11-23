@@ -155,7 +155,7 @@ function initializePdfModal() {
                 <iframe id="pdfViewer" style="width: 1000px; height: 450px; border: none;"></iframe>
                 <div class="button-container">
                     <button class="btn-enviar">Enviar</button>
-                    <button class="btn-rechazar">Rechazar</button>
+                    <button class="btn-cancelar">Cancelar</button>
                 </div>
             </div>
         </div>
@@ -190,7 +190,7 @@ function initializePdfModal() {
             margin-top: 15px;
         }
 
-        .btn-enviar, .btn-rechazar {
+        .btn-enviar, .btn-cancelar {
             padding: 10px 20px;
             border: none;
             border-radius: 4px;
@@ -203,7 +203,7 @@ function initializePdfModal() {
             color: white;
         }
 
-        .btn-rechazar {
+        .btn-cancelar {
             background: #f44336;
             color: white;
         }
@@ -211,6 +211,30 @@ function initializePdfModal() {
     `;
 
     jQuery('body').append(modalHTML);
+
+    // Función para cerrar todos los modales
+    function closeAllModals() {
+        jQuery('#pdfModal').hide();
+        jQuery('#pdfViewer').attr('src', '');
+        Swal.close(); // Cierra cualquier modal de SweetAlert2 que esté abierto
+    }
+
+    // Manejo del botón de "Cancelar"
+    jQuery('#pdfModal .btn-cancelar').on('click', closeAllModals);
+
+    // Cerrar el modal si se hace clic fuera de la caja
+    jQuery('#pdfModal').on('click', function (e) {
+        if (e.target === this) {
+            closeAllModals();
+        }
+    });
+
+    // Agregar manejo de tecla ESC
+    jQuery(document).on('keydown', function (e) {
+        if (e.key === 'Escape' && jQuery('#pdfModal').is(':visible')) {
+            closeAllModals();
+        }
+    });
 
     // Manejo del botón de "Enviar"
     jQuery('#pdfModal .btn-enviar').on('click', function () {
@@ -301,6 +325,7 @@ function showModal() {
 function closeModal() {
     jQuery('#pdfModal').hide();
     jQuery('#pdfViewer').attr('src', '');
+    Swal.close();
 }
 
 const pdf = async (e) => {
