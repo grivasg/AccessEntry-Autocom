@@ -238,27 +238,32 @@ function initializePdfModal() {
 
     // Manejo del botón de "Enviar"
     jQuery('#pdfModal .btn-enviar').on('click', function () {
+        let catalogoTemp; // Variable para almacenar el catálogo temporalmente
+
         Swal.fire({
             title: 'Por favor, ingrese el catálogo del usuario que está enviando esta solicitud.',
             html: `
-                <input type="text" id="catalogoInput" class="swal2-input" placeholder="Ingrese el catálogo" />
-            `,
+            <input type="text" id="catalogoInput" class="swal2-input" placeholder="Ingrese el catálogo" />
+        `,
             showCancelButton: true,
             confirmButtonText: 'Validar',
             cancelButtonText: 'Cancelar',
             showConfirmButton: true,
             showDenyButton: false,
-            allowOutsideClick: false
+            allowOutsideClick: false,
+            preConfirm: () => {
+                // Guardamos el valor antes de que se destruya el modal
+                catalogoTemp = document.getElementById('catalogoInput').value;
+                if (!catalogoTemp) {
+                    Swal.showValidationMessage('Por favor ingrese un catálogo.');
+                    return false;
+                }
+                return true;
+            }
         }).then(async (result) => {
             if (result.isConfirmed) {
-                const catalogo = document.getElementById('catalogoInput').value;
-                if (!catalogo) {
-                    Swal.showValidationMessage('Por favor ingrese un catálogo.');
-                    return;
-                }
-
                 // Validar el catálogo
-                const isValid = await validarCatalogo(catalogo);
+                const isValid = await validarCatalogo(catalogoTemp);
 
                 if (isValid) {
                     // Si es válido, mostrar nuevo modal con solo el botón de enviar
@@ -269,10 +274,35 @@ function initializePdfModal() {
                         showCancelButton: false,
                         confirmButtonText: 'Enviar',
                         allowOutsideClick: false
-                    }).then((result) => {
+                    }).then(async (result) => {
                         if (result.isConfirmed) {
-                            alert('esta funcion envia');
-                            closeModal(); // Cerrar el modal principal después de enviar
+                            try {
+                                const solicitudId = jQuery('#pdfViewer').data('solicitudId');
+
+                                // Usamos el catálogo almacenado temporalmente
+                                const resultado = await guardarHistorialCredenciales(solicitudId, catalogoTemp);
+
+                                if (resultado.codigo === 1) {
+                                    Swal.fire({
+                                        title: 'Éxito',
+                                        text: 'Las credenciales han sido enviadas y registradas correctamente.',
+                                        icon: 'success',
+                                        confirmButtonText: 'Aceptar'
+                                    }).then(() => {
+                                        closeModal();
+                                        buscar(); // Actualizar la tabla
+                                    });
+                                } else {
+                                    throw new Error(resultado.mensaje || 'Error al guardar el historial');
+                                }
+                            } catch (error) {
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: error.message,
+                                    icon: 'error',
+                                    confirmButtonText: 'Aceptar'
+                                });
+                            }
                         }
                     });
                 } else {
@@ -315,6 +345,52 @@ const validarCatalogo = async (catalogo) => {
         return false;
     }
 };
+
+
+async function guardarHistorialCredenciales(solicitudId, catalogoValidado) {
+    try {
+        const url = '/AccessEntry-Autocom/API/pendientes/guardarHistorial';
+        const formData = new FormData();
+
+        console.log('Enviando datos:', {
+            solicitudId,
+            catalogoValidado
+        });
+
+        formData.append('his_cred_solicitud_id', solicitudId);
+        formData.append('his_cred_metodo_envio', 'CORREO');
+        formData.append('his_cred_responsable_envio', catalogoValidado);
+
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData
+        });
+
+        // Verificar el tipo de contenido de la respuesta
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            // Si no es JSON, mostrar el texto de la respuesta para debug
+            const text = await response.text();
+            console.error('Respuesta no JSON:', text);
+            throw new Error('La respuesta del servidor no es JSON válido');
+        }
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.mensaje || 'Error en la respuesta del servidor');
+        }
+
+        if (data.codigo !== 1) {
+            throw new Error(data.mensaje || 'Error al guardar el historial');
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Error completo:', error);
+        throw new Error(`Error al guardar el historial: ${error.message}`);
+    }
+}
 
 
 
@@ -360,7 +436,9 @@ const pdf = async (e) => {
         const pdfUrlModified = await modificarPdfConContraseña(pdfUrl, passwordDesencriptada);
         Swal.close();
 
-        jQuery('#pdfViewer').attr('src', pdfUrlModified);
+        const pdfViewer = jQuery('#pdfViewer');
+        pdfViewer.attr('src', pdfUrlModified);
+        pdfViewer.data('solicitudId', solicitudId); // Guardamos el ID aquí
         showModal();
 
     } catch (error) {

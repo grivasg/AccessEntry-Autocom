@@ -69,6 +69,8 @@ $router->get('/pendientes', [PendientesController::class, 'index']);
 $router->get('/API/pendientes/buscar', [PendientesController::class, 'buscarAPI']);
 $router->post('/API/pendientes/catalogoexiste', [PendientesController::class, 'catalogoExisteAPI']);
 
+$router->post('/API/pendientes/guardarHistorial', [PendientesController::class, 'guardarHistorialAPI']);
+
 
 
 
