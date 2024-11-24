@@ -134,9 +134,9 @@ const modificarPdfConContraseña = async (pdfUrl, passwordDesencriptada) => {
     const page = pages[0];  // Edita la primera página
 
     // POSISICON DE IMPRESION DE CONTRASEÑA
-    page.drawText(`_____________ ${passwordDesencriptada}`, {
+    page.drawText(`____________  ${passwordDesencriptada}`, {
         x: 58,  // Distancia desde la izquierda
-        y: page.getHeight() - 240,  // Distancia desde la parte superior
+        y: page.getHeight() - 241,  // Distancia desde la parte superior
         size: 16,  // Tamaño de la fuente
         color: rgb(0, 0, 0)  // Color negro
     });
