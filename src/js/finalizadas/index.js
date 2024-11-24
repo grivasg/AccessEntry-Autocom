@@ -4,138 +4,138 @@ import Swal from "sweetalert2";
 import DataTable from "datatables.net-bs5";
 import { lenguaje } from "../lenguaje";
 
-const datatable = new DataTable('#tablaFinalizadas', {
-    data: null,
-    language: lenguaje,
-    pageLength: '15',
-    lengthMenu: [3, 9, 11, 25, 100],
-    columns: [
-        {
-            title: 'No.',
-            data: 'solicitud_id',
-            width: '2%',
-            render: (data, type, row, meta) => {
-                return meta.row + 1;
-            }
-        },
-        {
-            title: 'Grado y Arma',
-            data: 'grado_arma'
-        },
-        {
-            title: 'Nombres del Solicitante',
-            data: 'nombres_apellidos'
-        },
-        {
-            title: 'Puesto',
-            data: 'puesto_dependencia'
-        },
-        {
-            title: 'Catalogo',
-            data: 'sol_cred_catalogo'
-        },
-        {
-            title: 'Modulos para habilitar',
-            data: 'sol_cred_modulo'
-        },
-        {
-            title: 'Justificacion',
-            data: 'sol_cred_justificacion'
-        },
-        {
-            title: '¿Tiene Usuario de AUTOCOM?',
-            data: 'sol_cred_usuario'
-        },
-        {
-            title: 'Fecha de Solicitud',
-            data: 'sol_cred_fecha_solicitud',
-            render: (data, type, row) => {
-                if (!data) return "";
-                const fecha = new Date(data);
-                const dia = fecha.getDate().toString().padStart(2, '0');
-                const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
-                const año = fecha.getFullYear();
-                return `${dia}/${mes}/${año}`;
-            }
-        },
-        {
-            title: 'Estado de Solicitud',
-            data: 'estado_solicitud',
-            render: (data, type, row) => {
-                // Aquí decides qué imagen se mostrará dependiendo del valor del estado_solicitud
-                let imagen = '';
-                let estado = data.toUpperCase();
+let datatable;
 
-                // Puedes agregar imágenes condicionales para cada estado
-                switch (estado) {
-                    case 'CREDENCIALES ENVIADOS':
-                        imagen = `<img src='/AccessEntry-Autocom/public/images/ENVIADO1.png' alt='Recibida' style='width: 80px; height: 80px;' />`;
-                        break;
+// Función para formatear fecha
+const formatearFecha = (fecha) => {
+    if (!fecha) return 'N/A';
+    const date = new Date(fecha);
+
+    // Verificar si la fecha es válida
+    if (isNaN(date.getTime())) return fecha;
+
+    // Formatear fecha
+    return date.toLocaleString('es-MX', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    });
+};
+
+// Inicializar DataTable
+const inicializarDataTable = () => {
+    datatable = new DataTable('#tablaFinalizadas', {
+        language: lenguaje,
+        columns: [
+            { title: "ID", data: "envio_id" },
+            { title: "Solicitud", data: "his_cred_solicitud_id" },
+            {
+                title: "Fecha de Envío",
+                data: "his_cred_fecha_envio",
+                render: function (data) {
+                    return formatearFecha(data);
                 }
-
-                // Retorna el HTML que incluye la imagen y el texto
-                return `
-                    <div style="display: flex; align-items: center;">
-                        ${imagen}
-                        <span style="margin-left: 5px;">${data}</span>
-                    </div>
-                `;
+            },
+            { title: "Método de Envío", data: "his_cred_metodo_envio" },
+            { title: "Responsable", data: "his_cred_responsable" },
+            { title: "Destinatario", data: "his_cred_destinatario" },
+            { title: "Observaciones", data: "his_cred_observaciones" }
+        ],
+        responsive: true,
+        order: [[2, 'desc']], // Ordenar por fecha de envío descendente
+        dom: 'Bfrtip',
+        buttons: [
+            {
+                extend: 'excel',
+                text: 'Exportar a Excel',
+                className: 'btn btn-success',
+                exportOptions: {
+                    columns: ':visible'
+                }
+            },
+            {
+                extend: 'pdf',
+                text: 'Exportar a PDF',
+                className: 'btn btn-danger',
+                exportOptions: {
+                    columns: ':visible'
+                }
             }
-        },
-        {
-            title: 'Acciones',
-            data: 'solicitud_id',
-            searchable: false,
-            orderable: false,
-            render: (data, type, row, meta) => {
-                return `
-                    <button class='btn btn-success verificar'><i class="bi bi-clipboard-check"></i> </button>
-
-                    <button class='btn btn-danger rechazar'><i class="bi bi-hand-thumbs-down"></i></button>`;
-            }
-        }
-    ]
-});
+        ]
+    });
+};
 
 const buscar = async () => {
+    const fechaInicio = document.getElementById('busqueda_1').value;
+    const fechaFin = document.getElementById('busqueda_2').value;
+
+    // Validación de fechas
+    if (!fechaInicio || !fechaFin) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Campos Requeridos',
+            text: 'Por favor, seleccione ambas fechas para realizar la búsqueda.'
+        });
+        return;
+    }
+
+    // Validar que la fecha inicial no sea mayor que la final
+    if (new Date(fechaInicio) > new Date(fechaFin)) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error en fechas',
+            text: 'La fecha inicial no puede ser mayor a la fecha final.'
+        });
+        return;
+    }
+
     try {
-        const url = "/AccessEntry-Autocom/API/finalizadas/buscar";
-        const config = {
-            method: 'GET'
-        };
+        const url = `/AccessEntry-Autocom/API/finalizadas/buscar?fecha_inicio=${fechaInicio}&fecha_fin=${fechaFin}`;
+        const response = await fetch(url);
 
-        const respuesta = await fetch(url, config);
-        const data = await respuesta.json();
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-        console.log('Datos recibidos:', data);
+        const data = await response.json();
 
-        if (data && data.datos) {
+        if (data.tipo === 'exito' && data.datos) {
             datatable.clear();
             datatable.rows.add(data.datos).draw();
+
+            Toast.fire({
+                icon: 'success',
+                title: `Se encontraron ${data.datos.length} registros`
+            });
+        } else {
+            datatable.clear().draw();
+            Toast.fire({
+                icon: 'info',
+                title: data.mensaje || 'No se encontraron registros en este rango de fechas'
+            });
         }
     } catch (error) {
-        console.error('Error en buscar:', error);
-        Toast.fire({
-            icon: 'info',
-            title: 'No se encontraron Datos en esta pagina'
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Hubo un problema al realizar la búsqueda. Por favor, intente nuevamente.'
         });
     }
 };
 
-const verificar = async () => {
-    alert('SU SOLICITUD HA SIDO VERIFICADA')
+// Limpiar búsqueda
+const limpiar = () => {
+    document.getElementById('formularioAlumnos').reset();
+    datatable.clear().draw();
 };
 
-const rechazar = async () => {
-    alert('SU SOLICITUD HA SIDO RECHAZADA')
-};
-
-
-buscar();
-
-
-
-datatable.on('click', '.verificar', verificar);
-datatable.on('click', '.rechazar', rechazar);
-
-
+document.addEventListener('DOMContentLoaded', () => {
+    inicializarDataTable();
+    document.getElementById('btnBuscar').addEventListener('click', buscar);
+    document.getElementById('btnCancelar').addEventListener('click', limpiar);
+});

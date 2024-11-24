@@ -280,4 +280,19 @@ class ActiveRecord
     {
         return self::$db;
     }
+
+    public static function findByFechaEnvio($fechaInicio, $fechaFin)
+    {
+        // Asegurarse de que las fechas estén en el formato correcto (YYYY-MM-DD)
+        $fechaInicio = date('Y-m-d', strtotime($fechaInicio));
+        $fechaFin = date('Y-m-d', strtotime($fechaFin));
+
+        // Consulta SQL con el rango de fechas
+        $query = "SELECT * FROM " . static::$tabla . " WHERE his_cred_fecha_envio BETWEEN '$fechaInicio' AND '$fechaFin'";
+
+        // Ejecutar la consulta
+        $resultado = self::consultarSQL($query);
+
+        return $resultado;
+    }
 };

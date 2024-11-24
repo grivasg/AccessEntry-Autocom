@@ -90,4 +90,37 @@ class Historial extends ActiveRecord
 
         return self::getAlertas();
     }
+
+    public static function findByFechaEnvio($fechaInicio, $fechaFin)
+    {
+        try {
+            // Debug para ver las fechas
+            error_log("Fecha Inicio: " . $fechaInicio);
+            error_log("Fecha Fin: " . $fechaFin);
+
+            // Consulta SQL para buscar registros entre las fechas
+            $query = "SELECT h.*, 
+           s.solicitud_id,
+           m.per_nom1 as responsable_nombre
+        FROM historial_credenciales h
+        LEFT JOIN solicitud_credenciales s ON h.his_cred_solicitud_id = s.solicitud_id
+        LEFT JOIN mper m ON h.his_cred_responsable_envio = m.per_catalogo
+        WHERE h.his_cred_fecha_envio BETWEEN ? AND ?
+        ORDER BY h.his_cred_fecha_envio DESC";
+
+            // Parametros de búsqueda
+            $params = [$fechaInicio, $fechaFin];
+
+            // Realizar la consulta y devolver los resultados
+            $resultados = static::consultarSQL($query, $params);
+
+            // Debug para ver los resultados
+            error_log("Cantidad de resultados: " . count($resultados));
+
+            return $resultados;
+        } catch (\Exception $e) {
+            error_log("Error en findByFechaEnvio: " . $e->getMessage());
+            return [];
+        }
+    }
 }
