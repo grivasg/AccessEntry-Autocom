@@ -44,10 +44,6 @@
                             <li>
                                 <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/pendientes"><i class="bi bi-send-check-fill"></i> Solicitudes a Enviar</a>
                             </li>
-                            <li>
-                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/finalizadas"><i class="bi bi-bookmark-check-fill"></i> Solicitudes Finalizadas</a>
-                            </li>
-
                         </ul>
                     </div>
                     <div class="nav-item dropdown ">
@@ -83,7 +79,7 @@
                         <ul class="dropdown-menu  dropdown-menu-dark " id="dropwdownRevision" style="margin: 0;">
                             <!-- <h6 class="dropdown-header">Información</h6> -->
                             <li>
-                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/usuario"><i class="bi bi-hourglass-split"></i> Historial de Envios</a>
+                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/finalizadas"><i class="bi bi-hourglass-split"></i> Historial de Envios</a>
                             </li>
                         </ul>
                     </div>
