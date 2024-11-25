@@ -117,4 +117,42 @@ class PendientesController
             ]);
         }
     }
+
+    public static function detallesAPI()
+    {
+        try {
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $solicitudId = $_GET['solicitudId'] ?? null;
+
+                if (!$solicitudId) {
+                    throw new Exception('ID de solicitud no proporcionado');
+                }
+
+                // Obtener la solicitud con los detalles necesarios
+                $solicitud = Solicitud::find($solicitudId);
+
+                if (!$solicitud) {
+                    throw new Exception('Solicitud no encontrada');
+                }
+
+                http_response_code(200);
+                echo json_encode([
+                    'codigo' => 1,
+                    'mensaje' => 'Detalles obtenidos exitosamente',
+                    'datos' => [
+                        'solicitud_id' => $solicitud->solicitud_id,
+                        'sol_cred_usuario' => $solicitud->sol_cred_usuario,
+                        // Otros detalles que necesites
+                    ]
+                ]);
+            }
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode([
+                'codigo' => 0,
+                'mensaje' => 'Error al obtener detalles',
+                'detalle' => $e->getMessage()
+            ]);
+        }
+    }
 };

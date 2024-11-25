@@ -432,17 +432,30 @@ const pdf = async (e) => {
         }
     });
 
-
     try {
-        const passwordDesencriptada = await generar(solicitudId);
-        const pdfUrlModified = await modificarPdfConContraseña(pdfUrl, passwordDesencriptada);
-        Swal.close();
+        // Fetch additional details about the solicitud to check credential status
+        const solicitudDetalles = await obtenerDetallesSolicitud(solicitudId);
 
-        const pdfViewer = jQuery('#pdfViewer');
-        pdfViewer.attr('src', pdfUrlModified);
-        pdfViewer.data('solicitudId', solicitudId); // Guardamos el ID aquí
-        showModal();
+        if (solicitudDetalles.tieneCredenciales === 'NO') {
+            // Existing flow for new user credentials
+            const passwordDesencriptada = await generar(solicitudId);
+            const pdfUrlModified = await modificarPdfConContraseña(pdfUrl, passwordDesencriptada);
+            Swal.close();
 
+            const pdfViewer = jQuery('#pdfViewer');
+            pdfViewer.attr('src', pdfUrlModified);
+            pdfViewer.data('solicitudId', solicitudId);
+            showModal();
+        } else {
+            // New flow for users with existing credentials (just generate standard PDF)
+            const pdfUrlStandard = await generarPdfEstandar(pdfUrl);
+            Swal.close();
+
+            const pdfViewer = jQuery('#pdfViewer');
+            pdfViewer.attr('src', pdfUrlStandard);
+            pdfViewer.data('solicitudId', solicitudId);
+            showModal();
+        }
     } catch (error) {
         Swal.fire({
             title: 'Error',
@@ -453,6 +466,32 @@ const pdf = async (e) => {
         console.error('Error al generar o modificar el PDF:', error);
     }
 };
+
+// New function to fetch solicitud details
+async function obtenerDetallesSolicitud(solicitudId) {
+    try {
+        const response = await fetch(`/AccessEntry-Autocom/API/pendientes/detalles?solicitudId=${solicitudId}`);
+        const data = await response.json();
+
+        if (data.codigo !== 1) {
+            throw new Error(data.mensaje || 'Error al obtener detalles de la solicitud');
+        }
+
+        return {
+            tieneCredenciales: data.datos.sol_cred_usuario // 'SI' or 'NO'
+        };
+    } catch (error) {
+        console.error('Error al obtener detalles:', error);
+        throw error;
+    }
+}
+
+// New function to generate standard PDF without password modification
+async function generarPdfEstandar(pdfUrl) {
+    const pdfBytes = await fetch(pdfUrl).then(res => res.arrayBuffer());
+    const pdfBlob = new Blob([pdfBytes], { type: 'application/pdf' });
+    return URL.createObjectURL(pdfBlob);
+}
 
 jQuery(document).ready(function ($) {
     var datatable = $('#tuDataTable').DataTable();
