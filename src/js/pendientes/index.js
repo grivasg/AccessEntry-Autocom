@@ -61,7 +61,9 @@ const datatable = new DataTable('#tablaPendientes', {
             render: (data, type, row, meta) => `
                 <button class='btn btn-danger pdf' 
                 data-solicitud_id="${data}">
-                <i class="bi bi-file-earmark-pdf-fill" title="GENERAR Y ENVIAR CREDENCIALES"></i><i class="bi bi-send-check-fill"></i></button>`
+                <i class="bi bi-file-earmark-pdf-fill" title="GENERAR Y ENVIAR CREDENCIALES"></i>
+                <i class="bi bi-send-check-fill" title="GENERAR Y ENVIAR CREDENCIALES"></i>
+                </button>`
         },
     ]
 });

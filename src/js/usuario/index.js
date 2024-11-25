@@ -53,7 +53,7 @@ const datatable = new DataTable('#tablaUsuario', {
                         </button>`;
                 } else {
                     return ` 
-                        <button class='btn btn-dark ingresar'>
+                        <button class='btn btn-dark ingresar' title='INGRESAR'>
                             <i class="bi bi-pencil-square"></i>
                         </button>`;
                 }

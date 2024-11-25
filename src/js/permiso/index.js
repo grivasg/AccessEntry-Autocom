@@ -45,7 +45,8 @@ const datatable = new DataTable('#tablaPermisos', {
             orderable: false,
             render: (data, type, row, meta) => {
                 return `
-                    <button class='btn btn-success otorgar'><i class="bi bi-key"></i> </button>`;
+                    <button class='btn btn-success otorgar' title='ASIGNAR PERMISO'>
+                    <i class="bi bi-key"></i> </button>`;
             }
         }
     ]

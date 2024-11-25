@@ -46,7 +46,8 @@ const datatable = new DataTable('#tablaCambio', {
             orderable: false,
             render: (data, type, row, meta) => {
                 return `
-                    <button class='btn btn-warning otorgar'><i class="bi bi-arrow-left-right"></i></button>`;
+                    <button class='btn btn-warning otorgar' title='CAMBIAR'>
+                    <i class="bi bi-arrow-left-right"></i></button>`;
             }
         }
     ]
