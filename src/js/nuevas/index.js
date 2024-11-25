@@ -338,43 +338,68 @@ const mostrarJustificacion = async (e) => {
             const formData = new FormData();
             formData.append('solicitud_id', solicitud_id);
 
-            // Limpiar y formatear los módulos seleccionados
             const modulosLimpios = formValues.modulosSeleccionados.map(m => m.trim());
             formData.append('modulos_seleccionados', modulosLimpios.join(','));
 
-            // Concatenar justificaciones
             const justificacionesConcatenadas = Object.entries(formValues.justificaciones)
                 .map(([modulo, justificacion]) => `${modulo}: ${justificacion}`)
                 .join(' | ');
             formData.append('justificacion', justificacionesConcatenadas);
 
-            const url = "/AccessEntry-Autocom/API/nuevas/justificar";
-            const config = {
+            const respuesta = await fetch("/AccessEntry-Autocom/API/nuevas/justificar", {
                 method: 'POST',
                 body: formData
-            };
-
-            const respuesta = await fetch(url, config);
+            });
             const data = await respuesta.json();
 
             if (data.codigo === 1) {
-                // Set localStorage to remember justification state
                 localStorage.setItem(`justificacion_${solicitud_id}`, 'true');
 
-                Toast.fire({
-                    icon: 'success',
-                    title: data.mensaje
+                const tieneUsuario = row.sol_cred_usuario;
+                const nuevoEstado = tieneUsuario === 'SI' ? 7 : 2;
+                const mensajeConfirmacion = tieneUsuario === 'SI'
+                    ? 'El usuario de esta solicitud ya cuenta con credenciales para el Autocom, por lo que será enviada para el cambio de Permisos a Nivel Base de Datos.'
+                    : 'Esta Solicitud será enviada a la Compañía de Sistemas para la Generación de Usuario y Contraseña.';
+
+                await Swal.fire({
+                    title: '<strong>Notificación</strong>',
+                    text: mensajeConfirmacion,
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    showCancelButton: false,
+                    confirmButtonColor: '#206617',
+                    confirmButtonText: 'ACEPTAR'
                 });
 
-                await buscar(); // Actualiza la tabla
+                const verificationFormData = new FormData();
+                verificationFormData.append('solicitud_id', solicitud_id);
+                verificationFormData.append('nuevo_estado', nuevoEstado);
+
+                const verificationResponse = await fetch("/AccessEntry-Autocom/API/nuevas/verificar", {
+                    method: 'POST',
+                    body: verificationFormData
+                });
+                const verificationData = await verificationResponse.json();
+
+                if (verificationData.codigo === 1) {
+                    Toast.fire({
+                        icon: 'success',
+                        title: verificationData.mensaje
+                    });
+
+                    localStorage.removeItem(`justificacion_${solicitud_id}`);
+                    await buscar();
+                } else {
+                    throw new Error(verificationData.detalle);
+                }
             } else {
                 throw new Error(data.detalle);
             }
         } catch (error) {
-            console.error('Error en justificar:', error);
+            console.error('Error en proceso:', error);
             Toast.fire({
                 icon: 'error',
-                title: 'Error al justificar los módulos'
+                title: 'Error al procesar la solicitud'
             });
         }
     }
@@ -402,7 +427,7 @@ const verificar = async (e) => {
         const confirmacion = await Swal.fire({
             title: '<strong>Por favor, revise que los datos sean correctos.</strong>',
             text: mensajeConfirmacion,
-            icon: 'question',
+            icon: 'info',
             showCancelButton: true,
             confirmButtonColor: '#206617',
             cancelButtonColor: '#d33',

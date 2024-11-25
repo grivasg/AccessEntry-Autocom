@@ -45,18 +45,10 @@ const datatable = new DataTable('#tablaUsuario', {
             searchable: false,
             orderable: false,
             render: (data, type, row, meta) => {
-                const datosGuardados = localStorage.getItem(`datosGuardados_${data}`);
-                if (datosGuardados) {
-                    return ` 
-                        <button class='btn btn-success enviar'>
-                            <i class="bi bi-send-fill"></i>
-                        </button>`;
-                } else {
-                    return ` 
-                        <button class='btn btn-dark ingresar' title='INGRESAR'>
-                            <i class="bi bi-pencil-square"></i>
-                        </button>`;
-                }
+                return ` 
+                    <button class='btn btn-dark ingresar' title='INGRESAR'>
+                        <i class="bi bi-pencil-square"></i>
+                    </button>`;
             }
         }
     ]
@@ -102,7 +94,7 @@ const ingresar = async (e) => {
     // Paso único: Confirmación de Permisos con Selección de Módulos
     const { value: permisosConcedidos, isConfirmed } = await Swal.fire({
         title: 'Creación de Usuarios y Permisos a Nivel Base de Datos.',
-        html: `
+        html: ` 
             <div class="alert alert-success mb-4" role="alert">
                 <strong>Instrucciones:</strong> Por favor, seleccione las tareas 
                 que se han completado en la Compañía de Sistemas, con el fin de reflejar
@@ -245,14 +237,21 @@ const ingresar = async (e) => {
             console.log('Parsed response:', data);
 
             if (data.codigo === 1) {
-                localStorage.setItem(`datosGuardados_${datos.solicitud_id}`, true);
+                // No más localStorage aquí, eliminamos esa línea
                 datatable.row(fila).invalidate().draw();
 
+                // Show only the success alert
                 await Swal.fire({
                     title: 'Usuario Creado, Permisos Concedidos y Contraseña Registrada',
                     text: 'Las Credenciales del Usuario han sido Creadas Correctamente.',
-                    icon: 'success'
+                    icon: 'success',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false
                 });
+
+                // Directly call the enviar function with the current row's data
+                const row = datatable.row(fila);
+                await enviar({ target: { closest: () => row.node() } });
             } else {
                 throw new Error(data.mensaje || 'Error desconocido en la respuesta del servidor');
             }
@@ -267,24 +266,20 @@ const ingresar = async (e) => {
     }
 };
 
-
-
 // Función para enviar los datos (solo muestra un alert en este caso)
-
 const enviar = async (e) => {
     try {
         const row = datatable.row(e.target.closest('tr')).data();
         const solicitud_id = row.solicitud_id;
 
         const confirmacion = await Swal.fire({
-            title: '<strong>Por favor, revise que los datos sean correctos.</u></strong>',
+            title: '<strong>Notificación.</u></strong>',
             text: "Esta Solicitud será enviada a la Compañia de Atención al Usuario con los Permisos y contraseñas creadas ",
-            icon: 'question',
-            showCancelButton: true,
+            icon: 'info',
             confirmButtonColor: '#206617',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Sí, Enviar',
-            cancelButtonText: 'Cancelar'
+            confirmButtonText: 'Aceptar',
+            allowOutsideClick: false,
+            allowEscapeKey: false
         });
 
         if (!confirmacion.isConfirmed) return;
@@ -318,11 +313,6 @@ const enviar = async (e) => {
         });
     }
 };
-
-
-
-
-
 
 // Delegar eventos para los botones dinámicos
 datatable.on('click', '.ingresar', ingresar);
