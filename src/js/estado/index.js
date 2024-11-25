@@ -173,11 +173,29 @@ const ver = async (e) => {
             Swal.fire({
                 title: 'Solicitud Rechazada',
                 text: 'Lamentablemente, su solicitud ha sido rechazada. Para mas Información revise el Informe',
-                footer: '<a href="#">Ver Informe</a>',
+                footer: '<a href="#" id="verInforme">Ver Informe</a>',  // Agregar un ID al enlace para identificarlo
                 imageUrl: "/AccessEntry-Autocom/public/images/rechazado.png",
                 imageWidth: 200,
                 imageHeight: 200,
                 imageAlt: "Custom image"
+            }).then((result) => {
+                // Este bloque maneja cuando el modal principal se cierra
+                if (result.dismiss === Swal.DismissReason.close) {
+                    // Podrías agregar algo aquí si necesitas saber cuándo el primer modal se cierra
+                }
+            });
+
+            // Agregar un manejador de eventos para el enlace 'Ver Informe'
+            document.querySelector('#verInforme').addEventListener('click', function (e) {
+                e.preventDefault();  // Evitar que el enlace haga su acción por defecto (navegar a '#')
+
+                // Mostrar el segundo modal con la información del informe
+                Swal.fire({
+                    title: 'Informe Detallado',
+                    text: 'Aquí puedes agregar el contenido del informe de la solicitud rechazada.',
+                    icon: 'info',
+                    confirmButtonText: 'Cerrar'
+                });
             });
         } else if (estado === 6) {
             // console.log('El estado de la solicitud es 6');
