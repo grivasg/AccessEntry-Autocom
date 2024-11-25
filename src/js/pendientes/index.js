@@ -290,9 +290,21 @@ function initializePdfModal() {
                                         text: 'Las credenciales han sido enviadas y registradas correctamente.',
                                         icon: 'success',
                                         confirmButtonText: 'Aceptar'
-                                    }).then(() => {
-                                        closeModal();
-                                        buscar(); // Actualizar la tabla
+                                    }).then(async () => {
+                                        try {
+                                            // Call otorgarPermiso with the solicitudId
+                                            await cambiarestado(solicitudId);
+
+                                            closeModal();
+                                            buscar(); // Actualizar la tabla
+                                        } catch (error) {
+                                            Swal.fire({
+                                                title: 'Error',
+                                                text: 'Hubo un problema al otorgar los permisos',
+                                                icon: 'error',
+                                                confirmButtonText: 'Aceptar'
+                                            });
+                                        }
                                     });
                                 } else {
                                     throw new Error(resultado.mensaje || 'Error al guardar el historial');
@@ -499,6 +511,38 @@ jQuery(document).ready(function ($) {
     var datatable = $('#tuDataTable').DataTable();
     datatable.on('click', '.pdf', pdf);
 });
+
+const cambiarestado = async (solicitudId) => {
+    try {
+        const formData = new FormData();
+        formData.append('solicitud_id', solicitudId);
+
+        const url = "/AccessEntry-Autocom/API/pendientes/cambiarEstado";
+        const config = {
+            method: 'POST',
+            body: formData
+        };
+
+        const respuesta = await fetch(url, config);
+        const data = await respuesta.json();
+
+        if (data.codigo === 1) {
+            Toast.fire({
+                icon: 'success',
+                title: data.mensaje
+            });
+            await buscar(); // Actualiza la tabla con los nuevos datos
+        } else {
+            throw new Error(data.detalle || 'Hubo un problema al otorgar los Permisos');
+        }
+    } catch (error) {
+        console.error('Error al otorgar permisos:', error);
+        Toast.fire({
+            icon: 'error',
+            title: 'Error al verificar la solicitud'
+        });
+    }
+};
 
 const styles = `
 <style>
