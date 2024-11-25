@@ -1,11 +1,11 @@
 import { Dropdown } from "bootstrap";
-import { Toast, validarFormulario } from "../funciones";
+import { ocultarLoader, Toast, validarFormulario, mostrarLoader } from "../funciones";
 import Swal from "sweetalert2";
 import DataTable from "datatables.net-bs5";
 import { lenguaje } from "../lenguaje";
 
 
-
+ocultarLoader();
 const datatable = new DataTable('#tablaNuevas', {
     data: null,
     language: lenguaje,
@@ -121,6 +121,7 @@ const datatable = new DataTable('#tablaNuevas', {
 
 
 const buscar = async () => {
+    mostrarLoader();
     try {
         const url = "/AccessEntry-Autocom/API/nuevas/buscar";
         const config = {
@@ -167,6 +168,7 @@ const buscar = async () => {
     } catch (error) {
         console.log(error);
     }
+    ocultarLoader();
 };
 buscar();
 

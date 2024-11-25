@@ -2,11 +2,11 @@ import CryptoJS from 'crypto-js';
 import { PDFDocument, rgb } from 'pdf-lib';
 import jQuery from 'jquery';
 import { Dropdown } from "bootstrap";
-import { Toast } from "../funciones";
+import { ocultarLoader, Toast, mostrarLoader } from "../funciones";
 import Swal from "sweetalert2";
 import DataTable from "datatables.net-bs5";
 import { lenguaje } from "../lenguaje";
-
+ocultarLoader();
 const datatable = new DataTable('#tablaPendientes', {
     data: null,
     language: lenguaje,

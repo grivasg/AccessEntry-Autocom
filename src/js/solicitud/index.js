@@ -1,5 +1,5 @@
 import { Dropdown } from "bootstrap";
-import { Toast, validarFormulario } from "../funciones";
+import { ocultarLoader, Toast, validarFormulario, mostrarLoader } from "../funciones";
 import Swal from "sweetalert2";
 import DataTable from "datatables.net-bs5";
 import { lenguaje } from "../lenguaje";
@@ -33,6 +33,7 @@ if (backStepBtn) {
         });
     });
 }
+ocultarLoader();
 
 
 // Modificación de la función guardar
@@ -49,8 +50,11 @@ const guardar = async (e) => {
         confirmButtonText: "Sí, Generar Solicitud",
         cancelButtonText: "Cancelar"
     });
+    ocultarLoader();
+
 
     if (!result.isConfirmed) return;
+    ocultarLoader();
 
     const camposRequeridos = [
         'sol_cred_catalogo',
@@ -65,6 +69,7 @@ const guardar = async (e) => {
             text: "Debe llenar todos los campos requeridos",
             icon: "info",
         });
+        ocultarLoader();
         return;
     }
 
@@ -126,6 +131,8 @@ const guardar = async (e) => {
         const respuesta = await fetch(url, config);
         const data = await respuesta.json();
 
+        ocultarLoader();
+
         if (data.codigo === 1) {
             formulario.reset();
             document.getElementById('step-2').style.display = 'none';
@@ -147,16 +154,20 @@ const guardar = async (e) => {
         }
     } catch (error) {
         console.error('Error al guardar la solicitud:', error);
+        ocultarLoader();
         Swal.fire({
             title: "Error",
             text: "Hubo un problema al procesar la solicitud. Inténtelo de nuevo más tarde.",
             icon: "error",
         });
     }
+    ocultarLoader();
+
 };
 
 // Modificación de la función agregarModulo
 const agregarModulo = async () => {
+    mostrarLoader();
     const container = document.getElementById('modulos-container');
     const modulosActuales = container.querySelectorAll('.modulo-grupo').length;
 
@@ -166,6 +177,7 @@ const agregarModulo = async () => {
             text: "Solo puede solicitar un máximo de 4 módulos",
             icon: "warning"
         });
+        ocultarLoader();
         return;
     }
 
@@ -188,8 +200,8 @@ const agregarModulo = async () => {
                     <select name="modulos[]" id="modulos[]" class="form-control modulo-select">
                         <option value="#">Seleccione...</option>
                         ${modulos.map(modulo =>
-                            `<option value="${modulo.gma_desc}">${modulo.gma_desc}</option>`
-                        ).join('')}
+            `<option value="${modulo.gma_desc}">${modulo.gma_desc}</option>`
+        ).join('')}
                     </select>
                 </div>
                 <div class="col-md-5">
@@ -223,8 +235,11 @@ const agregarModulo = async () => {
             text: "No se pudieron cargar los módulos",
             icon: "error"
         });
+    } finally {
+        ocultarLoader(); // Asegurarse de ocultar el loader independientemente del resultado
     }
 };
+
 
 
 // Manejar la eliminación de módulos
@@ -260,6 +275,9 @@ document.addEventListener('click', function (e) {
 const siguiente = async (e) => {
     e.preventDefault();
 
+    // Mostrar el loader al inicio
+    mostrarLoader();
+
     // Establecer la fecha actual en el campo de fecha
     const fechaActual = new Date().toISOString().split('T')[0]; // 'YYYY-MM-DD'
     document.getElementById('sol_cred_fecha_solicitud').value = fechaActual;
@@ -274,6 +292,9 @@ const siguiente = async (e) => {
             text: "Debe ingresar un número de catálogo",
             icon: "warning"
         });
+
+        // Ocultar el loader cuando hay un error
+        ocultarLoader();
         return;
     }
 
@@ -288,6 +309,9 @@ const siguiente = async (e) => {
 
         const respuesta = await fetch(url, config);
         const data = await respuesta.json();
+
+        // Ocultar el loader después de recibir la respuesta
+        ocultarLoader();
 
         if (data.codigo === 1) {
             // El catálogo existe, obtener los datos del personal
@@ -334,8 +358,12 @@ const siguiente = async (e) => {
             text: "Ocurrio un problema al verificar el catálogo",
             icon: "error"
         });
+
+        // Ocultar el loader en caso de error
+        ocultarLoader();
     }
 };
+
 
 
 
