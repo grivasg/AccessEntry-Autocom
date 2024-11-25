@@ -1,6 +1,6 @@
 import CryptoJS from "crypto-js";
 import { Dropdown } from "bootstrap";
-import { Toast, validarFormulario } from "../funciones";
+import { ocultarLoader, Toast, validarFormulario, mostrarLoader } from "../funciones";
 import Swal from "sweetalert2";
 import DataTable from "datatables.net-bs5";
 import { lenguaje } from "../lenguaje";
@@ -53,6 +53,8 @@ const datatable = new DataTable('#tablaUsuario', {
         }
     ]
 });
+
+ocultarLoader();
 
 // Función para buscar los datos
 const buscar = async () => {
