@@ -437,7 +437,7 @@ const pdf = async (e) => {
         const solicitudDetalles = await obtenerDetallesSolicitud(solicitudId);
 
         if (solicitudDetalles.tieneCredenciales === 'NO') {
-            // Existing flow for new user credentials
+            // PARA USUARIOS NUEVOS QUE NO TIENEN CREDENCIALES
             const passwordDesencriptada = await generar(solicitudId);
             const pdfUrlModified = await modificarPdfConContraseña(pdfUrl, passwordDesencriptada);
             Swal.close();
@@ -447,8 +447,8 @@ const pdf = async (e) => {
             pdfViewer.data('solicitudId', solicitudId);
             showModal();
         } else {
-            // New flow for users with existing credentials (just generate standard PDF)
-            const pdfUrlStandard = await generarPdfEstandar(pdfUrl);
+            // PARA USUARIOS NUEVOS QUE SI TIENEN CREDENCIALES Y SOLO TIENEN CAMBIO DE PERMISOS
+            const pdfUrlStandard = await generarPdfEstandar(pdfUrl, solicitudId);
             Swal.close();
 
             const pdfViewer = jQuery('#pdfViewer');
@@ -486,9 +486,11 @@ async function obtenerDetallesSolicitud(solicitudId) {
     }
 }
 
-// New function to generate standard PDF without password modification
-async function generarPdfEstandar(pdfUrl) {
-    const pdfBytes = await fetch(pdfUrl).then(res => res.arrayBuffer());
+async function generarPdfEstandar(pdfUrl, solicitudId) {
+    // Create a different URL for the standard PDF, including the solicitudId
+    const standardPdfUrl = `/AccessEntry-Autocom/reporte/generarCredencialesEstandar?solicitud=${solicitudId}`;
+
+    const pdfBytes = await fetch(standardPdfUrl).then(res => res.arrayBuffer());
     const pdfBlob = new Blob([pdfBytes], { type: 'application/pdf' });
     return URL.createObjectURL(pdfBlob);
 }

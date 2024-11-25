@@ -67,9 +67,8 @@ $router->post('/API/permiso/otorgar', [PermisoController::class, 'otorgarAPI']);
 // RUTAS PARA PENDIENTES A ENVIAR
 $router->get('/pendientes', [PendientesController::class, 'index']);
 $router->get('/API/pendientes/buscar', [PendientesController::class, 'buscarAPI']);
-$router->post('/API/pendientes/catalogoexiste', [PendientesController::class, 'catalogoExisteAPI']);
 $router->get('/API/pendientes/detalles', [PendientesController::class, 'detallesAPI']);
-
+$router->post('/API/pendientes/catalogoexiste', [PendientesController::class, 'catalogoExisteAPI']);
 $router->post('/API/pendientes/guardarHistorial', [PendientesController::class, 'guardarHistorialAPI']);
 
 
@@ -85,8 +84,9 @@ $router->post('/API/cambio/otorgar', [CambioController::class, 'otorgarAPI']);
 $router->post('/API/passwords/guardarTemp', [PasswordsController::class, 'guardarTempAPI']);
 $router->get('/API/passwords/obtenerPassword', [PasswordsController::class, 'obtenerPasswordAPI']);
 
-
-$router->get('/reporte/generarCredenciales', [ReporteController::class, 'reportePDF']);
+//----------------------------------------PDF-----------------------------------------------/////
+$router->get('/reporte/generarCredenciales', [ReporteController::class, 'credencialesPDF']);
+$router->get('/reporte/generarCredencialesEstandar', [ReporteController::class, 'permisosPDF']);
 $router->get('/API/reporte/obtenernombre', [ReporteController::class, 'obtenernombreAPI']);
 
 
