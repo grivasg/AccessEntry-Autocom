@@ -1,5 +1,5 @@
 import { Dropdown } from "bootstrap";
-import { Toast, validarFormulario } from "../funciones";
+import { ocultarLoader, mostrarLoader, Toast, validarFormulario } from "../funciones";
 import Swal from "sweetalert2";
 import DataTable from "datatables.net-bs5";
 import { lenguaje } from "../lenguaje";
@@ -52,7 +52,10 @@ const datatable = new DataTable('#tablaPermisos', {
     ]
 });
 
+ocultarLoader();  // Asegúrate de ocultar el loader después de cargar la página
+
 const buscar = async () => {
+    mostrarLoader();  // Muestra el loader antes de comenzar la búsqueda
     try {
         const url = "/AccessEntry-Autocom/API/permiso/buscar";
         const config = {
@@ -72,8 +75,10 @@ const buscar = async () => {
         console.error('Error en buscar:', error);
         Toast.fire({
             icon: 'info',
-            title: 'No se encontraron Datos en esta pagina'
+            title: 'No se encontraron Datos en esta página'
         });
+    } finally {
+        ocultarLoader();  // Oculta el loader una vez completada la búsqueda
     }
 };
 
@@ -92,7 +97,7 @@ const otorgar = async (e) => {
     // Confirmación de si los permisos han sido concedidos y selección de módulos
     const { value: permisosConcedidos, isConfirmed } = await Swal.fire({
         title: 'Permisos a Nivel Aplicación.',
-        html: `
+        html: ` 
             <div class="alert alert-success mb-4" role="alert">
                 <strong>Instrucciones:</strong> Por favor, seleccione los módulos a los cuales
                 ha otorgado <strong>Permisos a Nivel de Aplicación</strong> para el 
@@ -157,6 +162,8 @@ const otorgar = async (e) => {
         return;
     }
 
+    mostrarLoader();  // Muestra el loader mientras se procesan los datos de otorgar permisos
+
     try {
         // Preparar los datos para enviarlos
         const formData = new FormData();
@@ -190,16 +197,11 @@ const otorgar = async (e) => {
             icon: 'error',
             title: 'Error al verificar la solicitud'
         });
+    } finally {
+        ocultarLoader();  // Oculta el loader una vez que la operación se haya completado
     }
 };
 
-
-
-
 buscar();
 
-
-
 datatable.on('click', '.otorgar', otorgar);
-
-

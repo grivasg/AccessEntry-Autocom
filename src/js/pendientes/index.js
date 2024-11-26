@@ -243,9 +243,9 @@ function initializePdfModal() {
         let catalogoTemp; // Variable para almacenar el catálogo temporalmente
 
         Swal.fire({
-            title: 'Por favor, ingrese el catálogo del usuario que está enviando esta solicitud.',
+            title: 'Por favor, ingrese el catálogo del usuario de Responsable de enviar esta solicitud.',
             html: `
-            <input type="text" id="catalogoInput" class="swal2-input" placeholder="Ingrese el catálogo" />
+            <input type="text" id="catalogoInput" class="swal2-input" placeholder="Catalogo CAU." />
         `,
             showCancelButton: true,
             confirmButtonText: 'Validar',

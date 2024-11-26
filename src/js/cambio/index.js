@@ -1,6 +1,6 @@
 import { jsPDF } from "jspdf";
 import { Dropdown } from "bootstrap";
-import { Toast, validarFormulario } from "../funciones";
+import { Toast, validarFormulario, mostrarLoader, ocultarLoader } from "../funciones";
 import Swal from "sweetalert2";
 import DataTable from "datatables.net-bs5";
 import { lenguaje } from "../lenguaje";
@@ -55,6 +55,7 @@ const datatable = new DataTable('#tablaCambio', {
 
 // Función para buscar los datos
 const buscar = async () => {
+    mostrarLoader(); // Muestra el loader mientras se realiza la búsqueda
     try {
         const url = "/AccessEntry-Autocom/API/cambio/buscar";
         const config = { method: 'GET' };
@@ -69,11 +70,12 @@ const buscar = async () => {
     } catch (error) {
         Toast.fire({
             icon: 'info',
-            title: 'No se encontraron Datos en esta pagina'
+            title: 'No se encontraron Datos en esta página'
         });
+    } finally {
+        ocultarLoader(); // Oculta el loader después de realizar la búsqueda
     }
 };
-
 
 const otorgar = async (e) => {
     e.preventDefault();
@@ -173,6 +175,8 @@ const otorgar = async (e) => {
         return; // No continuar si no se concedieron los permisos
     }
 
+    mostrarLoader(); // Muestra el loader mientras se procesan los datos de otorgar permisos
+
     try {
         // Preparar los datos para enviarlos
         const formData = new FormData();
@@ -206,12 +210,11 @@ const otorgar = async (e) => {
             icon: 'error',
             title: 'Error al verificar la solicitud'
         });
+    } finally {
+        ocultarLoader(); // Oculta el loader después de completar la operación
     }
 };
 
+buscar();  // Llamada inicial para cargar los datos
 
-buscar();
-
-
-
-datatable.on('click', '.otorgar', otorgar);
+datatable.on('click', '.otorgar', otorgar); // Asignar evento al botón de cambiar permisos
