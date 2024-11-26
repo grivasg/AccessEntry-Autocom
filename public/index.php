@@ -53,6 +53,7 @@ $router->post('/API/usuario/enviar', [UsuarioController::class, 'enviarAPI']);
 // HISTORIAL
 $router->get('/historial', [HistorialController::class, 'index']);
 $router->get('/API/historial/buscar', [HistorialController::class, 'buscarAPI']);
+$router->get('/API/historial/detalle', [HistorialController::class, 'detalleAPI']);
 
 ///FTP SUBIDA DE ARCHIVOS QAP
 $router->get('/subir', [FTPController::class, 'subir']);

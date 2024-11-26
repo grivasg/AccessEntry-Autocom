@@ -66,18 +66,12 @@ const datatable = new DataTable('#tablaHistorial', {
             searchable: false,
             orderable: false,
             render: (data, type, row, meta) => {
-                // Crear el botón como elemento HTML
                 const button = document.createElement('button');
                 button.className = 'btn btn-warning ver';
-                button.innerHTML = '<i class="bi bi-eye-fill"></i>';
+                button.innerHTML = '<i class="bi bi-book-half" title="DETALLES"></i>';
 
-                // Guardar los datos completos de la fila en un atributo data
-                button.setAttribute('data-row', JSON.stringify({
-                    solicitud_id: row.solicitud_id,
-                    estado_solicitud: row.estado_solicitud,
-                    sol_cred_justificacion_autorizacion: row.sol_cred_justificacion_autorizacion,
-                    id_estado: row.estado_cred_id
-                }));
+                // Guardar TODOS los datos de la fila
+                button.setAttribute('data-row', JSON.stringify(row));
 
                 return button.outerHTML;
             }
@@ -114,13 +108,98 @@ const buscar = async () => {
 };
 // Iniciar la búsqueda cuando se carga la página
 
-
-
-
-const ver = async () => {
-    alert('esta funcion enseñará el detalle')
-};
 buscar();
 
+
+const ver = async (e) => {
+    // Obtener los datos guardados en el botón
+    const rowDataString = e.currentTarget.getAttribute('data-row');
+
+    if (!rowDataString) {
+        console.error('No se encontraron datos en el botón');
+        return;
+    }
+
+    const rowData = JSON.parse(rowDataString);
+
+    try {
+        const url = `/AccessEntry-Autocom/API/historial/detalle?id=${rowData.solicitud_id}`;
+        const respuesta = await fetch(url);
+        const resultado = await respuesta.json();
+
+        console.log('Resultado completo:', resultado);
+
+        // Verificar si se encontraron datos
+        if (resultado.codigo === 1 && resultado.datos.length > 0) {
+            const solicitud = resultado.datos[0];
+
+            // Genera una tabla HTML con todos los datos
+            const generarTablaDetalles = (datos) => {
+                let html = '<table class="table table-striped table-bordered">';
+                html += '<thead><tr><th>DETALLES</th><th>INFO.</th></tr></thead>';
+                html += '<tbody>';
+
+                for (const [key, value] of Object.entries(datos)) {
+                    // Excluir campos vacíos o nulos si lo deseas
+                    if (value !== null && value !== '') {
+                        html += `
+                            <tr>
+                                <td><strong>${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</strong></td>
+                                <td>${value}</td>
+                            </tr>
+                        `;
+                    }
+                }
+
+                html += '</tbody></table>';
+                return html;
+            };
+
+            Swal.fire({
+                title: 'Detalles Completos de la Solicitud',
+                html: generarTablaDetalles(solicitud),
+                width: '80%',
+                showCloseButton: true,
+                showConfirmButton: false,
+                customClass: {
+                    popup: 'my-custom-popup-class'
+                },
+                didOpen: () => {
+                    // Añadir estilos personalizados si es necesario
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        .my-custom-popup-class .table {
+                            width: 100%;
+                            max-width: 100%;
+                            margin-bottom: 1rem;
+                            background-color: transparent;
+                        }
+                        .my-custom-popup-class .table th,
+                        .my-custom-popup-class .table td {
+                            padding: 0.75rem;
+                            vertical-align: top;
+                            border: 1px solid #dee2e6;
+                        }
+                        .my-custom-popup-class .table-striped tbody tr:nth-of-type(odd) {
+                            background-color: rgba(0,0,0,.05);
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+            });
+        } else {
+            Toast.fire({
+                icon: 'info',
+                title: 'No se encontraron detalles para esta solicitud'
+            });
+        }
+    } catch (error) {
+        console.error('Error al obtener detalles:', error);
+        Toast.fire({
+            icon: 'error',
+            title: 'Error al cargar los detalles'
+        });
+    }
+};
 
 datatable.on('click', '.ver', ver);
