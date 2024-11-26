@@ -19,12 +19,8 @@ const datatable = new DataTable('#tablaEstado', {
             }
         },
         {
-            title: 'Grado y Arma',
-            data: 'grado_arma'
-        },
-        {
-            title: 'Nombres del Solicitante',
-            data: 'nombres_apellidos'
+            title: 'Datos del Solicitante',
+            data: 'nombres_solicitante'
         },
         {
             title: 'Catalogo',
