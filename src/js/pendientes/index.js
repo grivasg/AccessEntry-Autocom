@@ -54,6 +54,10 @@ const datatable = new DataTable('#tablaPendientes', {
             }
         },
         {
+            title: '¿Tenía Usuario?',
+            data: 'sol_cred_usuario'
+        },
+        {
             title: 'Acciones',
             data: 'solicitud_id',
             searchable: false,
