@@ -72,7 +72,7 @@
                         <ul class="dropdown-menu  dropdown-menu-dark " id="dropwdownRevision" style="margin: 0;">
                             <!-- <h6 class="dropdown-header">Información</h6> -->
                             <li>
-                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/estado"><i class="bi bi-hourglass-split"></i> Verificar Estado </a>
+                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/estado"><i class="bi bi-eye-fill"></i> Verificar Estado </a>
                             </li>
 
                         </ul>
