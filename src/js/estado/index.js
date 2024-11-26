@@ -79,6 +79,7 @@ const datatable = new DataTable('#tablaEstado', {
                 button.setAttribute('data-row', JSON.stringify({
                     solicitud_id: row.solicitud_id,
                     estado_solicitud: row.estado_solicitud,
+                    sol_cred_justificacion_autorizacion: row.sol_cred_justificacion_autorizacion,
                     id_estado: row.estado_cred_id
                 }));
 
@@ -123,13 +124,13 @@ const ver = async (e) => {
 
         // Obtener y parsear los datos guardados en el botón
         const rowData = JSON.parse(button.getAttribute('data-row'));
+        console.log(rowData);  // Verificar los datos recibidos
 
         // Convertir id_estado a un número
         const estado = parseInt(rowData.id_estado, 10);
 
         // Evaluar el valor de estado
         if (estado === 1) {
-            // console.log('El estado de la solicitud es 1');
             Swal.fire({
                 title: 'Solicitud Recibida',
                 text: 'Su solicitud ha sido recibida y está en proceso de verificación.',
@@ -139,7 +140,6 @@ const ver = async (e) => {
                 imageAlt: "Custom image"
             });
         } else if (estado === 2) {
-            // console.log('El estado de la solicitud es 2');
             Swal.fire({
                 title: 'Generando Usuario',
                 text: 'Estamos generando el usuario para usted. Espere un momento.',
@@ -149,7 +149,6 @@ const ver = async (e) => {
                 imageAlt: "Custom image"
             });
         } else if (estado === 3) {
-            // console.log('El estado de la solicitud es 3');
             Swal.fire({
                 title: 'Otorgando Permisos',
                 text: 'Estamos otorgando los permisos necesarios para su cuenta.',
@@ -159,7 +158,6 @@ const ver = async (e) => {
                 imageAlt: "Custom image"
             });
         } else if (estado === 4) {
-            // console.log('El estado de la solicitud es 4');
             Swal.fire({
                 title: 'Credenciales Enviadas',
                 text: 'Las credenciales han sido enviadas. Revise su correo para más detalles.',
@@ -169,52 +167,34 @@ const ver = async (e) => {
                 imageAlt: "Custom image"
             });
         } else if (estado === 5) {
-            // console.log('El estado de la solicitud es 5');
+            // Aquí mostramos el modal con la justificación directamente en el mensaje
+            const justificacionAutorizacion = rowData.sol_cred_justificacion_autorizacion;
+
             Swal.fire({
-                title: 'Solicitud Rechazada',
-                text: 'Lamentablemente, su solicitud ha sido rechazada. Para mas Información revise el Informe',
-                footer: '<a href="#" id="verInforme">Ver Informe</a>',  // Agregar un ID al enlace para identificarlo
+                title: 'Lamentablemente, su solicitud ha sido rechazada.',
+                html: justificacionAutorizacion ? `<br><strong>MOTIVO:</strong><br>${justificacionAutorizacion}` : '',
                 imageUrl: "/AccessEntry-Autocom/public/images/rechazado.png",
                 imageWidth: 200,
                 imageHeight: 200,
                 imageAlt: "Custom image"
-            }).then((result) => {
-                // Este bloque maneja cuando el modal principal se cierra
-                if (result.dismiss === Swal.DismissReason.close) {
-                    // Podrías agregar algo aquí si necesitas saber cuándo el primer modal se cierra
-                }
             });
 
-            // Agregar un manejador de eventos para el enlace 'Ver Informe'
-            document.querySelector('#verInforme').addEventListener('click', function (e) {
-                e.preventDefault();  // Evitar que el enlace haga su acción por defecto (navegar a '#')
-
-                // Mostrar el segundo modal con la información del informe
-                Swal.fire({
-                    title: 'Informe Detallado',
-                    text: 'Aquí puedes agregar el contenido del informe de la solicitud rechazada.',
-                    icon: 'info',
-                    confirmButtonText: 'Cerrar'
-                });
-            });
         } else if (estado === 6) {
-            // console.log('El estado de la solicitud es 6');
             Swal.fire({
-                title: 'Otorgando Permisos',
-                text: 'Estamos otorgando los permisos necesarios para su cuenta.',
-                imageUrl: "/AccessEntry-Autocom/public/images/caso3.png",
-                imageWidth: 490,
-                imageHeight: 270,
+                title: 'Solicitud Aprobada',
+                text: 'Su solicitud ha sido aprobada.',
+                imageUrl: "/AccessEntry-Autocom/public/images/aprobado.png",
+                imageWidth: 200,
+                imageHeight: 200,
                 imageAlt: "Custom image"
             });
         } else if (estado === 7) {
-            // console.log('El estado de la solicitud es 3');
             Swal.fire({
-                title: 'Otorgando Permisos',
-                text: 'Estamos otorgando los permisos necesarios para su cuenta.',
-                imageUrl: "/AccessEntry-Autocom/public/images/caso3.png",
-                imageWidth: 490,
-                imageHeight: 270,
+                title: 'Solicitud Pendiente',
+                text: 'Su solicitud está pendiente de revisión.',
+                imageUrl: "/AccessEntry-Autocom/public/images/pending.png",
+                imageWidth: 200,
+                imageHeight: 200,
                 imageAlt: "Custom image"
             });
         } else {
@@ -234,6 +214,7 @@ const ver = async (e) => {
         });
     }
 };
+
 
 
 // Agregar el event listener usando delegación de eventos
