@@ -190,11 +190,11 @@ const ver = async (e) => {
             });
         } else if (estado === 7) {
             Swal.fire({
-                title: 'Solicitud Pendiente',
-                text: 'Su solicitud está pendiente de revisión.',
-                imageUrl: "/AccessEntry-Autocom/public/images/pending.png",
-                imageWidth: 200,
-                imageHeight: 200,
+                title: 'Otorgando Permisos',
+                text: 'Estamos otorgando los permisos necesarios para su cuenta.',
+                imageUrl: "/AccessEntry-Autocom/public/images/caso3.png",
+                imageWidth: 490,
+                imageHeight: 270,
                 imageAlt: "Custom image"
             });
         } else {
