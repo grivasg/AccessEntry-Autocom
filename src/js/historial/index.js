@@ -60,6 +60,28 @@ const datatable = new DataTable('#tablaHistorial', {
             title: 'Nombres del Responsable',
             data: 'nombres_responsable'
         },
+        {
+            title: 'Ver Detalles',
+            data: 'estado_solicitud',
+            searchable: false,
+            orderable: false,
+            render: (data, type, row, meta) => {
+                // Crear el botón como elemento HTML
+                const button = document.createElement('button');
+                button.className = 'btn btn-warning ver';
+                button.innerHTML = '<i class="bi bi-eye-fill"></i>';
+
+                // Guardar los datos completos de la fila en un atributo data
+                button.setAttribute('data-row', JSON.stringify({
+                    solicitud_id: row.solicitud_id,
+                    estado_solicitud: row.estado_solicitud,
+                    sol_cred_justificacion_autorizacion: row.sol_cred_justificacion_autorizacion,
+                    id_estado: row.estado_cred_id
+                }));
+
+                return button.outerHTML;
+            }
+        },
     ]
 });
 
@@ -91,4 +113,14 @@ const buscar = async () => {
     }
 };
 // Iniciar la búsqueda cuando se carga la página
+
+
+
+
+const ver = async () => {
+    alert('esta funcion enseñará el detalle')
+};
 buscar();
+
+
+datatable.on('click', '.ver', ver);
