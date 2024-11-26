@@ -235,8 +235,9 @@ class Solicitud extends ActiveRecord
 
     public static function PendientesConfirmacion()
     {
-        $sql = "SELECT (g.gra_desc_lg || ' DE ' || a.arm_desc_lg) AS Grado_Arma,
-                (m.per_nom1 || ' ' || m.per_nom2 || ' ' || m.per_ape1 || ' ' || m.per_ape2 || ' ' || m.per_ape3) AS Nombres_Apellidos,  -- Nombre completo del solicitante
+        $sql = "SELECT (trim(g.gra_desc_lg) || ' DE ' || trim(a.arm_desc_lg) || ' ' || 
+                trim(m.per_nom1) || ' ' || trim(m.per_nom2) || ' ' || 
+                trim(m.per_ape1) || ' ' || trim(m.per_ape2)) AS nombres_solicitante,
                 sc.sol_cred_catalogo,
                 TRIM(per_desc_empleo) || ' - ' || TRIM(d.dep_desc_lg) AS Puesto_Dependencia,
                 sc.solicitud_id,
