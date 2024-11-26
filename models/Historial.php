@@ -91,36 +91,28 @@ class Historial extends ActiveRecord
         return self::getAlertas();
     }
 
-    public static function findByFechaEnvio($fechaInicio, $fechaFin)
+    public static function obtenerHistorial()
     {
-        try {
-            // Debug para ver las fechas
-            error_log("Fecha Inicio: " . $fechaInicio);
-            error_log("Fecha Fin: " . $fechaFin);
-
-            // Consulta SQL para buscar registros entre las fechas
-            $query = "SELECT h.*, 
-           s.solicitud_id,
-           m.per_nom1 as responsable_nombre
-        FROM historial_credenciales h
-        LEFT JOIN solicitud_credenciales s ON h.his_cred_solicitud_id = s.solicitud_id
-        LEFT JOIN mper m ON h.his_cred_responsable_envio = m.per_catalogo
-        WHERE h.his_cred_fecha_envio BETWEEN ? AND ?
-        ORDER BY h.his_cred_fecha_envio DESC";
-
-            // Parametros de búsqueda
-            $params = [$fechaInicio, $fechaFin];
-
-            // Realizar la consulta y devolver los resultados
-            $resultados = static::consultarSQL($query, $params);
-
-            // Debug para ver los resultados
-            error_log("Cantidad de resultados: " . count($resultados));
-
-            return $resultados;
-        } catch (\Exception $e) {
-            error_log("Error en findByFechaEnvio: " . $e->getMessage());
-            return [];
-        }
+        $sql = "SELECT 
+                (trim(g.gra_desc_lg) || ' DE ' || trim(a.arm_desc_lg) || ' ' || 
+                trim(m.per_nom1) || ' ' || trim(m.per_nom2) || ' ' || 
+                trim(m.per_ape1) || ' ' || trim(m.per_ape2)) AS Nombres_Solicitante,
+                sc.sol_cred_catalogo,
+                sc.sol_cred_fecha_solicitud,
+                he.his_cred_fecha_envio AS Fecha_Envio,
+                (trim(gr_res.gra_desc_lg) || ' DE ' || trim(ar_res.arm_desc_lg) || ' ' || 
+                trim(mr.per_nom1) || ' ' || trim(mr.per_nom2) || ' ' || 
+                trim(mr.per_ape1) || ' ' || trim(mr.per_ape2)) AS Nombres_Responsable
+                FROM solicitud_credenciales sc
+                JOIN mper m ON sc.sol_cred_catalogo = m.per_catalogo
+                JOIN grados g ON m.per_grado = g.gra_codigo
+                JOIN armas a ON m.per_arma = a.arm_codigo
+                LEFT JOIN historial_credenciales he ON sc.solicitud_id = he.his_cred_solicitud_id
+                LEFT JOIN mper mr ON he.his_cred_responsable_envio = mr.per_catalogo
+                LEFT JOIN grados gr_res ON mr.per_grado = gr_res.gra_codigo
+                LEFT JOIN armas ar_res ON mr.per_arma = ar_res.arm_codigo
+                WHERE sc.sol_cred_estado_solicitud = 4
+                ORDER BY sc.solicitud_id ASC";
+        return self::fetchArray($sql);
     }
 }

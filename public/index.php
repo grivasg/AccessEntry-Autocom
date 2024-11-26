@@ -7,6 +7,7 @@ use Controllers\CambioController;
 use Controllers\EstadoController;
 use Controllers\FinalizadasController;
 use Controllers\FTPController;
+use Controllers\HistorialController;
 use Controllers\NuevasController;
 use Controllers\PasswordsController;
 use Controllers\PendientesController;
@@ -48,6 +49,10 @@ $router->post('/API/nuevas/rechazar', [NuevasController::class, 'rechazarAPI']);
 $router->get('/usuario', [UsuarioController::class, 'index']);
 $router->get('/API/usuario/buscar', [UsuarioController::class, 'buscarAPI']);
 $router->post('/API/usuario/enviar', [UsuarioController::class, 'enviarAPI']);
+
+// HISTORIAL
+$router->get('/historial', [HistorialController::class, 'index']);
+$router->get('/API/historial/buscar', [HistorialController::class, 'buscarAPI']);
 
 ///FTP SUBIDA DE ARCHIVOS QAP
 $router->get('/subir', [FTPController::class, 'subir']);

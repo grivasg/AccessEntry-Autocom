@@ -14,6 +14,7 @@ module.exports = {
     'js/pendientes/index' : './src/js/pendientes/index.js',
     'js/cambio/index' : './src/js/cambio/index.js',
     'js/ftp/index' : './src/js/ftp/index.js',
+    'js/historial/index' : './src/js/historial/index.js',
 
   },
   output: {
