@@ -79,12 +79,12 @@
                     </div>
                     <div class="nav-item dropdown ">
                         <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                            <i class="bi bi-card-checklist"></i> Reportes
+                            <i class="bi bi-card-checklist"></i> Finalizadas
                         </a>
                         <ul class="dropdown-menu  dropdown-menu-dark " id="dropwdownRevision" style="margin: 0;">
                             <!-- <h6 class="dropdown-header">Información</h6> -->
                             <li>
-                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/finalizadas"><i class="bi bi-hourglass-split"></i> Historial de Envios</a>
+                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/historial"><i class="bi bi-hourglass-split"></i> Historial de Envios</a>
                             </li>
                         </ul>
                     </div>
