@@ -124,7 +124,6 @@ const ver = async (e) => {
 
         // Obtener y parsear los datos guardados en el botón
         const rowData = JSON.parse(button.getAttribute('data-row'));
-        console.log(rowData);  // Verificar los datos recibidos
 
         // Convertir id_estado a un número
         const estado = parseInt(rowData.id_estado, 10);
@@ -142,7 +141,7 @@ const ver = async (e) => {
         } else if (estado === 2) {
             Swal.fire({
                 title: 'Generando Usuario',
-                text: 'Estamos generando el usuario para usted. Espere un momento.',
+                text: 'Estamos en proceso de crear su cuenta y generar las credenciales necesarias para habilitar su acceso.',
                 imageUrl: "/AccessEntry-Autocom/public/images/caso2.png",
                 imageWidth: 490,
                 imageHeight: 270,
@@ -151,7 +150,7 @@ const ver = async (e) => {
         } else if (estado === 3) {
             Swal.fire({
                 title: 'Otorgando Permisos',
-                text: 'Estamos otorgando los permisos necesarios para su cuenta.',
+                text: 'Estamos otorgando los permisos correspondientes para garantizar el correcto funcionamiento de su cuenta de usuario.',
                 imageUrl: "/AccessEntry-Autocom/public/images/caso3.png",
                 imageWidth: 490,
                 imageHeight: 270,
@@ -160,7 +159,7 @@ const ver = async (e) => {
         } else if (estado === 4) {
             Swal.fire({
                 title: 'Credenciales Enviadas',
-                text: 'Las credenciales han sido enviadas. Revise su correo para más detalles.',
+                text: 'Las credenciales han sido enviadas. Revise el correo electrónico registrado para mas detalles.',
                 imageUrl: "/AccessEntry-Autocom/public/images/caso4.png",
                 imageWidth: 490,
                 imageHeight: 270,
@@ -181,17 +180,17 @@ const ver = async (e) => {
 
         } else if (estado === 6) {
             Swal.fire({
-                title: 'Solicitud Aprobada',
-                text: 'Su solicitud ha sido aprobada.',
-                imageUrl: "/AccessEntry-Autocom/public/images/aprobado.png",
-                imageWidth: 200,
-                imageHeight: 200,
+                title: 'Otorgando Permisos',
+                text: 'Estamos otorgando los permisos correspondientes para garantizar el correcto funcionamiento de su cuenta de usuario.',
+                imageUrl: "/AccessEntry-Autocom/public/images/caso3.png",
+                imageWidth: 490,
+                imageHeight: 270,
                 imageAlt: "Custom image"
             });
         } else if (estado === 7) {
             Swal.fire({
                 title: 'Otorgando Permisos',
-                text: 'Estamos otorgando los permisos necesarios para su cuenta.',
+                text: 'Estamos otorgando los permisos correspondientes para garantizar el correcto funcionamiento de su cuenta de usuario.',
                 imageUrl: "/AccessEntry-Autocom/public/images/caso3.png",
                 imageWidth: 490,
                 imageHeight: 270,
