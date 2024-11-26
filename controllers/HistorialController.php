@@ -16,7 +16,7 @@ class HistorialController
     public static function buscarAPI()
     {
         try {
-            $solicitudes = Historial::obtenerHistorial();
+            $solicitudes = Historial::obtenerHistorialporId();
             http_response_code(200);
             echo json_encode([
                 'codigo' => 1,

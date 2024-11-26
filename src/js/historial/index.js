@@ -57,12 +57,8 @@ const datatable = new DataTable('#tablaHistorial', {
             }
         },
         {
-            title: 'Nombres del Responsable',
-            data: 'nombres_responsable'
-        },
-        {
             title: 'Ver Detalles',
-            data: 'estado_solicitud',
+            data: 'solicitud_id',
             searchable: false,
             orderable: false,
             render: (data, type, row, meta) => {
@@ -111,6 +107,136 @@ const buscar = async () => {
 buscar();
 
 
+const configuracionCampos = {
+    'solicitud_id': {
+        nombre: 'Número de Solicitud',
+        transformar: (valor) => `#${valor}`
+    },
+    'nombres_solicitante': {
+        nombre: 'Datos del Solicitante',
+        transformar: (valor) => valor
+    },
+    'sol_cred_catalogo': {
+        nombre: 'Catálogo/Usuario',
+        transformar: (valor) => valor
+    },
+    'sol_cred_fecha_solicitud': {
+        nombre: 'Fecha de Solicitud',
+        transformar: (valor) => {
+            const date = new Date(valor);
+            return date.toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        }
+    },
+    'fecha_envio': {
+        nombre: 'Fecha y Hora de Envío',
+        transformar: (valor) => {
+            const date = new Date(valor);
+            return date.toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+    },
+    'nombres_responsable': {
+        nombre: 'Responsable del Envío',
+        transformar: (valor) => valor
+    },
+    'sol_cred_usuario': {
+        nombre: '¿Tenia Usuario?',
+        transformar: (valor) => valor
+    },
+    'sol_cred_correo': {
+        nombre: 'Envíado a Correo',
+        transformar: (valor) => valor
+    },
+    'sol_cred_telefono': {
+        nombre: 'Teléfono',
+        transformar: (valor) => valor
+    },
+    'sol_cred_modulo': {
+        nombre: 'Módulo(s) Solicitado',
+        transformar: (valor) => valor
+    },
+    'sol_cred_justificacion': {
+        nombre: 'Justificación',
+        transformar: (valor) => valor
+    },
+    'sol_cred_modulos_autorizados': {
+        nombre: 'Módulos(s) Autorizado(s)',
+        transformar: (valor) => valor
+    },
+    'sol_cred_justificacion_autorizacion': {
+        nombre: 'Módulos(s) NO Autorizado(s) Motivo',
+        transformar: (valor) => valor
+    },
+    'estado_cred_id': {
+        nombre: 'ID de Estado',
+        transformar: (valor) => valor
+    },
+    'estado_solicitud': {
+        nombre: 'Estado de la Solicitud',
+        transformar: (valor) => valor
+    },
+
+};
+
+const generarTablaDetalles = (datos) => {
+    let html = '<table class="table table-striped table-bordered">';
+    html += '<thead><tr><th>DETALLES</th><th>INFORMACIÓN</th></tr></thead>';
+    html += '<tbody>';
+
+    // Ordenar los campos de manera específica
+    const camposOrdenados = [
+        'solicitud_id',
+        'nombres_solicitante',
+        'sol_cred_catalogo',
+        'sol_cred_fecha_solicitud',
+        'fecha_envio',
+        'nombres_responsable',
+        'sol_cred_usuario',
+        'sol_cred_correo',
+        'sol_cred_telefono',
+        'sol_cred_modulo',
+        'sol_cred_modulos_autorizados',
+        'sol_cred_justificacion_autorizacion',
+        'estado_solicitud',
+    ];
+
+    camposOrdenados.forEach(key => {
+        const value = datos[key];
+
+        // Solo mostrar si el valor no es null, undefined o cadena vacía
+        if (value !== null && value !== undefined && value !== '') {
+            const config = configuracionCampos[key] || {};
+
+            const nombreFormateado = config.nombre ||
+                key.replace(/_/g, ' ')
+                    .replace(/\b\w/g, l => l.toUpperCase());
+
+            const valorFormateado = config.transformar
+                ? config.transformar(value)
+                : value;
+
+            html += `
+                <tr>
+                    <td><strong>${nombreFormateado}</strong></td>
+                    <td>${valorFormateado}</td>
+                </tr>
+            `;
+        }
+    });
+
+    html += '</tbody></table>';
+    return html;
+};
+
 const ver = async (e) => {
     // Obtener los datos guardados en el botón
     const rowDataString = e.currentTarget.getAttribute('data-row');
@@ -121,8 +247,10 @@ const ver = async (e) => {
     }
 
     const rowData = JSON.parse(rowDataString);
+    console.log('Datos de la fila obtenidos:', rowData);
 
     try {
+        // Usar el ID específico de esta solicitud
         const url = `/AccessEntry-Autocom/API/historial/detalle?id=${rowData.solicitud_id}`;
         const respuesta = await fetch(url);
         const resultado = await respuesta.json();
@@ -133,31 +261,9 @@ const ver = async (e) => {
         if (resultado.codigo === 1 && resultado.datos.length > 0) {
             const solicitud = resultado.datos[0];
 
-            // Genera una tabla HTML con todos los datos
-            const generarTablaDetalles = (datos) => {
-                let html = '<table class="table table-striped table-bordered">';
-                html += '<thead><tr><th>DETALLES</th><th>INFO.</th></tr></thead>';
-                html += '<tbody>';
-
-                for (const [key, value] of Object.entries(datos)) {
-                    // Excluir campos vacíos o nulos si lo deseas
-                    if (value !== null && value !== '') {
-                        html += `
-                            <tr>
-                                <td><strong>${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</strong></td>
-                                <td>${value}</td>
-                            </tr>
-                        `;
-                    }
-                }
-
-                html += '</tbody></table>';
-                return html;
-            };
-
             Swal.fire({
                 title: 'Detalles Completos de la Solicitud',
-                html: generarTablaDetalles(solicitud),
+                html: generarTablaDetalles(rowData), // Asegúrate de que `generarTablaDetalles` usa los datos correctos
                 width: '80%',
                 showCloseButton: true,
                 showConfirmButton: false,

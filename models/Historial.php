@@ -93,7 +93,9 @@ class Historial extends ActiveRecord
 
     public static function obtenerHistorialporId()
     {
-        $sql = "SELECT (trim(g.gra_desc_lg) || ' DE ' || trim(a.arm_desc_lg) || ' ' || 
+        $sql = "SELECT 
+                sc.solicitud_id, 
+                (trim(g.gra_desc_lg) || ' DE ' || trim(a.arm_desc_lg) || ' ' || 
                 trim(m.per_nom1) || ' ' || trim(m.per_nom2) || ' ' || 
                 trim(m.per_ape1) || ' ' || trim(m.per_ape2)) AS Nombres_Solicitante,
                 sc.sol_cred_catalogo,
@@ -126,40 +128,4 @@ class Historial extends ActiveRecord
         return self::fetchArray($sql);
     }
 
-    public static function obtenerHistorial()
-    {
-        $sql = "SELECT 
-                sc.solicitud_id, 
-                (trim(g.gra_desc_lg) || ' DE ' || trim(a.arm_desc_lg) || ' ' || 
-                trim(m.per_nom1) || ' ' || trim(m.per_nom2) || ' ' || 
-                trim(m.per_ape1) || ' ' || trim(m.per_ape2)) AS Nombres_Solicitante,
-                sc.sol_cred_catalogo,
-                sc.sol_cred_fecha_solicitud,
-                he.his_cred_fecha_envio AS Fecha_Envio,
-                (trim(gr_res.gra_desc_lg) || ' DE ' || trim(ar_res.arm_desc_lg) || ' ' || 
-                trim(mr.per_nom1) || ' ' || trim(mr.per_nom2) || ' ' || 
-                trim(mr.per_ape1) || ' ' || trim(mr.per_ape2)) AS Nombres_Responsable,
-                sc.sol_cred_correo,
-                sc.sol_cred_telefono,
-                sc.sol_cred_modulo,
-                sc.sol_cred_justificacion,
-                sc.sol_cred_usuario,
-                sc.sol_cred_modulos_autorizados,
-                sc.sol_cred_justificacion_autorizacion,
-                e.estado_cred_id,
-                e.estado_cred_nombre AS Estado_Solicitud,
-                he.his_cred_metodo_envio
-            FROM solicitud_credenciales sc
-            JOIN mper m ON sc.sol_cred_catalogo = m.per_catalogo
-            JOIN grados g ON m.per_grado = g.gra_codigo
-            JOIN armas a ON m.per_arma = a.arm_codigo
-            LEFT JOIN historial_credenciales he ON sc.solicitud_id = he.his_cred_solicitud_id
-            LEFT JOIN mper mr ON he.his_cred_responsable_envio = mr.per_catalogo
-            LEFT JOIN grados gr_res ON mr.per_grado = gr_res.gra_codigo
-            LEFT JOIN armas ar_res ON mr.per_arma = ar_res.arm_codigo
-            JOIN estado_credenciales e ON sc.sol_cred_estado_solicitud = e.estado_cred_id
-            WHERE sc.sol_cred_estado_solicitud = 4
-            ORDER BY sc.solicitud_id ASC";
-        return self::fetchArray($sql);
-    }
 }
