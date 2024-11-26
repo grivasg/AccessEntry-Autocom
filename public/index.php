@@ -44,10 +44,6 @@ $router->post('/API/nuevas/verificar', [NuevasController::class, 'verificarAPI']
 $router->post('/API/nuevas/justificar', [NuevasController::class, 'justificarAPI']);
 $router->post('/API/nuevas/rechazar', [NuevasController::class, 'rechazarAPI']);
 
-// RUTAS DE SOLICITUDES FINALIZADAS
-$router->get('/finalizadas', [FinalizadasController::class, 'index']);
-$router->get('/API/finalizadas/buscar', [FinalizadasController::class, 'buscarAPI']);
-
 // RUTAS DE CREACION DE USUARIO
 $router->get('/usuario', [UsuarioController::class, 'index']);
 $router->get('/API/usuario/buscar', [UsuarioController::class, 'buscarAPI']);
