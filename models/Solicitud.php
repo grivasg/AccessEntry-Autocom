@@ -349,9 +349,9 @@ class Solicitud extends ActiveRecord
     public static function obtenerDatosPersonal($catalogo)
     {
         $sql = "SELECT 
-    TRIM(REPLACE(REPLACE(g.gra_desc_lg || ' DE ' || a.arm_desc_lg || ' ' || 
-        m.per_nom1 || ' ' || m.per_nom2 || ' ' || 
-        m.per_ape1 || ' ' || m.per_ape2 || ' ' || m.per_ape3, '  ', ' '), '  ', ' ')) AS nombres_completos,
+    (trim(g.gra_desc_lg) || ' DE ' || trim(a.arm_desc_lg) || ' ' || 
+                trim(m.per_nom1) || ' ' || trim(m.per_nom2) || ' ' || 
+                trim(m.per_ape1) || ' ' || trim(m.per_ape2)) AS nombres_completos,
     TRIM(REPLACE(per_desc_empleo, '  ', ' ')) AS puesto
 FROM mper m
 JOIN morg org ON m.per_plaza = org.org_plaza
