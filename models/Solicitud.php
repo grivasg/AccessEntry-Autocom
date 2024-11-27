@@ -352,7 +352,7 @@ class Solicitud extends ActiveRecord
     (trim(g.gra_desc_lg) || ' DE ' || trim(a.arm_desc_lg) || ' ' || 
                 trim(m.per_nom1) || ' ' || trim(m.per_nom2) || ' ' || 
                 trim(m.per_ape1) || ' ' || trim(m.per_ape2)) AS nombres_completos,
-    TRIM(REPLACE(per_desc_empleo, '  ', ' ')) AS puesto
+                TRIM(per_desc_empleo) || ' - ' || TRIM(d.dep_desc_lg) AS puesto
 FROM mper m
 JOIN morg org ON m.per_plaza = org.org_plaza
 JOIN mdep d ON org.org_dependencia = d.dep_llave

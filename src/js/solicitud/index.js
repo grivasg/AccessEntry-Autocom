@@ -214,7 +214,7 @@ const agregarModulo = async () => {
                         maxlength="200"
                     >
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-2 d-flex align-items-start justify-content-left mt-4">
                     <button type="button" class="btn btn-danger btn-remove-modulo">
                         <i class="bi bi-x-circle-fill"></i>
                     </button>
