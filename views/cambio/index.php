@@ -7,3 +7,4 @@
 </div>
 
 <script src="<?= asset('./build/js/cambio/index.js') ?>"></script>
+<link rel="stylesheet" href="css/custom-datatable.css">
