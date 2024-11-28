@@ -6,7 +6,7 @@ class Solicitud extends ActiveRecord
 {
     protected static $tabla = 'solicitud_credenciales';
     protected static $idTabla = 'solicitud_id';
-    protected static $columnasDB = ['sol_cred_catalogo', 'sol_cred_correo', 'sol_cred_telefono', 'sol_cred_fecha_solicitud', 'sol_cred_modulo', 'sol_cred_justificacion', 'sol_cred_usuario', 'sol_cred_estado_solicitud', 'password', 'sol_cred_modulos_autorizados', 'sol_cred_justificacion_autorizacion'];
+    protected static $columnasDB = ['sol_cred_catalogo', 'sol_cred_correo', 'sol_cred_telefono', 'sol_cred_fecha_solicitud', 'sol_cred_modulo', 'sol_cred_justificacion', 'sol_cred_usuario', 'sol_cred_estado_solicitud', 'sol_cred_modulos_autorizados', 'sol_cred_justificacion_autorizacion'];
 
     public $solicitud_id;
     public $sol_cred_catalogo;
@@ -17,7 +17,6 @@ class Solicitud extends ActiveRecord
     public $sol_cred_fecha_solicitud;
     public $sol_cred_usuario;
     public $sol_cred_estado_solicitud;
-    public $password;
     public $sol_cred_modulos_autorizados;
     public $sol_cred_justificacion_autorizacion;
 
@@ -33,18 +32,23 @@ class Solicitud extends ActiveRecord
         $this->sol_cred_fecha_solicitud = $args['sol_cred_fecha_solicitud'] ?? '';
         $this->sol_cred_usuario = $args['sol_cred_usuario'] ?? '';
         $this->sol_cred_estado_solicitud = $args['sol_cred_estado_solicitud'] ?? 1;
-        $this->password = $args['password'] ?? '';
         $this->sol_cred_modulos_autorizados = $args['sol_cred_modulos_autorizados'] ?? '';
         $this->sol_cred_justificacion_autorizacion = $args['sol_cred_justificacion_autorizacion'] ?? '';
     }
 
     public function guardars()
     {
-        // Decodificar los arrays JSON de módulos y justificaciones
-        if (isset($this->modulos) && isset($this->justificaciones)) {
-            $this->sol_cred_modulo = json_encode($this->modulos);
-            $this->sol_cred_justificacion = json_encode($this->justificaciones);
-        }
+        // Transformar los arrays de módulos y justificaciones en cadenas separadas por comas
+        $this->sol_cred_modulo = implode(', ', $this->modulos);
+        $this->sol_cred_justificacion = implode(', ', $this->justificaciones);
+
+        // Usar mb_convert_encoding para asegurarnos de que los caracteres se guarden correctamente
+        $this->sol_cred_catalogo = mb_convert_encoding($this->sol_cred_catalogo, 'UTF-8');
+        $this->sol_cred_correo = mb_convert_encoding($this->sol_cred_correo, 'UTF-8');
+        $this->sol_cred_telefono = mb_convert_encoding($this->sol_cred_telefono, 'UTF-8');
+        $this->sol_cred_modulo = mb_convert_encoding($this->sol_cred_modulo, 'UTF-8');
+        $this->sol_cred_justificacion = mb_convert_encoding($this->sol_cred_justificacion, 'UTF-8');
+        $this->sol_cred_usuario = mb_convert_encoding($this->sol_cred_usuario, 'UTF-8');
 
         if (!is_null($this->solicitud_id)) {
             return $this->actualizar();
@@ -53,13 +57,29 @@ class Solicitud extends ActiveRecord
         }
     }
 
-    // Método para obtener los módulos y justificaciones como array
-    public function getModulosJustificaciones()
+    public function actualizar()
     {
-        return [
-            'modulos' => json_decode($this->sol_cred_modulo, true) ?? [],
-            'justificaciones' => json_decode($this->sol_cred_justificacion, true) ?? []
-        ];
+        // Usar mb_convert_encoding para asegurarnos de que los caracteres se actualicen correctamente
+        $this->sol_cred_catalogo = mb_convert_encoding($this->sol_cred_catalogo, 'UTF-8');
+        $this->sol_cred_correo = mb_convert_encoding($this->sol_cred_correo, 'UTF-8');
+        $this->sol_cred_telefono = mb_convert_encoding($this->sol_cred_telefono, 'UTF-8');
+        $this->sol_cred_modulo = mb_convert_encoding($this->sol_cred_modulo, 'UTF-8');
+        $this->sol_cred_justificacion = mb_convert_encoding($this->sol_cred_justificacion, 'UTF-8');
+        $this->sol_cred_usuario = mb_convert_encoding($this->sol_cred_usuario, 'UTF-8');
+
+        return parent::actualizar();
+    }
+
+    public function obtenerModulos()
+    {
+        // Transformar la cadena de módulos en un array
+        return explode(', ', $this->sol_cred_modulo);
+    }
+
+    public function obtenerJustificaciones()
+    {
+        // Transformar la cadena de justificaciones en un array
+        return explode(', ', $this->sol_cred_justificacion);
     }
 
 
