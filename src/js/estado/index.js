@@ -27,10 +27,6 @@ const datatable = new DataTable('#tablaEstado', {
             data: 'sol_cred_catalogo'
         },
         {
-            title: 'Puesto',
-            data: 'puesto_dependencia'
-        },
-        {
             title: 'Modulos Solicitados',
             data: 'sol_cred_modulo',
             render: (data, type, row) => {
