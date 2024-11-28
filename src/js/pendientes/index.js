@@ -1,5 +1,5 @@
 import CryptoJS from 'crypto-js';
-import { PDFDocument, rgb } from 'pdf-lib';
+import { PDFDocument, rgb, degrees } from 'pdf-lib';
 import jQuery from 'jquery';
 import { Dropdown } from "bootstrap";
 import { ocultarLoader, Toast, mostrarLoader } from "../funciones";
@@ -448,36 +448,77 @@ const pdf = async (e) => {
         // Fetch additional details about the solicitud to check credential status
         const solicitudDetalles = await obtenerDetallesSolicitud(solicitudId);
 
+        let pdfUrlModified;
         if (solicitudDetalles.tieneCredenciales === 'NO') {
             // PARA USUARIOS NUEVOS QUE NO TIENEN CREDENCIALES
             const passwordDesencriptada = await generar(solicitudId);
-            const pdfUrlModified = await modificarPdfConContraseña(pdfUrl, passwordDesencriptada);
-            Swal.close();
-
-            const pdfViewer = jQuery('#pdfViewer');
-            pdfViewer.attr('src', pdfUrlModified);
-            pdfViewer.data('solicitudId', solicitudId);
-            showModal();
+            pdfUrlModified = await modificarPdfConContraseña(pdfUrl, passwordDesencriptada);
         } else {
             // PARA USUARIOS NUEVOS QUE SI TIENEN CREDENCIALES Y SOLO TIENEN CAMBIO DE PERMISOS
-            const pdfUrlStandard = await generarPdfEstandar(pdfUrl, solicitudId);
-            Swal.close();
-
-            const pdfViewer = jQuery('#pdfViewer');
-            pdfViewer.attr('src', pdfUrlStandard);
-            pdfViewer.data('solicitudId', solicitudId);
-            showModal();
+            pdfUrlModified = await generarPdfEstandar(pdfUrl, solicitudId);
         }
+
+        // Ahora aplicamos el filtro borroso antes de mostrar el PDF
+        const pdfUrlWithBlur = await aplicarFiltroBorroso(pdfUrlModified);
+
+        Swal.close();
+
+        const pdfViewer = jQuery('#pdfViewer');
+        pdfViewer.attr('src', pdfUrlWithBlur);
+        pdfViewer.data('solicitudId', solicitudId);
+        showModal();
     } catch (error) {
         Swal.fire({
             title: 'Error',
-            text: 'Hubo un problema al generar el PDF',
+            text: 'Hubo un problema al generar o modificar el PDF',
             icon: 'error',
             confirmButtonText: 'Aceptar'
         });
         console.error('Error al generar o modificar el PDF:', error);
     }
 };
+
+
+// Asegúrate de que esta función esté definida antes de ser llamada
+const aplicarFiltroBorroso = async (pdfUrl) => {
+    const pdfBytes = await fetch(pdfUrl).then(res => res.arrayBuffer());
+    const pdfDoc = await PDFDocument.load(pdfBytes);
+
+    const pages = pdfDoc.getPages();
+    const page = pages[0];
+
+    // Dibujar un rectángulo semi-transparente con efecto de desenfoque
+    page.drawRectangle({
+        x: 0,
+        y: 0,
+        width: page.getWidth(),
+        height: page.getHeight(),
+        color: rgb(0.9, 0.9, 0.9),  // Color gris claro
+        opacity: 0.5,  // Semi-transparente
+    });
+
+    // Parámetros para la marca de agua diagonal
+    const padding = 50;  // Espaciado entre la marca de agua y los bordes
+    const xPos = padding;  // Posición X en la esquina inferior izquierda
+    const yPos = padding;  // Posición Y en la esquina inferior izquierda
+
+    // Dibujar una sola marca de agua "CONFIDENCIAL" en la diagonal
+    page.drawText('CONFIDENCIAL', {
+        x: xPos,
+        y: yPos,
+        size: 110,  // Tamaño aleatorio
+        color: rgb(0.0, 0.0, 0.0),
+        opacity: 0.1,
+        rotate: degrees(45)  // Rotación de 45 grados para hacerla diagonal desde abajo a la derecha
+    });
+
+    const pdfBytesModified = await pdfDoc.save();
+    const pdfBlob = new Blob([pdfBytesModified], { type: 'application/pdf' });
+    return URL.createObjectURL(pdfBlob);
+};
+
+
+
 
 // New function to fetch solicitud details
 async function obtenerDetallesSolicitud(solicitudId) {
@@ -506,6 +547,7 @@ async function generarPdfEstandar(pdfUrl, solicitudId) {
     const pdfBlob = new Blob([pdfBytes], { type: 'application/pdf' });
     return URL.createObjectURL(pdfBlob);
 }
+
 
 jQuery(document).ready(function ($) {
     var datatable = $('#tuDataTable').DataTable();
