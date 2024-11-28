@@ -16,12 +16,6 @@
         <tr>
             <td style="padding: 5px; font-size: 18px;">✔ <?php echo $solicitud['sol_cred_modulos_autorizados'] ?? ''; ?></td>
         </tr>
-        <tr>
-            <td style="text-align: center; padding: 5px; font-size: 18px;"><strong>MÓDULOS NO AUTORIZADOS</strong></td>
-        </tr>
-        <tr>
-            <td style="font-size: 18px;"><?php echo $solicitud['sol_cred_justificacion_autorizacion'] ?? ''; ?></td>
-        </tr>
     </table>
 </div>
 
