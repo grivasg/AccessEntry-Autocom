@@ -39,7 +39,7 @@ ocultarLoader();
 // Modificación de la función guardar
 const guardar = async (e) => {
     e.preventDefault();
-
+    
     const result = await Swal.fire({
         title: "Confirmación",
         text: "Revise bien la Información ya que esta acción es Irreversible. ¿Está Seguro que desea continuar?",
@@ -50,11 +50,11 @@ const guardar = async (e) => {
         confirmButtonText: "Sí, Generar Solicitud",
         cancelButtonText: "Cancelar"
     });
-    ocultarLoader();
-
-
+    
+    
     if (!result.isConfirmed) return;
-    ocultarLoader();
+    mostrarLoader();
+    // ocultarLoader();
 
     const camposRequeridos = [
         'sol_cred_catalogo',

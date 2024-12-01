@@ -1,5 +1,5 @@
 import { Dropdown } from "bootstrap";
-import { ocultarLoader, Toast, validarFormulario } from "../funciones";
+import { mostrarLoader, ocultarLoader, Toast, validarFormulario } from "../funciones";
 import Swal from "sweetalert2";
 import DataTable from "datatables.net-bs5";
 import { lenguaje } from "../lenguaje";
@@ -192,6 +192,8 @@ const generarTablaDetalles = (datos) => {
     html += '<thead><tr><th>DETALLES</th><th>INFORMACIÓN</th></tr></thead>';
     html += '<tbody>';
 
+    mostrarLoader();
+
     // Ordenar los campos de manera específica
     const camposOrdenados = [
         'solicitud_id',
@@ -215,21 +217,21 @@ const generarTablaDetalles = (datos) => {
         // Solo mostrar si el valor no es null, undefined o cadena vacía
         if (value !== null && value !== undefined && value !== '') {
             const config = configuracionCampos[key] || {};
-
+            
             const nombreFormateado = config.nombre ||
-                key.replace(/_/g, ' ')
-                    .replace(/\b\w/g, l => l.toUpperCase());
-
+            key.replace(/_/g, ' ')
+            .replace(/\b\w/g, l => l.toUpperCase());
+            
             const valorFormateado = config.transformar
-                ? config.transformar(value)
-                : value;
-
+            ? config.transformar(value)
+            : value;
             html += `
-                <tr>
-                    <td><strong>${nombreFormateado}</strong></td>
-                    <td>${valorFormateado}</td>
-                </tr>
+            <tr>
+            <td><strong>${nombreFormateado}</strong></td>
+            <td>${valorFormateado}</td>
+            </tr>
             `;
+            ocultarLoader();
         }
     });
 
