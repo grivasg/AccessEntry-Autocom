@@ -340,7 +340,7 @@ class Solicitud extends ActiveRecord
 
     public static function catalogoExiste($catalogo)
     {
-        $sql = "SELECT COUNT(*) FROM mper WHERE per_catalogo = ?";
+        $sql = "SELECT COUNT(*) FROM mper WHERE per_catalogo = ? AND per_situacion = 11";
         $stmt = self::prepare($sql);
         $stmt->bindParam(1, $catalogo);
         $stmt->execute();

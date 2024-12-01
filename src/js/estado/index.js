@@ -128,7 +128,8 @@ const ver = async (e) => {
                 imageUrl: "/AccessEntry-Autocom/public/images/caso1.png",
                 imageWidth: 490,
                 imageHeight: 270,
-                imageAlt: "Custom image"
+                imageAlt: "Custom image",
+                width: '700px',
             });
         } else if (estado === 2) {
             Swal.fire({
@@ -137,7 +138,8 @@ const ver = async (e) => {
                 imageUrl: "/AccessEntry-Autocom/public/images/caso2.png",
                 imageWidth: 490,
                 imageHeight: 270,
-                imageAlt: "Custom image"
+                imageAlt: "Custom image",
+                width: '700px'
             });
         } else if (estado === 3) {
             Swal.fire({
@@ -146,7 +148,9 @@ const ver = async (e) => {
                 imageUrl: "/AccessEntry-Autocom/public/images/caso3.png",
                 imageWidth: 490,
                 imageHeight: 270,
-                imageAlt: "Custom image"
+                imageAlt: "Custom image",
+                width: '700px'
+
             });
         } else if (estado === 4) {
             Swal.fire({
@@ -155,7 +159,8 @@ const ver = async (e) => {
                 imageUrl: "/AccessEntry-Autocom/public/images/caso4.png",
                 imageWidth: 490,
                 imageHeight: 270,
-                imageAlt: "Custom image"
+                imageAlt: "Custom image",
+                width: '700px',
             });
         } else if (estado === 5) {
             // Aquí mostramos el modal con la justificación directamente en el mensaje
@@ -167,7 +172,8 @@ const ver = async (e) => {
                 imageUrl: "/AccessEntry-Autocom/public/images/rechazado.png",
                 imageWidth: 200,
                 imageHeight: 200,
-                imageAlt: "Custom image"
+                imageAlt: "Custom image",
+                width: '700px',
             });
 
         } else if (estado === 6) {
@@ -177,7 +183,8 @@ const ver = async (e) => {
                 imageUrl: "/AccessEntry-Autocom/public/images/caso3.png",
                 imageWidth: 490,
                 imageHeight: 270,
-                imageAlt: "Custom image"
+                imageAlt: "Custom image",
+                width: '700px',
             });
         } else if (estado === 7) {
             Swal.fire({
@@ -186,7 +193,8 @@ const ver = async (e) => {
                 imageUrl: "/AccessEntry-Autocom/public/images/caso3.png",
                 imageWidth: 490,
                 imageHeight: 270,
-                imageAlt: "Custom image"
+                imageAlt: "Custom image",
+                width: '700px',
             });
         } else {
             console.log('Estado desconocido');

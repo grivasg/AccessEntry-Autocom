@@ -79,7 +79,7 @@ const ingresar = async (e) => {
 
     const fila = e.target.closest('tr');
     const datos = datatable.row(fila).data();
-    const sol_cred_catalogo = datos.sol_cred_catalogo; // Obtener el valor del campo sol_cred_catalogo de la fila
+    const sol_cred_catalogo = datos.sol_cred_catalogo;
 
     // Parsear los módulos autorizados
     const modulosAutorizados = datos.sol_cred_modulos_autorizados
@@ -121,21 +121,17 @@ const ingresar = async (e) => {
         showCancelButton: true,
         cancelButtonText: 'Cancelar',
         didRender: () => {
-            // Deshabilitamos el botón de confirmación inicialmente
             const confirmButton = Swal.getConfirmButton();
             confirmButton.style.display = 'none';
 
-            // Ajustamos el ancho del modal a 800px
             const modal = Swal.getPopup();
-            modal.style.width = '800px';  // Ajuste del ancho aquí
+            modal.style.width = '800px';
 
-            // Agregamos listener para los checkboxes
             const checkboxes = document.querySelectorAll('.modulo-checkbox');
             checkboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', () => {
                     const checkedBoxes = Array.from(checkboxes).filter(cb => cb.checked);
                     if (checkedBoxes.length === modulosConCreacionCLI.length) {
-                        // Si todos los checkboxes están marcados, mostramos el botón de confirmación
                         const confirmButton = Swal.getConfirmButton();
                         confirmButton.style.display = 'block';
                         confirmButton.textContent = 'Finalizar Tareas';
@@ -196,7 +192,6 @@ const ingresar = async (e) => {
             const token = CryptoJS.lib.WordArray.random(32).toString();
             const encryptedPassword = CryptoJS.AES.encrypt(formData.password, secretKey).toString();
 
-            // Log the data being sent
             console.log('Sending data:', {
                 solicitud_id: datos.solicitud_id,
                 password_encriptada: encryptedPassword,
@@ -221,7 +216,7 @@ const ingresar = async (e) => {
             };
 
             const respuesta = await fetch(url, config);
-            const responseText = await respuesta.text(); // Get raw response text first
+            const responseText = await respuesta.text();
             console.log('Raw response:', responseText);
 
             let data;
@@ -235,21 +230,18 @@ const ingresar = async (e) => {
             console.log('Parsed response:', data);
 
             if (data.codigo === 1) {
-                // No más localStorage aquí, eliminamos esa línea
-                datatable.row(fila).invalidate().draw();
-
-                // Show only the success alert
+                // Mostrar alerta de éxito de usuario creado
                 await Swal.fire({
-                    title: 'Usuario Creado, Permisos Concedidos y Contraseña Registrada',
-                    text: 'Las Credenciales del Usuario han sido Creadas Correctamente.',
+                    title: 'Usuario Creado y Permisos Concedidos.',
+                    text: 'Las Credenciales del Usuario han sido Registradas Correctamente, por lo que esta solicitud será enviada a la Compañia de Atención al Usuario.',
                     icon: 'success',
                     allowOutsideClick: false,
-                    allowEscapeKey: false
+                    allowEscapeKey: false,
+                    width: '700px',
                 });
 
-                // Directly call the enviar function with the current row's data
-                const row = datatable.row(fila);
-                await enviar({ target: { closest: () => row.node() } });
+                // Luego enviamos la solicitud
+                await enviarSolicitud(fila);
             } else {
                 throw new Error(data.mensaje || 'Error desconocido en la respuesta del servidor');
             }
@@ -264,23 +256,11 @@ const ingresar = async (e) => {
     }
 };
 
-// Función para enviar los datos (solo muestra un alert en este caso)
-const enviar = async (e) => {
+// Función separada para enviar la solicitud
+const enviarSolicitud = async (fila) => {
     try {
-        const row = datatable.row(e.target.closest('tr')).data();
+        const row = datatable.row(fila).data();
         const solicitud_id = row.solicitud_id;
-
-        const confirmacion = await Swal.fire({
-            title: '<strong>Notificación.</u></strong>',
-            text: "Esta Solicitud será enviada a la Compañia de Atención al Usuario con los Permisos y contraseñas creadas ",
-            icon: 'info',
-            confirmButtonColor: '#206617',
-            confirmButtonText: 'Aceptar',
-            allowOutsideClick: false,
-            allowEscapeKey: false
-        });
-
-        if (!confirmacion.isConfirmed) return;
 
         const formData = new FormData();
         formData.append('solicitud_id', solicitud_id);
@@ -295,6 +275,7 @@ const enviar = async (e) => {
         const data = await respuesta.json();
 
         if (data.codigo === 1) {
+            // Mostrar toast de éxito y actualizar tabla
             Toast.fire({
                 icon: 'success',
                 title: data.mensaje
@@ -314,7 +295,7 @@ const enviar = async (e) => {
 
 // Delegar eventos para los botones dinámicos
 datatable.on('click', '.ingresar', ingresar);
-datatable.on('click', '.enviar', enviar);
+datatable.on('click', '.enviar', enviarSolicitud);
 
 // Asegurarnos de cargar los datos y mostrar el estado correcto después de recargar la página
 buscar();
