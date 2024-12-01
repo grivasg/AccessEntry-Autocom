@@ -38,17 +38,11 @@ class Solicitud extends ActiveRecord
 
     public function guardars()
     {
-        // Transformar los arrays de módulos y justificaciones en cadenas separadas por comas
-        $this->sol_cred_modulo = implode(', ', $this->modulos);
-        $this->sol_cred_justificacion = implode(', ', $this->justificaciones);
-
-        // Usar mb_convert_encoding para asegurarnos de que los caracteres se guarden correctamente
-        $this->sol_cred_catalogo = mb_convert_encoding($this->sol_cred_catalogo, 'UTF-8');
-        $this->sol_cred_correo = mb_convert_encoding($this->sol_cred_correo, 'UTF-8');
-        $this->sol_cred_telefono = mb_convert_encoding($this->sol_cred_telefono, 'UTF-8');
-        $this->sol_cred_modulo = mb_convert_encoding($this->sol_cred_modulo, 'UTF-8');
-        $this->sol_cred_justificacion = mb_convert_encoding($this->sol_cred_justificacion, 'UTF-8');
-        $this->sol_cred_usuario = mb_convert_encoding($this->sol_cred_usuario, 'UTF-8');
+        // Decodificar los arrays JSON de módulos y justificaciones
+        if (isset($this->modulos) && isset($this->justificaciones)) {
+            $this->sol_cred_modulo = json_encode($this->modulos);
+            $this->sol_cred_justificacion = json_encode($this->justificaciones);
+        }
 
         if (!is_null($this->solicitud_id)) {
             return $this->actualizar();
@@ -57,31 +51,14 @@ class Solicitud extends ActiveRecord
         }
     }
 
-    public function actualizar()
+    // Método para obtener los módulos y justificaciones como array
+    public function getModulosJustificaciones()
     {
-        // Usar mb_convert_encoding para asegurarnos de que los caracteres se actualicen correctamente
-        $this->sol_cred_catalogo = mb_convert_encoding($this->sol_cred_catalogo, 'UTF-8');
-        $this->sol_cred_correo = mb_convert_encoding($this->sol_cred_correo, 'UTF-8');
-        $this->sol_cred_telefono = mb_convert_encoding($this->sol_cred_telefono, 'UTF-8');
-        $this->sol_cred_modulo = mb_convert_encoding($this->sol_cred_modulo, 'UTF-8');
-        $this->sol_cred_justificacion = mb_convert_encoding($this->sol_cred_justificacion, 'UTF-8');
-        $this->sol_cred_usuario = mb_convert_encoding($this->sol_cred_usuario, 'UTF-8');
-
-        return parent::actualizar();
+        return [
+            'modulos' => json_decode($this->sol_cred_modulo, true) ?? [],
+            'justificaciones' => json_decode($this->sol_cred_justificacion, true) ?? []
+        ];
     }
-
-    public function obtenerModulos()
-    {
-        // Transformar la cadena de módulos en un array
-        return explode(', ', $this->sol_cred_modulo);
-    }
-
-    public function obtenerJustificaciones()
-    {
-        // Transformar la cadena de justificaciones en un array
-        return explode(', ', $this->sol_cred_justificacion);
-    }
-
 
 
 
