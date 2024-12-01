@@ -38,11 +38,15 @@ class Solicitud extends ActiveRecord
 
     public function guardars()
     {
-        // Decodificar los arrays JSON de módulos y justificaciones
-        if (isset($this->modulos) && isset($this->justificaciones)) {
-            $this->sol_cred_modulo = json_encode($this->modulos);
-            $this->sol_cred_justificacion = json_encode($this->justificaciones);
+        // Validar que los datos no estén vacíos
+        if (empty($this->modulos) || empty($this->justificaciones)) {
+            error_log("Módulos o justificaciones vacíos");
+            return false;
         }
+
+        // Si modulos y justificaciones ya son strings separados por coma, úsalos directamente
+        $this->sol_cred_modulo = $this->modulos;
+        $this->sol_cred_justificacion = $this->justificaciones;
 
         if (!is_null($this->solicitud_id)) {
             return $this->actualizar();
@@ -418,13 +422,16 @@ WHERE m.per_catalogo = ?
 
     public static function justificarModulos($solicitud_id, $modulosSeleccionados, $justificacion)
     {
-        // Convertir módulos a JSON
-        $modulosAutorizados = json_encode($modulosSeleccionados);
+        // Usar json_encode con opciones para manejar caracteres especiales
+        $modulosAutorizados = json_encode($modulosSeleccionados, JSON_UNESCAPED_UNICODE);
+
+        // Asegúrate de que la justificación se maneje correctamente
+        $justificacion = trim($justificacion);
 
         $sql = "UPDATE solicitud_credenciales 
-            SET sol_cred_modulos_autorizados = :modulos,
-                sol_cred_justificacion_autorizacion = :justificacion
-            WHERE solicitud_id = :solicitud_id";
+        SET sol_cred_modulos_autorizados = :modulos,
+            sol_cred_justificacion_autorizacion = :justificacion
+        WHERE solicitud_id = :solicitud_id";
 
         $stmt = self::prepare($sql);
         $stmt->bindParam(':modulos', $modulosAutorizados);

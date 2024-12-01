@@ -47,9 +47,9 @@ class SolicitudController
             // Sanitizar entrada básica
             $_POST['sol_cred_catalogo'] = htmlspecialchars($_POST['sol_cred_catalogo']);
 
-            // Decodificar los arrays JSON recibidos
-            $modulos = json_decode($_POST['modulos'], true);
-            $justificaciones = json_decode($_POST['justificaciones'], true);
+            // Decodificar los arrays JSON y aplicar utf8_decode
+            $modulos = array_map('utf8_decode', json_decode($_POST['modulos'], true));
+            $justificaciones = array_map('utf8_decode', json_decode($_POST['justificaciones'], true));
 
             // Validar que haya al menos un módulo y justificación
             if (empty($modulos) || empty($justificaciones)) {
@@ -61,7 +61,7 @@ class SolicitudController
                 throw new Exception("La cantidad de módulos y justificaciones debe coincidir");
             }
 
-            // Convertir los arrays a cadenas separadas por coma
+            // Convertir los arrays a cadenas separadas por coma, aplicando utf8_decode
             $modulosString = implode(', ', $modulos);
             $justificacionesString = implode(', ', $justificaciones);
 
