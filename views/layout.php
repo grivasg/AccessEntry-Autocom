@@ -25,7 +25,7 @@
             </button>
             <a class="navbar-brand" href="/AccessEntry-Autocom/">
                 <img src="<?= asset('./images/cit.png') ?>" width="35px'" alt="cit">
-                Access Entry
+                Entry
             </a>
             <div class="collapse navbar-collapse" id="navbarToggler">
 
@@ -85,6 +85,17 @@
                             <!-- <h6 class="dropdown-header">Información</h6> -->
                             <li>
                                 <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/historial"><i class="bi bi-hourglass-split"></i> Historial de Envios</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="nav-item dropdown ">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                            <i class="bi bi-question-circle-fill"></i> Ayuda
+                        </a>
+                        <ul class="dropdown-menu  dropdown-menu-dark " id="dropwdownRevision" style="margin: 0;">
+                            <!-- <h6 class="dropdown-header">Información</h6> -->
+                            <li>
+                                <a class="dropdown-item nav-link text-white " href="/AccessEntry-Autocom/historial"><i class="bi bi-journal-bookmark-fill"></i> Manual de Usuario</a>
                             </li>
                         </ul>
                     </div>
