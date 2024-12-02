@@ -15,6 +15,7 @@ module.exports = {
     'js/cambio/index' : './src/js/cambio/index.js',
     'js/ftp/index' : './src/js/ftp/index.js',
     'js/historial/index' : './src/js/historial/index.js',
+    'js/manual/index' : './src/js/manual/index.js',
 
   },
   output: {

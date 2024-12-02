@@ -8,6 +8,7 @@ use Controllers\EstadoController;
 use Controllers\FinalizadasController;
 use Controllers\FTPController;
 use Controllers\HistorialController;
+use Controllers\ManualController;
 use Controllers\NuevasController;
 use Controllers\PasswordsController;
 use Controllers\PendientesController;
@@ -91,6 +92,9 @@ $router->get('/API/passwords/obtenerPassword', [PasswordsController::class, 'obt
 $router->get('/reporte/generarCredenciales', [ReporteController::class, 'credencialesPDF']);
 $router->get('/reporte/generarCredencialesEstandar', [ReporteController::class, 'permisosPDF']);
 $router->get('/API/reporte/obtenernombre', [ReporteController::class, 'obtenernombreAPI']);
+
+//MANUAL
+$router->get('/manual', [ManualController::class, 'index']);
 
 
 
