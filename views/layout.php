@@ -25,7 +25,6 @@
             </button>
             <a class="navbar-brand" href="/AccessEntry-Autocom/">
                 <img src="<?= asset('./images/cit.png') ?>" width="35px'" alt="cit">
-                Entry
             </a>
             <div class="collapse navbar-collapse" id="navbarToggler">
 
