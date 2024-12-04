@@ -36,10 +36,23 @@ if (backStepBtn) {
 ocultarLoader();
 
 
+
+// Funciones de validación
+function emailIsValid(email) {
+    const emailRegExp = /^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|hotmail\.com|outlook\.com|live\.com|ejemplo\.com)$/;
+    return emailRegExp.test(email);
+}
+
+function telefonoIsValid(telefono) {
+    const telefonoRegExp = /^\d{8}$/;
+    return telefonoRegExp.test(telefono);
+}
+
+
 // Modificación de la función guardar
 const guardar = async (e) => {
     e.preventDefault();
-    
+
     const result = await Swal.fire({
         title: "Confirmación",
         text: "Revise bien la Información ya que esta acción es Irreversible. ¿Está Seguro que desea continuar?",
@@ -50,11 +63,65 @@ const guardar = async (e) => {
         confirmButtonText: "Sí, Generar Solicitud",
         cancelButtonText: "Cancelar"
     });
-    
-    
+
     if (!result.isConfirmed) return;
     mostrarLoader();
-    // ocultarLoader();
+
+    // Obtener referencias a los campos de correo y teléfono
+    const correoInput = document.getElementById('sol_cred_correo');
+    const telefonoInput = document.getElementById('sol_cred_telefono');
+
+    // Validar correo electrónico
+    const correo = correoInput.value.trim();
+    if (!correo) {
+        ocultarLoader();
+        Swal.fire({
+            title: "Correo vacío",
+            text: "El correo electrónico es obligatorio.",
+            icon: "info"
+        });
+        correoInput.classList.add('is-invalid');
+        return;
+    }
+
+    if (!emailIsValid(correo)) {
+        ocultarLoader();
+        Swal.fire({
+            title: "Correo inválido",
+            text: "El correo electrónico no es válido. Use solo dominios permitidos.",
+            icon: "error"
+        });
+        correoInput.classList.add('is-invalid');
+        return;
+    } else {
+        correoInput.classList.remove('is-invalid');
+    }
+
+    // Validar teléfono
+    const telefono = telefonoInput.value.trim();
+    if (!telefono) {
+        ocultarLoader();
+        Swal.fire({
+            title: "Teléfono vacío",
+            text: "El número de teléfono es obligatorio.",
+            icon: "info"
+        });
+        telefonoInput.classList.add('is-invalid');
+        return;
+    }
+
+    if (!telefonoIsValid(telefono)) {
+        ocultarLoader();
+        Swal.fire({
+            title: "Teléfono inválido",
+            text: "El número de teléfono debe tener exactamente 8 dígitos.",
+            icon: "error"
+        });
+        telefonoInput.classList.add('is-invalid');
+        return;
+    } else {
+        telefonoInput.classList.remove('is-invalid');
+    }
 
     const camposRequeridos = [
         'sol_cred_catalogo',
