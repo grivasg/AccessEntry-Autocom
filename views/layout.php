@@ -11,11 +11,11 @@
 </head>
 
 <body>
-    <div id="loader" style="width: 100vw; height:100vh; z-index:5000; position:fixed; margin-top:0" class="d-flex flex-column bg-light opacity-75 justify-content-center align-items-center">
+    <!-- <div id="loader" style="width: 100vw; height:100vh; z-index:5000; position:fixed; margin-top:0" class="d-flex flex-column bg-light opacity-75 justify-content-center align-items-center">
         <div class="spinner-grow text-warning" role="status">
         </div>
         <p id="loaderText" class="text-dark h5 fw-bold">CARGANDO</p>
-    </div>
+    </div> -->
     <nav class="navbar navbar-expand-lg navbar-dark  bg-dark">
 
         <div class="container-fluid">
